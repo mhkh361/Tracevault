@@ -50,24 +50,32 @@
 
 ```mermaid
 flowchart LR
-  subgraph Client ["Client Browser Runtime (GitHub Pages Ready)"]
+  subgraph Client ["Client Browser Runtime (GitHub Pages)"]
     UI["✨ Frosted Glass SPA<br/>(Reactive UI & Real-Time KPIs)"]
     MEM["⚡ SHA-256 Memory Vault<br/>(Sub-Millisecond Deduplication)"]
     KEY["🔑 Universal AI Auto-Router<br/>(Client-Side Key Management)"]
   end
 
-  subgraph Backend ["Backend & Database (Full-Stack Mode)"]
-    SRV["🌐 Node.js REST API<br/>(Express Port 3000)"]
-    DB[("💾 3NF Relational Vault<br/>domains & error_logs")]
+  subgraph Diagnostics ["Diagnostic & Intelligence Layer"]
+    ENGINE["🧠 Rule Diagnostic Engine<br/>(Deterministic Fallback)"]
+    AI["🤖 Direct AI Provider<br/>(Gemini / Groq / OpenRouter / OpenAI)"]
+  end
+
+  subgraph Storage ["Normalized Storage Model (3NF)"]
+    DOM["📁 domains<br/>(Classification Entities)"]
+    LOGS["📋 error_logs<br/>(Fingerprints & Verified Fixes)"]
     VIEW["📊 Analytics View<br/>(v_domain_summary)"]
   end
 
   UI --> MEM
   MEM -- "Cache Miss" --> KEY
-  KEY --> UI
-  UI -. "Sync (When Active)" .-> SRV
-  SRV --> DB
-  DB --> VIEW
+  KEY --> AI
+  KEY -. "Offline Fallback" .-> ENGINE
+  AI --> UI
+  ENGINE --> UI
+  UI --> DOM
+  DOM --> LOGS
+  LOGS --> VIEW
   VIEW -.-> UI
   MEM -- "Cache Hit (<1ms)" --> UI
 
@@ -77,9 +85,8 @@ flowchart LR
   classDef amber fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fde68a;
 
   class UI,MEM cyan;
-  class KEY violet;
-  class SRV emerald;
-  class DB,VIEW amber;
+  class KEY,AI,ENGINE violet;
+  class DOM,LOGS,VIEW amber;
 ```
 
 ---
@@ -101,25 +108,32 @@ TraceVault replaces traditional multi-step model configuration menus with a fric
 
 ## 💾 Relational Data Architecture (3NF)
 
-When running in full-stack mode, the TraceVault storage schema strictly adheres to **Third Normal Form (3NF)** to ensure transactional integrity, eliminate data redundancy, and provide instant analytical views:
+The TraceVault storage schema adheres strictly to **Third Normal Form (3NF)** to ensure transactional integrity, eliminate data redundancy, and provide instant analytical views:
 
-```
-┌─────────────────────────┐          1:N          ┌────────────────────────────────────────┐
-│         domains         │ ───────────────────── │               error_logs               │
-├─────────────────────────┤                       ├────────────────────────────────────────┤
-│ PK  domain_id   (INT)   │                       │ PK  error_id         (INT)             │
-│     domain_name (VARCHAR│                       │ FK  domain_id        (INT)             │
-└─────────────────────────┘                       │     tech_stack       (VARCHAR)         │
-                                                  │     error_signature  (VARCHAR)         │
-                                                  │     signature_hash   (CHAR 64, UNIQUE) │
-                                                  │     root_cause       (TEXT)            │
-                                                  │     fix_requirements (TEXT)            │
-                                                  │     times_hit        (INT)             │
-                                                  │     is_verified      (TINYINT)         │
-                                                  │     created_at       (TIMESTAMP)       │
-                                                  │     updated_at       (TIMESTAMP)       │
-                                                  └────────────────────────────────────────┘
-```
+### Normalized Entities
+
+#### 1. `domains` (Parent Classification Table)
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `domain_id` | `INT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Unique identifier for the technical domain |
+| `domain_name` | `VARCHAR(64)` | `NOT NULL`, `UNIQUE` | Distinct classification label (e.g., `Database`, `Auth`, `Network`) |
+
+#### 2. `error_logs` (Child Incident & Resolution Table)
+
+| Column | Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `error_id` | `INT` | `PRIMARY KEY`, `AUTO_INCREMENT` | Unique incident identifier |
+| `domain_id` | `INT` | `FOREIGN KEY` &rarr; `domains(domain_id)` | Normalized reference to parent domain |
+| `tech_stack` | `VARCHAR(64)` | `NOT NULL` | Technology ecosystem (e.g., `Node.js / Express`, `MySQL`) |
+| `error_signature` | `VARCHAR(255)` | `NOT NULL` | Canonical error message or exception header |
+| `signature_hash` | `CHAR(64)` | `NOT NULL`, `UNIQUE` | SHA-256 fingerprint for sub-millisecond deduplication |
+| `root_cause` | `TEXT` | `NOT NULL` | Structured technical breakdown of failure mechanism |
+| `fix_requirements` | `TEXT` | `NOT NULL` | Verified remediation steps and code fix instructions |
+| `times_hit` | `INT` | `DEFAULT 1` | Cumulative occurrence frequency counter |
+| `is_verified` | `TINYINT(1)` | `DEFAULT 1` | Verification flag for tested solutions |
+| `created_at` | `TIMESTAMP` | `DEFAULT CURRENT_TIMESTAMP` | Initial incident registration timestamp |
+| `updated_at` | `TIMESTAMP` | `DEFAULT CURRENT_TIMESTAMP ON UPDATE` | Last occurrence or modification timestamp |
 
 ### Key Relational Constructs
 
@@ -132,35 +146,13 @@ When running in full-stack mode, the TraceVault storage schema strictly adheres 
 
 ---
 
-## 🌐 Live Web App & Deployment
+## 🌐 Live Web App (GitHub Pages)
 
-### 1. One-Click Live App (GitHub Pages)
+TraceVault is deployed as a zero-dependency standalone application on GitHub Pages:
 
-TraceVault is deployed as a zero-dependency static application on GitHub Pages:
-
-- **Live URL:** [https://mhkh361.github.io/Tracevault/](https://mhkh361.github.io/Tracevault/)
-- **Zero-Server Standalone:** Detects static hosting environments and transparently utilizes high-performance browser `localStorage` and memory caching.
-- **Automated CI/CD:** GitHub Actions automatically deploys updates on push to `main`.
-
-### 2. Local Full-Stack Setup (Node.js + MySQL 3306)
-
-For local development with the complete MySQL relational engine:
-
-```bash
-# Clone the repository
-git clone https://github.com/mhkh361/Tracevault.git
-cd Tracevault
-
-# Install dependencies
-npm install
-
-# Initialize MySQL Schema, View, Stored Procedure & Trigger
-node setup-mysql.js
-
-# Start local server
-npm start
-# Active at http://localhost:3000
-```
+- **Official Live Application:** [https://mhkh361.github.io/Tracevault/](https://mhkh361.github.io/Tracevault/)
+- **Zero-Server Standalone Execution:** Instant sub-millisecond deduplication, client-side SHA-256 fingerprinting, and browser memory/`localStorage` persistence without requiring backend servers.
+- **Client Privacy Guarantee:** API credentials and diagnostic traces remain exclusively inside your browser session and communicate over direct TLS.
 
 ---
 
