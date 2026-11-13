@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TraceVault | Production Developer Vault &amp; DBMS Lab Knowledge Base</title>
-  <meta name="description" content="Production-grade, single-page developer error knowledge base and self-learning debugging bot for DBMS lab.">
+  <title>TraceVault | Self-Learning AI Debug Bot &amp; Error Knowledge Base</title>
+  <meta name="description" content="Production-grade, single-page developer error knowledge base and self-learning debugging bot.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=obsidian_v4">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=cube_v6">
+  <link rel="stylesheet" href="style.css?v=cube_v6">
 </head>
 <body>
+
+  <!-- Vibrant Ambient Mesh Spheres for Glass Refraction -->
+  <div class="ambient-glow glow-1" aria-hidden="true"></div>
+  <div class="ambient-glow glow-2" aria-hidden="true"></div>
+  <div class="ambient-glow glow-3" aria-hidden="true"></div>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -22,18 +28,49 @@
     <header class="app-header">
       <div class="header-left">
         <div class="brand-logo">
-          <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="#10b981" fill-opacity="0.15"/>
-            <path d="M7 11L16 6L25 11L16 16L7 11Z" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 16L16 21L25 16" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 21L16 26L25 21" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg class="brand-icon" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="navCoreGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="16" result="blur1" />
+                <feMerge><feMergeNode in="blur1" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+              <linearGradient id="navGlassTop" x1="100" y1="76" x2="412" y2="256" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4" />
+                <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0.15" />
+              </linearGradient>
+              <linearGradient id="navGlassLeft" x1="100" y1="166" x2="256" y2="436" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.3" />
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0.15" />
+              </linearGradient>
+              <linearGradient id="navGlassRight" x1="412" y1="166" x2="256" y2="436" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.3" />
+                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.15" />
+              </linearGradient>
+            </defs>
+            <path d="M256 76 L100 166 L100 346 L256 256 Z" fill="rgba(6, 182, 212, 0.08)" stroke="rgba(6, 182, 212, 0.35)" stroke-width="2" stroke-dasharray="5 5" />
+            <path d="M256 76 L412 166 L412 346 L256 256 Z" fill="rgba(16, 185, 129, 0.08)" stroke="rgba(16, 185, 129, 0.35)" stroke-width="2" stroke-dasharray="5 5" />
+            <path d="M256 256 L100 346 L256 436 L412 346 Z" fill="rgba(255, 255, 255, 0.05)" stroke="rgba(255, 255, 255, 0.2)" stroke-width="2" stroke-dasharray="5 5" />
+            <g filter="url(#navCoreGlow)">
+              <path d="M256 184 L318 220 L256 256 L194 220 Z" fill="#38bdf8" stroke="rgba(255,255,255,0.9)" stroke-width="2" />
+              <path d="M194 220 L256 256 L256 328 L194 292 Z" fill="#06b6d4" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
+              <path d="M256 256 L318 220 L318 292 L256 328 Z" fill="#10b981" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
+            </g>
+            <path d="M100 166 L256 256 L256 436 L100 346 Z" fill="url(#navGlassLeft)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2" />
+            <path d="M256 256 L412 166 L412 346 L256 436 Z" fill="url(#navGlassRight)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2" />
+            <path d="M256 76 L412 166 L256 256 L100 166 Z" fill="url(#navGlassTop)" stroke="rgba(255, 255, 255, 0.5)" stroke-width="2.5" />
+            <path d="M256 76 L100 166 L256 256" stroke="rgba(255, 255, 255, 0.95)" stroke-width="3" stroke-linecap="round" />
+            <path d="M256 76 L412 166" stroke="rgba(255, 255, 255, 0.8)" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M256 256 L256 436" stroke="rgba(255, 255, 255, 0.75)" stroke-width="2.5" stroke-linecap="round" />
+            <circle cx="256" cy="76" r="5" fill="#ffffff" />
+            <circle cx="256" cy="256" r="5" fill="#ffffff" />
           </svg>
           <div class="brand-titles">
             <div class="brand-main">
               <span class="brand-title">TraceVault</span>
               <span class="badge badge-primary">Production Vault</span>
             </div>
-            <p class="brand-subtitle">Pure Obsidian Glass &bull; Self-Learning AI Debug Bot</p>
+            <p class="brand-subtitle">Self-Learning AI Debug Bot &amp; Error Knowledge Base</p>
           </div>
         </div>
       </div>
@@ -72,7 +109,7 @@
         <!-- BYOK Config Button -->
         <button class="btn btn-secondary" id="open-byok-modal-btn">
           <span class="key-icon">🔑</span>
-          <span class="btn-label">AI Key</span>
+          <span class="btn-label" id="byok-btn-label">AI Key</span>
           <span class="byok-indicator" id="byok-status-pill">Offline</span>
         </button>
 
@@ -380,7 +417,9 @@
           <!-- Chat Messages Area -->
           <div class="chat-messages-container" id="chat-messages">
             <div class="chat-message bot-message">
-              <div class="message-avatar">🤖</div>
+              <div class="message-avatar">
+                <img src="app-icon.svg?v=cube_v6" class="bot-avatar-img" alt="TraceVault AI" style="width: 22px; height: 22px; display: block;" />
+              </div>
               <div class="message-content">
                 <p>Hello! I am your <strong>TraceVault Debug Assistant</strong>.</p>
                 <p>Scan an error in <strong>Panel A</strong> or click <strong>💬 Chat</strong> on any table record below to bind context. I will diagnose the issue and generate targeted code fixes without hallucinating.</p>
@@ -506,9 +545,9 @@
         <span>Dual-Storage Engine: Local Disk Vault + Live MySQL 8+ Bridge</span>
       </div>
       <div class="footer-right">
-        <!-- Subtle University Lab Demo Sandbox Trigger -->
-        <button class="footer-lab-trigger" id="open-lab-modal-btn" title="Open DBMS Lab Evaluation Sandbox (Alt+L)">
-          <span>🎓</span> Lab Sandbox (Alt+L)
+        <!-- Interactive Live Demo Trigger -->
+        <button class="footer-lab-trigger" id="open-lab-modal-btn" title="Open Interactive Live Demo (Alt+L)">
+          <span>✨</span> Live Demo (Alt+L)
         </button>
       </div>
     </footer>
@@ -519,18 +558,19 @@
   <!-- MODALS -->
   <!-- ===================================================================== -->
 
-  <!-- 1. FULLSCREEN DBMS LAB EVALUATION SANDBOX MODAL (Alt + L) -->
+  <!-- 1. FULLSCREEN INTERACTIVE LIVE DEMO WORKSPACE MODAL (Alt + L) -->
   <div class="modal-overlay hidden" id="modal-lab-sandbox">
     <div class="modal-dialog modal-dialog-lab">
       
       <div class="modal-header">
         <div class="brand-main">
-          <span class="modal-title">🎓 DBMS Laboratory Evaluation Sandbox</span>
-          <span class="badge badge-accent">Isolated Mode: is_demo = 1</span>
+          <img src="app-icon.svg?v=cube_v6" class="modal-brand-icon" alt="TraceVault Cube" style="width: 26px; height: 26px; vertical-align: middle; margin-right: 6px;" />
+          <span class="modal-title">Live Demo Workspace</span>
+          <span class="badge badge-accent">INTERACTIVE DEMO</span>
         </div>
         <div class="modal-header-actions">
-          <button class="btn btn-sm btn-outline" id="btn-lab-reset" title="Reset the 12 evaluation records to default">
-            ↺ Reset 12 Lab Records
+          <button class="btn btn-sm btn-outline" id="btn-lab-reset" title="Reset demo records to default">
+            ↻ Reset Demo Data
           </button>
           <button class="btn-close-modal" id="btn-close-lab-modal">✕</button>
         </div>
@@ -538,13 +578,10 @@
 
       <div class="modal-body">
         
-        <!-- Lab SQL Banner -->
+        <!-- Live Demo Banner -->
         <div class="lab-banner-info">
           <div class="lab-banner-text">
-            <strong>DBMS Lab Evaluator View:</strong> This sandbox tests relational 3NF queries, triggers, stored procedures, and views across the 12 pre-seeded lab records without polluting your real workspace.
-          </div>
-          <div class="lab-sql-hint">
-            Query: SELECT * FROM error_logs WHERE is_demo = 1 INNER JOIN domains;
+            Interactive Live Demo: Explore pre-loaded sample error logs, test real-time search and filtering, and try full CRUD operations without affecting your personal workspace.
           </div>
         </div>
 
@@ -585,7 +622,7 @@
         <!-- Lab Quick Add Form -->
         <div class="lab-quick-add-drawer">
           <div class="drawer-title">
-            <span>➕ Test SQL INSERT into Demo Sandbox</span>
+            <span>➕ Add Sample Record</span>
           </div>
           <form id="lab-quick-add-form" class="form-grid-2">
             <div class="form-group" style="margin-bottom: 0;">
@@ -610,7 +647,7 @@
             </div>
             <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
               <button type="submit" class="btn btn-sm btn-primary">
-                Execute INSERT Query
+                Add Demo Record
               </button>
             </div>
           </form>
@@ -619,7 +656,7 @@
         <!-- Lab Filter Bar -->
         <div class="filter-toolbar" style="margin-bottom: 12px;">
           <div class="filter-control search-filter-box">
-            <input type="text" id="lab-filter-search" class="form-control form-control-sm" placeholder="Search lab records...">
+            <input type="text" id="lab-filter-search" class="form-control form-control-sm" placeholder="Search demo records...">
           </div>
           <div class="filter-control">
             <select id="lab-filter-domain" class="form-control form-control-sm">
@@ -668,9 +705,9 @@
 
       <div class="modal-footer">
         <span style="font-size: 0.725rem; color: var(--text-dim); margin-right: auto;">
-          Press <kbd class="shortcut-pill">Esc</kbd> or <kbd class="shortcut-pill">Alt+L</kbd> to exit lab sandbox.
+          Press <kbd class="shortcut-pill">Esc</kbd> or <kbd class="shortcut-pill">Alt+L</kbd> to exit live demo.
         </span>
-        <button type="button" class="btn btn-secondary" id="btn-close-lab-footer">Close Sandbox</button>
+        <button type="button" class="btn btn-secondary" id="btn-close-lab-footer">Close Demo</button>
       </div>
 
     </div>
@@ -757,11 +794,11 @@
     </div>
   </div>
 
-  <!-- 4. BYOK AI CONFIGURATION MODAL -->
+  <!-- 4. UNIVERSAL AI KEY CONFIGURATION MODAL -->
   <div class="modal-overlay hidden" id="modal-byok-config">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-sm">
       <div class="modal-header">
-        <h3 class="modal-title">🔑 BYOK AI Provider Settings</h3>
+        <h3 class="modal-title">🔑 Connect AI Key</h3>
         <button class="btn-close-modal" id="btn-close-byok-modal">✕</button>
       </div>
       <div class="modal-body">
@@ -770,55 +807,14 @@
         </div>
 
         <div class="form-group">
-          <label for="byok-key-input">API Key</label>
+          <label for="byok-key-input">Universal API Key</label>
           <div class="password-input-wrapper">
-            <input type="password" id="byok-key-input" class="form-control code-font" placeholder="Paste your API key (e.g. AIza..., gsk_..., sk-or-..., sk-...)">
+            <input type="password" id="byok-key-input" class="form-control code-font" placeholder="Paste any valid API key here...">
             <button type="button" class="btn-toggle-eye" id="btn-toggle-key-visibility" title="Show/Hide Key">👁️</button>
           </div>
           <div id="byok-detected-badge" class="detected-badge hidden"></div>
-          <small class="form-hint">Pasting your key auto-detects the provider and assigns a verified free model. Free offline heuristic fallback runs when no key is entered.</small>
+          <small class="form-hint">Supports Google Gemini, Groq, OpenRouter, OpenAI, DeepSeek, and Anthropic keys. Intelligently routes and validates in the background.</small>
         </div>
-
-        <details class="model-override-details" id="model-override-accordion">
-          <summary class="model-override-summary">⚙️ Change Model (Optional - 16 Free &amp; Paid Models)</summary>
-          <div style="margin-top: 12px;">
-            <div class="form-group" style="margin-bottom: 8px;">
-              <label for="byok-provider-select">Provider Override</label>
-              <select id="byok-provider-select" class="form-control">
-                <option value="gemini">Google Gemini (Recommended Free)</option>
-                <option value="groq">Groq (Ultra-Fast Free)</option>
-                <option value="openrouter">OpenRouter (Multi-Model Gateway)</option>
-                <option value="openai">OpenAI</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label for="byok-model-select">Model Override</label>
-              <select id="byok-model-select" class="form-control code-font">
-                <optgroup label="🟢 FREE MODELS (10 Models)">
-                  <option value="gemini-2.5-flash">Google: gemini-2.5-flash (Default Free)</option>
-                  <option value="gemini-2.0-flash">Google: gemini-2.0-flash (Free)</option>
-                  <option value="gemini-1.5-flash">Google: gemini-1.5-flash (Free)</option>
-                  <option value="llama-3.3-70b-versatile">Groq: llama-3.3-70b-versatile (Free)</option>
-                  <option value="llama-3.1-8b-instant">Groq: llama-3.1-8b-instant (Free)</option>
-                  <option value="qwen-2.5-coder-32b">Groq: qwen-2.5-coder-32b (Free)</option>
-                  <option value="deepseek/deepseek-r1:free">OpenRouter: deepseek/deepseek-r1:free (Free)</option>
-                  <option value="deepseek/deepseek-chat:free">OpenRouter: deepseek/deepseek-chat:free (Free)</option>
-                  <option value="qwen/qwen-2.5-coder-32b-instruct:free">OpenRouter: qwen-2.5-coder-32b-instruct:free (Free)</option>
-                  <option value="meta-llama/llama-3.3-70b-instruct:free">OpenRouter: llama-3.3-70b-instruct:free (Free)</option>
-                </optgroup>
-                <optgroup label="⚡ PRO / PAID MODELS (6 Models)">
-                  <option value="gpt-4o-mini">OpenAI: gpt-4o-mini</option>
-                  <option value="gpt-4o">OpenAI: gpt-4o</option>
-                  <option value="gemini-1.5-pro">Google: gemini-1.5-pro</option>
-                  <option value="claude-3-5-haiku">OpenRouter: anthropic/claude-3-5-haiku</option>
-                  <option value="claude-3-5-sonnet">OpenRouter: anthropic/claude-3-5-sonnet</option>
-                  <option value="deepseek/deepseek-r1">OpenRouter: deepseek/deepseek-r1 (Paid tier)</option>
-                </optgroup>
-              </select>
-              <input type="text" id="byok-model-input" class="form-control code-font hidden" style="margin-top: 6px;" placeholder="Custom model name">
-            </div>
-          </div>
-        </details>
 
         <div class="test-connection-box">
           <button type="button" class="btn btn-sm btn-secondary" id="btn-test-ai-key">
@@ -828,51 +824,113 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-clear-byok">Clear Key</button>
-        <button type="button" class="btn btn-primary" id="btn-save-byok">Save Settings</button>
+        <button type="button" class="btn btn-secondary" id="btn-clear-byok">Disconnect</button>
+        <button type="button" class="btn btn-primary" id="btn-save-byok">Connect Key</button>
       </div>
     </div>
   </div>
 
-  <!-- 5. MYSQL TWO-STEP SYNC INFO MODAL -->
+  <!-- 5. MYSQL 3306 LIVE CONNECTION INSPECTOR MODAL -->
   <div class="modal-overlay hidden" id="modal-mysql-sync">
-    <div class="modal-dialog modal-dialog-sm">
+    <div class="modal-dialog" style="max-width: 640px;">
       <div class="modal-header">
-        <h3 class="modal-title">⚡ MySQL Port 3306 Live Sync</h3>
-        <button class="btn-close-modal" id="btn-close-mysql-modal">✕</button>
+        <div class="brand-main">
+          <span class="mysql-dot" style="width: 10px; height: 10px; background-color: var(--accent-emerald); box-shadow: 0 0 10px #10b981;"></span>
+          <h3 class="modal-title" style="margin-left: 6px;">MySQL 3306 Live Connection Inspector</h3>
+        </div>
+        <div class="modal-header-actions">
+          <span class="badge badge-primary" id="modal-db-status-badge">● MySQL 3306 Live</span>
+          <button class="btn-close-modal" id="btn-close-mysql-modal">✕</button>
+        </div>
       </div>
       <div class="modal-body">
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-          TraceVault operates with high-performance local disk storage and automatically connects to MySQL 8+ on port 3306 with zero-click schema initialization and two-way live data mirroring.
-        </p>
-
-        <div class="mysql-sync-step">
-          <div class="step-num">1</div>
-          <div class="step-content">
-            <strong>Start MySQL on Localhost (Port 3306)</strong>
-            <p>Start XAMPP, MySQL Server 8.0, or Docker MySQL container. TraceVault's background poller will automatically detect it.</p>
+        <!-- Live Connection Spec Grid -->
+        <div class="db-inspector-grid">
+          <div class="db-inspector-card">
+            <div class="db-inspector-label">Active Host &amp; Port</div>
+            <div class="db-inspector-value" id="inspect-host">127.0.0.1:3306</div>
+          </div>
+          <div class="db-inspector-card">
+            <div class="db-inspector-label">Database Schema</div>
+            <div class="db-inspector-value highlight-emerald" id="inspect-db">tracevault</div>
+          </div>
+          <div class="db-inspector-card">
+            <div class="db-inspector-label">Database Driver</div>
+            <div class="db-inspector-value" id="inspect-driver">mysql2/promise</div>
+          </div>
+          <div class="db-inspector-card">
+            <div class="db-inspector-label">Relational Normalization</div>
+            <div class="db-inspector-value highlight-emerald" id="inspect-norm">3NF (Third Normal Form)</div>
           </div>
         </div>
 
-        <div class="mysql-sync-step">
-          <div class="step-num">2</div>
-          <div class="step-content">
-            <strong>Automatic Bootstrap &amp; Two-Way Sync</strong>
-            <p>Once detected, TraceVault auto-creates the <code>tracevault</code> database, executes <code>database.sql</code>, imports existing local bugs, and mirrors all future CRUD actions directly into MySQL Workbench.</p>
+        <!-- Relational Schema Architecture Objects -->
+        <div class="db-objects-list">
+          <div class="db-object-row">
+            <div>
+              <strong>Parent Table:</strong> <code>domains</code>
+              <span class="text-muted" style="font-size: 0.7rem; margin-left: 4px;">Primary Key (domain_id)</span>
+            </div>
+            <span class="db-object-tag badge-primary">PK PARENT</span>
+          </div>
+          <div class="db-object-row">
+            <div>
+              <strong>Child Table:</strong> <code>error_logs</code>
+              <span class="text-muted" style="font-size: 0.7rem; margin-left: 4px;">Foreign Key (domain_id &rarr; domains.domain_id)</span>
+            </div>
+            <span class="db-object-tag badge-accent">FK CHILD</span>
+          </div>
+          <div class="db-object-row">
+            <div>
+              <strong>Active View:</strong> <code>v_domain_summary</code>
+              <span class="text-muted" style="font-size: 0.7rem; margin-left: 4px;">Aggregates error counts &amp; hit stats</span>
+            </div>
+            <span class="db-object-tag badge-subtle">VIEW</span>
+          </div>
+          <div class="db-object-row">
+            <div>
+              <strong>Stored Procedure:</strong> <code>sp_increment_error_hit</code>
+              <span class="text-muted" style="font-size: 0.7rem; margin-left: 4px;">Atomic bug hit counter</span>
+            </div>
+            <span class="db-object-tag badge-subtle">PROCEDURE</span>
+          </div>
+          <div class="db-object-row">
+            <div>
+              <strong>Database Trigger:</strong> <code>trg_error_logs_before_update</code>
+              <span class="text-muted" style="font-size: 0.7rem; margin-left: 4px;">Auto-updates updated_at timestamp</span>
+            </div>
+            <span class="db-object-tag badge-subtle">TRIGGER</span>
           </div>
         </div>
 
-        <div style="margin-top: 14px; padding: 10px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; font-size: 0.75rem; color: var(--accent-emerald);">
-          ✓ Terminal helper: You can also run <code>npm run db:setup</code> in terminal to attempt auto-starting local MySQL and verify connection.
+        <!-- Real-Time SQL Query & Ping Verification Panel -->
+        <div class="ping-panel-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-weight: 700; font-size: 0.8rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+              <span>⚡ Live SQL Execution Test</span>
+              <span class="badge badge-primary" id="sql-ping-latency">0 ms</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" id="btn-run-sql-ping">
+              ⚡ Run Live SQL Ping
+            </button>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px;">SQL Query:</div>
+          <div class="code-font" style="background: rgba(0, 0, 0, 0.45); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.725rem; color: var(--accent-cyan); word-break: break-all;">
+            SELECT 1 AS ping, DATABASE() AS active_db, VERSION() AS mysql_version, NOW() AS server_time, (SELECT COUNT(*) FROM error_logs) AS total_vault_records;
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; margin-bottom: 4px;">Live Response:</div>
+          <pre id="sql-ping-result" class="code-box" style="margin: 0; padding: 10px; border-radius: 6px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(16, 185, 129, 0.25); color: #a7f3d0; font-size: 0.725rem; max-height: 120px; overflow: auto;">Ready to verify. Click "⚡ Run Live SQL Ping".</pre>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.725rem; color: var(--text-dim);">
+          GUI Inspector: HeidiSQL connected to <code>127.0.0.1:3306/tracevault</code>
+        </span>
         <button type="button" class="btn btn-secondary" id="btn-close-mysql-footer">Close</button>
-        <button type="button" class="btn btn-primary" id="btn-check-mysql-now">Check Connection Now</button>
       </div>
     </div>
   </div>
 
-  <script src="app.js?v=obsidian_v4"></script>
+  <script src="app.js?v=cube_v6"></script>
 </body>
 </html>

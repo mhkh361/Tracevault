@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Quantum Glow Filters -->
+    <filter id="coreGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16" result="blur1" />
+      <feGaussianBlur stdDeviation="32" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="ambientRefract" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+    </filter>
+
+    <!-- Linear Gradients for Outer Glass Facets -->
+    <linearGradient id="glassTop" x1="100" y1="76" x2="412" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38" />
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.12" />
+    </linearGradient>
+
+    <linearGradient id="glassLeft" x1="100" y1="166" x2="256" y2="436" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25" />
+      <stop offset="60%" stop-color="#0a101d" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.18" />
+    </linearGradient>
+
+    <linearGradient id="glassRight" x1="412" y1="166" x2="256" y2="436" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.28" />
+      <stop offset="60%" stop-color="#060913" stop-opacity="0.68" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.2" />
+    </linearGradient>
+
+    <!-- Inner Core Quantum Gradients -->
+    <linearGradient id="coreGradTop" x1="194" y1="184" x2="318" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <linearGradient id="coreGradLeft" x1="194" y1="220" x2="256" y2="328" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+
+    <linearGradient id="coreGradRight" x1="318" y1="220" x2="256" y2="328" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+
+    <radialGradient id="quantumHalo" cx="256" cy="256" r="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
+      <stop offset="45%" stop-color="#10b981" stop-opacity="0.4" />
+      <stop offset="80%" stop-color="#10b981" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#060913" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Internal Quantum Aura -->
+  <circle cx="256" cy="256" r="120" fill="url(#quantumHalo)" filter="url(#ambientRefract)" />
+
+  <!-- Background Internal Glass Walls (Translucent Backplanes) -->
+  <path d="M256 76 L100 166 L100 346 L256 256 Z" fill="rgba(6, 182, 212, 0.07)" stroke="rgba(6, 182, 212, 0.3)" stroke-width="1.5" stroke-dasharray="5 4" />
+  <path d="M256 76 L412 166 L412 346 L256 256 Z" fill="rgba(16, 185, 129, 0.07)" stroke="rgba(16, 185, 129, 0.3)" stroke-width="1.5" stroke-dasharray="5 4" />
+  <path d="M256 256 L100 346 L256 436 L412 346 Z" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1.5" stroke-dasharray="5 4" />
+
+  <!-- FLOATING 3D QUANTUM CORE (CYAN TO EMERALD) -->
+  <g filter="url(#coreGlow)">
+    <!-- Core Top -->
+    <path d="M256 184 L318 220 L256 256 L194 220 Z" fill="url(#coreGradTop)" />
+    <!-- Core Left -->
+    <path d="M194 220 L256 256 L256 328 L194 292 Z" fill="url(#coreGradLeft)" />
+    <!-- Core Right -->
+    <path d="M256 256 L318 220 L318 292 L256 328 Z" fill="url(#coreGradRight)" />
+    <!-- Core Seams & Highlights -->
+    <path d="M256 184 L318 220 L256 256 L194 220 Z" stroke="rgba(255, 255, 255, 0.9)" stroke-width="2" />
+    <path d="M256 256 L256 328" stroke="rgba(255, 255, 255, 0.75)" stroke-width="2" />
+    <path d="M194 220 L256 328 L318 220" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1.5" />
+  </g>
+
+  <!-- Orbital Energy Rings around Core -->
+  <ellipse cx="256" cy="256" rx="92" ry="46" transform="rotate(-25 256 256)" stroke="url(#coreGradTop)" stroke-width="2" stroke-dasharray="14 10" opacity="0.65" />
+  <ellipse cx="256" cy="256" rx="92" ry="46" transform="rotate(25 256 256)" stroke="url(#coreGradRight)" stroke-width="2" stroke-dasharray="12 8" opacity="0.65" />
+
+  <!-- OUTER TRANSLUCENT FROSTED GLASS FACETS -->
+  <!-- Left Outer Face -->
+  <path d="M100 166 L256 256 L256 436 L100 346 Z" fill="url(#glassLeft)" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2" />
+  <!-- Right Outer Face -->
+  <path d="M256 256 L412 166 L412 346 L256 436 Z" fill="url(#glassRight)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="2" />
+  <!-- Top Specular Glass Face -->
+  <path d="M256 76 L412 166 L256 256 L100 166 Z" fill="url(#glassTop)" stroke="rgba(255, 255, 255, 0.45)" stroke-width="2.5" />
+
+  <!-- Outer Glass Specular Highlight Edges -->
+  <path d="M256 76 L100 166 L256 256" stroke="rgba(255, 255, 255, 0.95)" stroke-width="3" stroke-linecap="round" />
+  <path d="M256 76 L412 166" stroke="rgba(255, 255, 255, 0.75)" stroke-width="2.5" stroke-linecap="round" />
+  <path d="M256 256 L256 436" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Glass Vertex Nodes (Glowing cyan/emerald micro-spheres) -->
+  <circle cx="256" cy="76" r="4.5" fill="#ffffff" filter="url(#coreGlow)" />
+  <circle cx="100" cy="166" r="4" fill="#06b6d4" />
+  <circle cx="412" cy="166" r="4" fill="#10b981" />
+  <circle cx="256" cy="256" r="5" fill="#ffffff" filter="url(#coreGlow)" />
+  <circle cx="256" cy="436" r="4" fill="#10b981" />
+</svg>

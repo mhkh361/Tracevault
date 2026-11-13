@@ -1,31 +1,31 @@
 /* =====================================================================
-   TraceVault - Option 1: Master Pure Obsidian Glass Design System
-   Pure #000000 Canvas with Aurora Glow & Frosted 3D Glass Surfaces
-   Spec: v=obsidian_v4
+   TraceVault - Master Frosted Glassmorphism Design System
+   Deep Midnight-Indigo Mesh (#060913) & 3D Isometric Glass Cube
+   Spec: v=cube_v6
    ===================================================================== */
 
 :root {
-  /* DARK THEME: TRUE PURE OBSIDIAN GLASS (DEFAULT) */
-  --bg-app: #000000;
-  --bg-aurora: radial-gradient(ellipse 80% 50% at 50% -15%, rgba(16, 185, 129, 0.22), rgba(6, 182, 212, 0.12), transparent 70%);
-  --bg-glass-panel: linear-gradient(155deg, rgba(20, 22, 30, 0.76) 0%, rgba(8, 9, 14, 0.92) 100%);
-  --bg-glass-elevated: linear-gradient(155deg, rgba(26, 29, 40, 0.82) 0%, rgba(11, 13, 20, 0.94) 100%);
-  --bg-input: rgba(6, 7, 10, 0.88);
-  --bg-code: #030406;
+  /* DARK THEME: TRUE TRANSLUCENT FROSTED GLASSMORPHISM (DEFAULT) */
+  --bg-app: #060913;
+  --bg-aurora: none;
+  --bg-glass-panel: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 100%);
+  --bg-glass-elevated: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%);
+  --bg-input: rgba(255, 255, 255, 0.06);
+  --bg-code: rgba(0, 0, 0, 0.55);
 
-  /* Specular Glass Edge */
-  --border-glass: 1px solid rgba(255, 255, 255, 0.08);
-  --border-specular: 1px solid rgba(255, 255, 255, 0.22);
-  --border-hover: rgba(16, 185, 129, 0.45);
-  --border-focus: rgba(16, 185, 129, 0.65);
+  /* Frosted Glass Specular Borders */
+  --border-glass: 1px solid rgba(255, 255, 255, 0.18);
+  --border-specular: 1px solid rgba(255, 255, 255, 0.28);
+  --border-hover: rgba(16, 185, 129, 0.5);
+  --border-focus: rgba(16, 185, 129, 0.7);
 
   --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
+  --text-muted: #cbd5e1;
+  --text-dim: #94a3b8;
   --text-inverse: #000000;
 
   --accent-emerald: #10b981;
-  --accent-emerald-glow: rgba(16, 185, 129, 0.18);
+  --accent-emerald-glow: rgba(16, 185, 129, 0.22);
   --accent-cyan: #06b6d4;
   --accent-blue: #3b82f6;
   --accent-purple: #8b5cf6;
@@ -34,48 +34,48 @@
 
   --domain-frontend: #38bdf8;
   --domain-backend: #10b981;
-  --domain-database: #a855f7;
-  --domain-fullstack: #f97316;
+  --domain-database: #c084fc;
+  --domain-fullstack: #fb923c;
 
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', Consolas, 'Fira Code', Menlo, monospace;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
   --radius-full: 9999px;
 
-  --shadow-panel: 0 20px 45px rgba(0, 0, 0, 0.85);
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.9);
-  --glass-blur: blur(22px);
+  --shadow-panel: 0 8px 32px 0 rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.28);
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.65);
+  --glass-blur: blur(28px) saturate(190%);
   --transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="light"] {
-  --bg-app: #f8fafc;
-  --bg-aurora: radial-gradient(ellipse 80% 50% at 50% -15%, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.06), transparent 70%);
-  --bg-glass-panel: linear-gradient(155deg, rgba(255, 255, 255, 0.92) 0%, rgba(241, 245, 249, 0.96) 100%);
-  --bg-glass-elevated: #ffffff;
-  --bg-input: #ffffff;
-  --bg-code: #f1f5f9;
+  --bg-app: #f1f5f9;
+  --bg-aurora: none;
+  --bg-glass-panel: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.65) 100%);
+  --bg-glass-elevated: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.85) 100%);
+  --bg-input: rgba(255, 255, 255, 0.8);
+  --bg-code: rgba(241, 245, 249, 0.9);
 
-  --border-glass: 1px solid #e2e8f0;
-  --border-specular: 1px solid #cbd5e1;
-  --border-hover: #10b981;
+  --border-glass: 1px solid rgba(203, 213, 225, 0.7);
+  --border-specular: 1px solid rgba(255, 255, 255, 0.9);
+  --border-hover: rgba(16, 185, 129, 0.6);
   --border-focus: #10b981;
 
   --text-main: #0f172a;
   --text-muted: #475569;
-  --text-dim: #94a3b8;
+  --text-dim: #64748b;
   --text-inverse: #ffffff;
 
-  --shadow-panel: 0 10px 30px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.1);
+  --shadow-panel: 0 8px 32px 0 rgba(0, 0, 0, 0.08), inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
-/* Base Reset & Obsidian Canvas */
+/* Base Reset & Glass Canvas */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -85,14 +85,56 @@
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-app);
-  background-image: var(--bg-aurora);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Ambient Glowing Gradient Spheres (Required for Glass Refraction) */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.glow-1 {
+  top: -100px;
+  left: -80px;
+  width: 580px;
+  height: 580px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 70%);
+}
+
+.glow-2 {
+  top: -100px;
+  right: -80px;
+  width: 580px;
+  height: 580px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.32) 0%, transparent 70%);
+}
+
+.glow-3 {
+  bottom: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 720px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, transparent 70%);
+}
+
+[data-theme="light"] .glow-1 {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+}
+[data-theme="light"] .glow-2 {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.16) 0%, transparent 70%);
+}
+[data-theme="light"] .glow-3 {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, transparent 70%);
 }
 
 .code-font {
@@ -104,22 +146,25 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
-/* TOP HEADER */
+/* TOP HEADER - FROSTED GLASS BAR */
 .app-header {
-  height: 68px;
+  height: 72px;
   background: var(--bg-glass-panel);
   border-bottom: var(--border-glass);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 28px;
   position: sticky;
   top: 0;
   z-index: 100;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
 }
 
 .header-left {
@@ -490,8 +535,8 @@ body {
   flex: 1;
   max-width: 1480px;
   width: 100%;
-  margin: 0 auto;
-  padding: 24px;
+  margin: 8px auto 0 auto;
+  padding: 36px 28px 48px 28px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -1489,7 +1534,7 @@ textarea.form-control {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.88);
+  background-color: rgba(6, 9, 19, 0.72);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   display: flex;
@@ -1735,6 +1780,76 @@ textarea.form-control {
 .test-result-status {
   font-size: 0.775rem;
   font-weight: 600;
+}
+
+/* MySQL 3306 Live Connection Inspector Modal */
+.db-inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.db-inspector-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.db-inspector-label {
+  font-size: 0.675rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
+}
+
+.db-inspector-value {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+}
+
+.db-objects-list {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.db-object-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.775rem;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.db-object-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.db-object-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.ping-panel-box {
+  background: rgba(16, 185, 129, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px;
 }
 
 /* Sync MySQL Info Modal */
