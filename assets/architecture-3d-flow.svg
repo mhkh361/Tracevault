@@ -1,227 +1,194 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 360" width="100%" height="100%">
   <defs>
     <!-- Background Canvas Gradients -->
-    <linearGradient id="archBg" x1="0" y1="0" x2="900" y2="380" gradientUnits="userSpaceOnUse">
+    <linearGradient id="archCanvasBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#060913" />
       <stop offset="50%" stop-color="#0a1024" />
       <stop offset="100%" stop-color="#060913" />
     </linearGradient>
 
     <!-- Node 1: Cyan/Indigo -->
-    <linearGradient id="node1Grad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="n1Grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#06b6d4" />
       <stop offset="100%" stop-color="#4f46e5" />
     </linearGradient>
 
     <!-- Node 2: Violet/Magenta -->
-    <linearGradient id="node2Grad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="n2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#8b5cf6" />
       <stop offset="100%" stop-color="#d946ef" />
     </linearGradient>
 
     <!-- Node 3: Emerald/Teal -->
-    <linearGradient id="node3Grad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="n3Grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#10b981" />
       <stop offset="100%" stop-color="#0d9488" />
     </linearGradient>
 
     <!-- Node 4: Amber/Gold -->
-    <linearGradient id="node4Grad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="n4Grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#f59e0b" />
       <stop offset="100%" stop-color="#d97706" />
     </linearGradient>
-
-    <!-- Pipeline Glow -->
-    <filter id="packetGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="5" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
   </defs>
 
-  <style>
-    @keyframes dataPulseForward {
-      0% { stroke-dashoffset: 72; }
-      100% { stroke-dashoffset: 0; }
-    }
-    @keyframes packetFlow1 {
-      0% { cx: 195; cy: 190; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { cx: 285; cy: 190; opacity: 0; }
-    }
-    @keyframes packetFlow2 {
-      0% { cx: 435; cy: 190; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { cx: 525; cy: 190; opacity: 0; }
-    }
-    @keyframes packetFlow3 {
-      0% { cx: 675; cy: 190; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { cx: 755; cy: 190; opacity: 0; }
-    }
-    @keyframes nodeFloat {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-    }
-    .flow-line {
-      stroke-dasharray: 8 8;
-      animation: dataPulseForward 2s linear infinite;
-    }
-    .packet-1 { animation: packetFlow1 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
-    .packet-2 { animation: packetFlow2 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.7s; }
-    .packet-3 { animation: packetFlow3 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite 1.4s; }
-    
-    .node-anim-1 { animation: nodeFloat 4s ease-in-out infinite; }
-    .node-anim-2 { animation: nodeFloat 4s ease-in-out infinite 1s; }
-    .node-anim-3 { animation: nodeFloat 4s ease-in-out infinite 2s; }
-    .node-anim-4 { animation: nodeFloat 4s ease-in-out infinite 3s; }
-
-    .ui-text {
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    .code-text {
-      font-family: 'JetBrains Mono', Consolas, 'Fira Code', monospace;
-    }
-  </style>
-
   <!-- Canvas Frame -->
-  <rect x="8" y="8" width="884" height="364" rx="18" fill="url(#archBg)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" />
+  <rect x="6" y="6" width="908" height="348" rx="16" fill="url(#archCanvasBg)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" />
 
-  <!-- Top Title Strip -->
-  <text x="36" y="44" class="ui-text" font-size="14" font-weight="900" letter-spacing="0.08em" fill="#e2e8f0">
-    TRACEVAULT SYSTEM ARCHITECTURE &amp; DATA FLOW PIPELINE
-  </text>
-  <rect x="670" y="28" width="194" height="24" rx="12" fill="rgba(6, 182, 212, 0.1)" stroke="rgba(6, 182, 212, 0.3)" stroke-width="1" />
-  <circle cx="684" cy="40" r="3.5" fill="#06b6d4" />
-  <text x="696" y="44" class="ui-text" font-size="10.5" font-weight="700" fill="#38bdf8">EDGE &amp; CLOUD READY</text>
+  <!-- Top Title Bar -->
+  <g font-family="system-ui, -apple-system, sans-serif">
+    <text x="36" y="42" font-size="13.5" font-weight="900" letter-spacing="0.08em" fill="#e2e8f0">
+      TRACEVAULT SYSTEM ARCHITECTURE &amp; DATA FLOW PIPELINE
+    </text>
+    <rect x="690" y="26" width="194" height="24" rx="12" fill="rgba(6, 182, 212, 0.1)" stroke="rgba(6, 182, 212, 0.3)" stroke-width="1" />
+    <circle cx="704" cy="38" r="3.5" fill="#06b6d4">
+      <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
+    </circle>
+    <text x="716" y="42" font-size="10.5" font-weight="700" fill="#38bdf8">EDGE &amp; CLOUD READY</text>
+  </g>
 
-  <!-- ================= HORIZONTAL DATA PIPELINES ================= -->
-  <!-- Pipeline 1: Node 1 -> Node 2 -->
-  <path d="M195 190 L285 190" stroke="rgba(6, 182, 212, 0.3)" stroke-width="4" />
-  <path d="M195 190 L285 190" stroke="#06b6d4" stroke-width="2.5" class="flow-line" />
-  <circle cx="240" cy="190" r="4.5" fill="#38bdf8" class="packet-1" filter="url(#packetGlow)" />
+  <!-- ================= HORIZONTAL DATA PIPELINES WITH SMIL ANIMATIONS ================= -->
+  <!-- Pipeline 1: Node 1 to Node 2 -->
+  <path d="M205 175 L265 175" stroke="rgba(6, 182, 212, 0.25)" stroke-width="4" />
+  <path d="M205 175 L265 175" stroke="#06b6d4" stroke-width="2.5" stroke-dasharray="6,6">
+    <animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.5s" repeatCount="indefinite" />
+  </path>
+  <circle cy="175" r="4.5" fill="#38bdf8">
+    <animate attributeName="cx" values="205;265;205" dur="2.4s" repeatCount="indefinite" />
+  </circle>
 
-  <!-- Pipeline 2: Node 2 -> Node 3 -->
-  <path d="M435 190 L525 190" stroke="rgba(139, 92, 246, 0.3)" stroke-width="4" />
-  <path d="M435 190 L525 190" stroke="#a78bfa" stroke-width="2.5" class="flow-line" />
-  <circle cx="480" cy="190" r="4.5" fill="#c084fc" class="packet-2" filter="url(#packetGlow)" />
+  <!-- Pipeline 2: Node 2 to Node 3 -->
+  <path d="M435 175 L495 175" stroke="rgba(139, 92, 246, 0.25)" stroke-width="4" />
+  <path d="M435 175 L495 175" stroke="#a78bfa" stroke-width="2.5" stroke-dasharray="6,6">
+    <animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.5s" repeatCount="indefinite" />
+  </path>
+  <circle cy="175" r="4.5" fill="#c084fc">
+    <animate attributeName="cx" values="435;495;435" dur="2.4s" repeatCount="indefinite" />
+  </circle>
 
-  <!-- Pipeline 3: Node 3 -> Node 4 -->
-  <path d="M675 190 L755 190" stroke="rgba(16, 185, 129, 0.3)" stroke-width="4" />
-  <path d="M675 190 L755 190" stroke="#34d399" stroke-width="2.5" class="flow-line" />
-  <circle cx="715" cy="190" r="4.5" fill="#6ee7b7" class="packet-3" filter="url(#packetGlow)" />
+  <!-- Pipeline 3: Node 3 to Node 4 -->
+  <path d="M665 175 L725 175" stroke="rgba(16, 185, 129, 0.25)" stroke-width="4" />
+  <path d="M665 175 L725 175" stroke="#34d399" stroke-width="2.5" stroke-dasharray="6,6">
+    <animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.5s" repeatCount="indefinite" />
+  </path>
+  <circle cy="175" r="4.5" fill="#6ee7b7">
+    <animate attributeName="cx" values="665;725;665" dur="2.4s" repeatCount="indefinite" />
+  </circle>
 
-  <!-- ================= 4 ISOMETRIC SYSTEM NODES ================= -->
+  <!-- ================= 4 SYSTEM ARCHITECTURE NODES ================= -->
 
   <!-- NODE 1: Browser-First Frosted Glass SPA -->
-  <g class="node-anim-1" transform="translate(35, 95)">
-    <!-- 3D Pedestal / Base -->
-    <path d="M80 30 L150 65 L80 100 L10 65 Z" fill="rgba(6, 182, 212, 0.15)" stroke="rgba(6, 182, 212, 0.4)" stroke-width="1.5" />
-    <path d="M10 65 L80 100 L80 115 L10 80 Z" fill="rgba(6, 182, 212, 0.25)" />
-    <path d="M80 100 L150 65 L150 80 L80 115 Z" fill="rgba(4, 120, 87, 0.3)" />
+  <g transform="translate(35, 78)" font-family="system-ui, -apple-system, sans-serif">
+    <animateTransform attributeName="transform" type="translate" values="35,78; 35,74; 35,78" dur="4s" repeatCount="indefinite" />
+    
+    <!-- 3D Pedestal Base -->
+    <path d="M85 30 L160 65 L85 100 L10 65 Z" fill="rgba(6, 182, 212, 0.15)" stroke="rgba(6, 182, 212, 0.4)" stroke-width="1.5" />
+    <path d="M10 65 L85 100 L85 115 L10 80 Z" fill="rgba(6, 182, 212, 0.25)" />
+    <path d="M85 100 L160 65 L160 80 L85 115 Z" fill="rgba(4, 120, 87, 0.3)" />
 
     <!-- Card Body -->
-    <rect x="0" y="40" width="160" height="175" rx="14" fill="rgba(10, 16, 32, 0.85)" stroke="url(#node1Grad)" stroke-width="1.5" />
-    <rect x="12" y="52" width="28" height="28" rx="6" fill="rgba(6, 182, 212, 0.2)" />
-    <text x="21" y="70" class="ui-text" font-size="14">🌐</text>
-    <text x="48" y="65" class="ui-text" font-size="11" font-weight="800" fill="#38bdf8">BROWSER SPA</text>
-    <text x="48" y="77" class="ui-text" font-size="9" fill="#94a3b8">Frosted Glass UI</text>
+    <rect x="5" y="42" width="160" height="180" rx="14" fill="rgba(10, 16, 32, 0.88)" stroke="url(#n1Grad)" stroke-width="1.5" />
+    <rect x="18" y="55" width="28" height="28" rx="6" fill="rgba(6, 182, 212, 0.2)" />
+    <text x="26" y="74" font-size="14">&#127760;</text>
+    <text x="54" y="68" font-size="11" font-weight="800" fill="#38bdf8">BROWSER SPA</text>
+    <text x="54" y="80" font-size="9" fill="#94a3b8">Frosted Glass UI</text>
 
-    <!-- Details -->
-    <rect x="12" y="90" width="136" height="52" rx="6" fill="rgba(0, 0, 0, 0.5)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-    <text x="20" y="106" class="code-text" font-size="8.5" fill="#a7f3d0">&bull; SHA-256 Memory</text>
-    <text x="20" y="120" class="code-text" font-size="8.5" fill="#94a3b8">&bull; Zero-Latency Cache</text>
-    <text x="20" y="134" class="code-text" font-size="8.5" fill="#38bdf8">&bull; Client LocalStorage</text>
+    <!-- Details Box -->
+    <rect x="18" y="94" width="134" height="56" rx="6" fill="rgba(0, 0, 0, 0.55)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+    <text x="26" y="112" font-family="monospace" font-size="8.5" fill="#a7f3d0">&#8226; SHA-256 Memory</text>
+    <text x="26" y="126" font-family="monospace" font-size="8.5" fill="#94a3b8">&#8226; Zero-Latency Cache</text>
+    <text x="26" y="140" font-family="monospace" font-size="8.5" fill="#38bdf8">&#8226; Client LocalStorage</text>
 
-    <!-- Tag -->
-    <rect x="12" y="152" width="136" height="24" rx="6" fill="rgba(6, 182, 212, 0.15)" />
-    <text x="28" y="168" class="ui-text" font-size="9.5" font-weight="700" fill="#67e8f9">&lt; 1ms Instant Lookup</text>
+    <!-- Badge Tag -->
+    <rect x="18" y="158" width="134" height="24" rx="6" fill="rgba(6, 182, 212, 0.15)" />
+    <text x="32" y="174" font-size="9.5" font-weight="700" fill="#67e8f9">&lt; 1ms Ingest</text>
   </g>
 
   <!-- NODE 2: Universal Zero-Config AI Router -->
-  <g class="node-anim-2" transform="translate(275, 95)">
-    <!-- 3D Pedestal / Base -->
-    <path d="M80 30 L150 65 L80 100 L10 65 Z" fill="rgba(139, 92, 246, 0.15)" stroke="rgba(139, 92, 246, 0.4)" stroke-width="1.5" />
-    <path d="M10 65 L80 100 L80 115 L10 80 Z" fill="rgba(139, 92, 246, 0.25)" />
-    <path d="M80 100 L150 65 L150 80 L80 115 Z" fill="rgba(109, 40, 217, 0.3)" />
+  <g transform="translate(265, 78)" font-family="system-ui, -apple-system, sans-serif">
+    <animateTransform attributeName="transform" type="translate" values="265,74; 265,78; 265,74" dur="4s" repeatCount="indefinite" />
+
+    <!-- 3D Pedestal Base -->
+    <path d="M85 30 L160 65 L85 100 L10 65 Z" fill="rgba(139, 92, 246, 0.15)" stroke="rgba(139, 92, 246, 0.4)" stroke-width="1.5" />
+    <path d="M10 65 L85 100 L85 115 L10 80 Z" fill="rgba(139, 92, 246, 0.25)" />
+    <path d="M85 100 L160 65 L160 80 L85 115 Z" fill="rgba(109, 40, 217, 0.3)" />
 
     <!-- Card Body -->
-    <rect x="0" y="40" width="160" height="175" rx="14" fill="rgba(10, 16, 32, 0.85)" stroke="url(#node2Grad)" stroke-width="1.5" />
-    <rect x="12" y="52" width="28" height="28" rx="6" fill="rgba(139, 92, 246, 0.2)" />
-    <text x="20" y="70" class="ui-text" font-size="14">🧠</text>
-    <text x="48" y="65" class="ui-text" font-size="11" font-weight="800" fill="#c084fc">AI AUTO-ROUTER</text>
-    <text x="48" y="77" class="ui-text" font-size="9" fill="#94a3b8">Universal Key Engine</text>
+    <rect x="5" y="42" width="160" height="180" rx="14" fill="rgba(10, 16, 32, 0.88)" stroke="url(#n2Grad)" stroke-width="1.5" />
+    <rect x="18" y="55" width="28" height="28" rx="6" fill="rgba(139, 92, 246, 0.2)" />
+    <text x="26" y="74" font-size="14">&#129504;</text>
+    <text x="54" y="68" font-size="11" font-weight="800" fill="#c084fc">AI AUTO-ROUTER</text>
+    <text x="54" y="80" font-size="9" fill="#94a3b8">Universal Key Engine</text>
 
-    <!-- Details -->
-    <rect x="12" y="90" width="136" height="52" rx="6" fill="rgba(0, 0, 0, 0.5)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-    <text x="20" y="106" class="code-text" font-size="8.5" fill="#e9d5ff">&bull; Auto-Prefix Match</text>
-    <text x="20" y="120" class="code-text" font-size="8.5" fill="#94a3b8">&bull; Zero Dropdowns</text>
-    <text x="20" y="134" class="code-text" font-size="8.5" fill="#f472b6">&bull; Direct API Dispatch</text>
+    <!-- Details Box -->
+    <rect x="18" y="94" width="134" height="56" rx="6" fill="rgba(0, 0, 0, 0.55)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+    <text x="26" y="112" font-family="monospace" font-size="8.5" fill="#e9d5ff">&#8226; Auto-Prefix Match</text>
+    <text x="26" y="126" font-family="monospace" font-size="8.5" fill="#94a3b8">&#8226; Zero Dropdowns</text>
+    <text x="26" y="140" font-family="monospace" font-size="8.5" fill="#f472b6">&#8226; Direct API Dispatch</text>
 
-    <!-- Tag -->
-    <rect x="12" y="152" width="136" height="24" rx="6" fill="rgba(139, 92, 246, 0.15)" />
-    <text x="24" y="168" class="ui-text" font-size="9.5" font-weight="700" fill="#e9d5ff">Zero-Server Privacy</text>
+    <!-- Badge Tag -->
+    <rect x="18" y="158" width="134" height="24" rx="6" fill="rgba(139, 92, 246, 0.15)" />
+    <text x="28" y="174" font-size="9.5" font-weight="700" fill="#e9d5ff">Zero-Server Privacy</text>
   </g>
 
-  <!-- NODE 3: Edge & Serverless Engine (Vercel / Cloudflare) -->
-  <g class="node-anim-3" transform="translate(515, 95)">
-    <!-- 3D Pedestal / Base -->
-    <path d="M80 30 L150 65 L80 100 L10 65 Z" fill="rgba(16, 185, 129, 0.15)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="1.5" />
-    <path d="M10 65 L80 100 L80 115 L10 80 Z" fill="rgba(16, 185, 129, 0.25)" />
-    <path d="M80 100 L150 65 L150 80 L80 115 Z" fill="rgba(5, 150, 105, 0.3)" />
+  <!-- NODE 3: Edge and Serverless Engine (Vercel / Cloudflare) -->
+  <g transform="translate(495, 78)" font-family="system-ui, -apple-system, sans-serif">
+    <animateTransform attributeName="transform" type="translate" values="495,78; 495,74; 495,78" dur="4s" repeatCount="indefinite" />
+
+    <!-- 3D Pedestal Base -->
+    <path d="M85 30 L160 65 L85 100 L10 65 Z" fill="rgba(16, 185, 129, 0.15)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="1.5" />
+    <path d="M10 65 L85 100 L85 115 L10 80 Z" fill="rgba(16, 185, 129, 0.25)" />
+    <path d="M85 100 L160 65 L160 80 L85 115 Z" fill="rgba(5, 150, 105, 0.3)" />
 
     <!-- Card Body -->
-    <rect x="0" y="40" width="160" height="175" rx="14" fill="rgba(10, 16, 32, 0.85)" stroke="url(#node3Grad)" stroke-width="1.5" />
-    <rect x="12" y="52" width="28" height="28" rx="6" fill="rgba(16, 185, 129, 0.2)" />
-    <text x="20" y="70" class="ui-text" font-size="14">⚡</text>
-    <text x="48" y="65" class="ui-text" font-size="11" font-weight="800" fill="#34d399">EDGE ENGINE</text>
-    <text x="48" y="77" class="ui-text" font-size="9" fill="#94a3b8">Serverless APIs</text>
+    <rect x="5" y="42" width="160" height="180" rx="14" fill="rgba(10, 16, 32, 0.88)" stroke="url(#n3Grad)" stroke-width="1.5" />
+    <rect x="18" y="55" width="28" height="28" rx="6" fill="rgba(16, 185, 129, 0.2)" />
+    <text x="26" y="74" font-size="14">&#9889;</text>
+    <text x="54" y="68" font-size="11" font-weight="800" fill="#34d399">EDGE ENGINE</text>
+    <text x="54" y="80" font-size="9" fill="#94a3b8">Serverless APIs</text>
 
-    <!-- Details -->
-    <rect x="12" y="90" width="136" height="52" rx="6" fill="rgba(0, 0, 0, 0.5)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-    <text x="20" y="106" class="code-text" font-size="8.5" fill="#a7f3d0">&bull; Vercel Serverless</text>
-    <text x="20" y="120" class="code-text" font-size="8.5" fill="#94a3b8">&bull; Cloudflare Edge</text>
-    <text x="20" y="134" class="code-text" font-size="8.5" fill="#38bdf8">&bull; Zero-Cold-Start</text>
+    <!-- Details Box -->
+    <rect x="18" y="94" width="134" height="56" rx="6" fill="rgba(0, 0, 0, 0.55)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+    <text x="26" y="112" font-family="monospace" font-size="8.5" fill="#a7f3d0">&#8226; Vercel Serverless</text>
+    <text x="26" y="126" font-family="monospace" font-size="8.5" fill="#94a3b8">&#8226; Cloudflare Edge</text>
+    <text x="26" y="140" font-family="monospace" font-size="8.5" fill="#38bdf8">&#8226; Zero-Cold-Start</text>
 
-    <!-- Tag -->
-    <rect x="12" y="152" width="136" height="24" rx="6" fill="rgba(16, 185, 129, 0.15)" />
-    <text x="24" y="168" class="ui-text" font-size="9.5" font-weight="700" fill="#a7f3d0">1-Click Deploy Ready</text>
+    <!-- Badge Tag -->
+    <rect x="18" y="158" width="134" height="24" rx="6" fill="rgba(16, 185, 129, 0.15)" />
+    <text x="26" y="174" font-size="9.5" font-weight="700" fill="#a7f3d0">1-Click Deploy</text>
   </g>
 
-  <!-- NODE 4: Normalized 3NF Relational Storage -->
-  <g class="node-anim-4" transform="translate(745, 95)">
-    <!-- 3D Pedestal / Base -->
-    <path d="M60 30 L115 65 L60 100 L5 65 Z" fill="rgba(245, 158, 11, 0.15)" stroke="rgba(245, 158, 11, 0.4)" stroke-width="1.5" />
-    <path d="M5 65 L60 100 L60 115 L5 80 Z" fill="rgba(245, 158, 11, 0.25)" />
-    <path d="M60 100 L115 65 L115 80 L60 115 Z" fill="rgba(180, 83, 9, 0.3)" />
+  <!-- NODE 4: Normalized 3NF Relational Vault -->
+  <g transform="translate(725, 78)" font-family="system-ui, -apple-system, sans-serif">
+    <animateTransform attributeName="transform" type="translate" values="725,74; 725,78; 725,74" dur="4s" repeatCount="indefinite" />
+
+    <!-- 3D Pedestal Base -->
+    <path d="M80 30 L150 65 L80 100 L10 65 Z" fill="rgba(245, 158, 11, 0.15)" stroke="rgba(245, 158, 11, 0.4)" stroke-width="1.5" />
+    <path d="M10 65 L80 100 L80 115 L10 80 Z" fill="rgba(245, 158, 11, 0.25)" />
+    <path d="M80 100 L150 65 L150 80 L80 115 Z" fill="rgba(180, 83, 9, 0.3)" />
 
     <!-- Card Body -->
-    <rect x="0" y="40" width="120" height="175" rx="14" fill="rgba(10, 16, 32, 0.85)" stroke="url(#node4Grad)" stroke-width="1.5" />
-    <rect x="10" y="52" width="26" height="26" rx="6" fill="rgba(245, 158, 11, 0.2)" />
-    <text x="17" y="70" class="ui-text" font-size="13">💾</text>
-    <text x="42" y="65" class="ui-text" font-size="10.5" font-weight="800" fill="#fbbf24">3NF VAULT</text>
-    <text x="42" y="77" class="ui-text" font-size="8.5" fill="#94a3b8">Relational</text>
+    <rect x="5" y="42" width="150" height="180" rx="14" fill="rgba(10, 16, 32, 0.88)" stroke="url(#n4Grad)" stroke-width="1.5" />
+    <rect x="16" y="55" width="28" height="28" rx="6" fill="rgba(245, 158, 11, 0.2)" />
+    <text x="24" y="74" font-size="14">&#128190;</text>
+    <text x="50" y="68" font-size="11" font-weight="800" fill="#fbbf24">3NF VAULT</text>
+    <text x="50" y="80" font-size="9" fill="#94a3b8">Relational Engine</text>
 
-    <!-- Details -->
-    <rect x="10" y="90" width="100" height="52" rx="6" fill="rgba(0, 0, 0, 0.5)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-    <text x="16" y="106" class="code-text" font-size="8" fill="#fde68a">&bull; PK domains</text>
-    <text x="16" y="120" class="code-text" font-size="8" fill="#94a3b8">&bull; FK error_logs</text>
-    <text x="16" y="134" class="code-text" font-size="8" fill="#fbbf24">&bull; Summary View</text>
+    <!-- Details Box -->
+    <rect x="16" y="94" width="128" height="56" rx="6" fill="rgba(0, 0, 0, 0.55)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
+    <text x="24" y="112" font-family="monospace" font-size="8.5" fill="#fde68a">&#8226; PK domains</text>
+    <text x="24" y="126" font-family="monospace" font-size="8.5" fill="#94a3b8">&#8226; FK error_logs</text>
+    <text x="24" y="140" font-family="monospace" font-size="8.5" fill="#fbbf24">&#8226; Summary View</text>
 
-    <!-- Tag -->
-    <rect x="10" y="152" width="100" height="24" rx="6" fill="rgba(245, 158, 11, 0.15)" />
-    <text x="16" y="168" class="ui-text" font-size="9" font-weight="700" fill="#fde68a">ACID Clean</text>
+    <!-- Badge Tag -->
+    <rect x="16" y="158" width="128" height="24" rx="6" fill="rgba(245, 158, 11, 0.15)" />
+    <text x="32" y="174" font-size="9.5" font-weight="700" fill="#fde68a">ACID Clean</text>
   </g>
 
-  <!-- Bottom Pipeline Flow Summary -->
-  <g transform="translate(35, 330)">
-    <text x="0" y="16" class="ui-text" font-size="11.5" fill="#94a3b8">
-      Pipeline Execution Flow: <tspan fill="#38bdf8" font-weight="700">1. Client Ingest &amp; SHA-256 Memory Lookup</tspan> &rarr; <tspan fill="#c084fc" font-weight="700">2. Universal AI Auto-Routing</tspan> &rarr; <tspan fill="#34d399" font-weight="700">3. Edge Serverless Execution</tspan> &rarr; <tspan fill="#fbbf24" font-weight="700">4. 3NF Vault Persistence</tspan>
+  <!-- Bottom Data Flow Pipeline Summary -->
+  <g transform="translate(36, 318)" font-family="system-ui, -apple-system, sans-serif">
+    <text x="0" y="16" font-size="11" fill="#94a3b8">
+      Pipeline Execution Flow: <tspan fill="#38bdf8" font-weight="700">1. Client Ingest &amp; SHA-256 Memory Lookup</tspan> &#8594; <tspan fill="#c084fc" font-weight="700">2. Universal AI Auto-Routing</tspan> &#8594; <tspan fill="#34d399" font-weight="700">3. Edge Serverless Execution</tspan> &#8594; <tspan fill="#fbbf24" font-weight="700">4. 3NF Vault Persistence</tspan>
     </text>
   </g>
 </svg>

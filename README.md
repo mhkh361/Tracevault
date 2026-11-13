@@ -8,6 +8,7 @@
   <a href="#-one-click-cloud-deployment"><img src="https://img.shields.io/badge/Cloud-Edge%20%26%20Serverless-8b5cf6?style=for-the-badge&logo=vercel&logoColor=white" alt="Edge & Serverless Ready" /></a>
   <a href="#-relational-data-architecture"><img src="https://img.shields.io/badge/Storage-3NF%20Relational%20Engine-f59e0b?style=for-the-badge&logo=databricks&logoColor=white" alt="3NF Relational Engine" /></a>
   <a href="#-zero-server-privacy-guarantee"><img src="https://img.shields.io/badge/Security-Zero--Server%20Privacy-10b981?style=for-the-badge&logo=auth0&logoColor=white" alt="Zero-Server Privacy" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-10b981?style=for-the-badge" alt="MIT License" /></a>
 </p>
 
 <p align="center">
@@ -169,4 +170,4 @@ Streamline your debugging workflow with intuitive single-key shortcuts:
 
 ## 📄 License
 
-This project is licensed under the terms of the **MIT License**.
+Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for full details.

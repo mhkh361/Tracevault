@@ -2,6 +2,7 @@
   "name": "tracevault",
   "version": "2.0.0",
   "description": "Self-Learning AI Debug Bot & Local-First Error Knowledge Base",
+  "license": "MIT",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
