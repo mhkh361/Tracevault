@@ -44,7 +44,7 @@
     <circle cx="704" cy="38" r="3.5" fill="#06b6d4">
       <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
     </circle>
-    <text x="716" y="42" font-size="10.5" font-weight="700" fill="#38bdf8">EDGE &amp; CLOUD READY</text>
+    <text x="716" y="42" font-size="10.5" font-weight="700" fill="#38bdf8">BROWSER &amp; CLOUD READY</text>
   </g>
 
   <!-- ================= HORIZONTAL DATA PIPELINES WITH SMIL ANIMATIONS ================= -->
@@ -131,7 +131,7 @@
     <text x="28" y="174" font-size="9.5" font-weight="700" fill="#e9d5ff">Zero-Server Privacy</text>
   </g>
 
-  <!-- NODE 3: Edge and Serverless Engine (Vercel / Cloudflare) -->
+  <!-- NODE 3: Standalone Client Engine (GitHub Pages) -->
   <g transform="translate(495, 78)" font-family="system-ui, -apple-system, sans-serif">
     <animateTransform attributeName="transform" type="translate" values="495,78; 495,74; 495,78" dur="4s" repeatCount="indefinite" />
 
@@ -144,18 +144,18 @@
     <rect x="5" y="42" width="160" height="180" rx="14" fill="rgba(10, 16, 32, 0.88)" stroke="url(#n3Grad)" stroke-width="1.5" />
     <rect x="18" y="55" width="28" height="28" rx="6" fill="rgba(16, 185, 129, 0.2)" />
     <text x="26" y="74" font-size="14">&#9889;</text>
-    <text x="54" y="68" font-size="11" font-weight="800" fill="#34d399">EDGE ENGINE</text>
-    <text x="54" y="80" font-size="9" fill="#94a3b8">Serverless APIs</text>
+    <text x="54" y="68" font-size="11" font-weight="800" fill="#34d399">CLIENT ENGINE</text>
+    <text x="54" y="80" font-size="9" fill="#94a3b8">Zero-Server Standalone</text>
 
     <!-- Details Box -->
     <rect x="18" y="94" width="134" height="56" rx="6" fill="rgba(0, 0, 0, 0.55)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1" />
-    <text x="26" y="112" font-family="monospace" font-size="8.5" fill="#a7f3d0">&#8226; Vercel Serverless</text>
-    <text x="26" y="126" font-family="monospace" font-size="8.5" fill="#94a3b8">&#8226; Cloudflare Edge</text>
-    <text x="26" y="140" font-family="monospace" font-size="8.5" fill="#38bdf8">&#8226; Zero-Cold-Start</text>
+    <text x="26" y="112" font-family="monospace" font-size="8.5" fill="#a7f3d0">&#8226; GitHub Pages Ready</text>
+    <text x="26" y="126" font-family="monospace" font-size="8.5" fill="#94a3b8">&#8226; LocalStorage Vault</text>
+    <text x="26" y="140" font-family="monospace" font-size="8.5" fill="#38bdf8">&#8226; Instant Static CDN</text>
 
     <!-- Badge Tag -->
     <rect x="18" y="158" width="134" height="24" rx="6" fill="rgba(16, 185, 129, 0.15)" />
-    <text x="26" y="174" font-size="9.5" font-weight="700" fill="#a7f3d0">1-Click Deploy</text>
+    <text x="26" y="174" font-size="9.5" font-weight="700" fill="#a7f3d0">1-Click Live App</text>
   </g>
 
   <!-- NODE 4: Normalized 3NF Relational Vault -->
@@ -188,7 +188,7 @@
   <!-- Bottom Data Flow Pipeline Summary -->
   <g transform="translate(36, 318)" font-family="system-ui, -apple-system, sans-serif">
     <text x="0" y="16" font-size="11" fill="#94a3b8">
-      Pipeline Execution Flow: <tspan fill="#38bdf8" font-weight="700">1. Client Ingest &amp; SHA-256 Memory Lookup</tspan> &#8594; <tspan fill="#c084fc" font-weight="700">2. Universal AI Auto-Routing</tspan> &#8594; <tspan fill="#34d399" font-weight="700">3. Edge Serverless Execution</tspan> &#8594; <tspan fill="#fbbf24" font-weight="700">4. 3NF Vault Persistence</tspan>
+      Pipeline Execution Flow: <tspan fill="#38bdf8" font-weight="700">1. Client Ingest &amp; SHA-256 Memory Lookup</tspan> &#8594; <tspan fill="#c084fc" font-weight="700">2. Universal AI Auto-Routing</tspan> &#8594; <tspan fill="#34d399" font-weight="700">3. Standalone Client Execution</tspan> &#8594; <tspan fill="#fbbf24" font-weight="700">4. 3NF Vault Persistence</tspan>
     </text>
   </g>
 </svg>

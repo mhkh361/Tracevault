@@ -3,16 +3,20 @@
 </p>
 
 <p align="center">
+  <a href="https://mhkh361.github.io/Tracevault/"><img src="https://img.shields.io/badge/LIVE%20DEMO-GitHub%20Pages-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Live Demo on GitHub Pages" /></a>
   <a href="#-core-capabilities"><img src="https://img.shields.io/badge/UI-Frosted%20Glassmorphism-10b981?style=for-the-badge&logo=css3&logoColor=white" alt="Frosted Glassmorphism UI" /></a>
   <a href="#-universal-api-key-auto-router"><img src="https://img.shields.io/badge/AI-Universal%20Auto--Router-06b6d4?style=for-the-badge&logo=probot&logoColor=white" alt="Universal AI Auto-Router" /></a>
-  <a href="#-one-click-cloud-deployment"><img src="https://img.shields.io/badge/Cloud-Edge%20%26%20Serverless-8b5cf6?style=for-the-badge&logo=vercel&logoColor=white" alt="Edge & Serverless Ready" /></a>
-  <a href="#-relational-data-architecture"><img src="https://img.shields.io/badge/Storage-3NF%20Relational%20Engine-f59e0b?style=for-the-badge&logo=databricks&logoColor=white" alt="3NF Relational Engine" /></a>
+  <a href="#-relational-data-architecture-3nf"><img src="https://img.shields.io/badge/Storage-3NF%20Relational%20Engine-f59e0b?style=for-the-badge&logo=databricks&logoColor=white" alt="3NF Relational Engine" /></a>
   <a href="#-zero-server-privacy-guarantee"><img src="https://img.shields.io/badge/Security-Zero--Server%20Privacy-10b981?style=for-the-badge&logo=auth0&logoColor=white" alt="Zero-Server Privacy" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-10b981?style=for-the-badge" alt="MIT License" /></a>
 </p>
 
 <p align="center">
-  <strong>TraceVault</strong> is a cloud-native, browser-first self-learning AI debug bot and high-performance error knowledge base. Engineered with deep frosted glassmorphism and instant memory-first deduplication, it turns chaotic application exceptions into structured, actionable engineering intelligence without transmitting API credentials to any server.
+  <strong>TraceVault</strong> is a high-performance, browser-first self-learning AI debug bot and error knowledge base. Engineered with deep frosted glassmorphism, instant SHA-256 memory deduplication, and zero-server client execution, it transforms chaotic runtime exceptions into structured engineering intelligence without transmitting API credentials to any intermediary server.
+</p>
+
+<p align="center">
+  👉 <strong><a href="https://mhkh361.github.io/Tracevault/">Open Live Application (GitHub Pages)</a></strong>
 </p>
 
 ---
@@ -29,16 +33,16 @@
 
 | Capability | Description | Architectural Advantage |
 | :--- | :--- | :--- |
-| **SHA-256 Memory-First Deduplication** | Automatically computes canonical signature hashes for incoming stack traces and checks the in-memory vault. | Serves recurring bug solutions in **< 1ms**, bypassing external API calls and token consumption. |
+| **SHA-256 Memory-First Deduplication** | Automatically computes canonical signature hashes for incoming stack traces and checks the in-memory vault. | Serves recurring bug solutions in **&lt; 1ms**, eliminating redundant API calls and token waste. |
 | **Universal API Key Auto-Router** | Intelligently identifies API keys by cryptographic prefix and verifies connectivity silently in the background. | **Zero dropdowns, zero provider toggles.** Users paste any valid key and begin debugging immediately. |
 | **Context-Aware AI Debug Bot** | Conversational debugging assistant bound directly to the active error signature, stack trace, and resolution history. | Guarantees targeted code repairs without context drift or model hallucination. |
 | **3D Frosted Glassmorphism UI** | Multi-layered translucent canvas (`backdrop-filter: blur(28px)`) with ambient refraction glow and responsive layout. | Delivers a high-focus visual environment designed specifically for modern engineering teams. |
 | **Real-Time Telemetry & Aggregate KPIs** | Dynamic telemetry engine computing cumulative hit counts, domain distributions, and severity metrics. | Instant visibility into system stability and high-impact regression patterns. |
-| **Zero-Server Key Privacy** | API credentials reside exclusively within the user's browser `localStorage` and communicate over direct TLS. | Eliminates server-side credential leakage and compliance overhead. |
+| **Zero-Server Key Privacy Guarantee** | API credentials reside exclusively within the user's browser `localStorage` and communicate over direct TLS. | Eliminates server-side credential leakage, third-party logging, and compliance risks. |
 
 ---
 
-## 🏗️ 3D System Architecture & Data Flow
+## 🏗️ System Architecture & Data Flow
 
 <p align="center">
   <img src="./assets/architecture-3d-flow.svg" alt="TraceVault 3D System Architecture and Data Pipeline" width="100%" />
@@ -46,25 +50,23 @@
 
 ```mermaid
 flowchart LR
-  subgraph Client ["Client Browser Runtime"]
+  subgraph Client ["Client Browser Runtime (GitHub Pages Ready)"]
     UI["✨ Frosted Glass SPA<br/>(Reactive UI & Real-Time KPIs)"]
     MEM["⚡ SHA-256 Memory Vault<br/>(Sub-Millisecond Deduplication)"]
     KEY["🔑 Universal AI Auto-Router<br/>(Client-Side Key Management)"]
   end
 
-  subgraph Edge ["Cloud & Edge Engine"]
-    EDGE["🌐 Serverless Edge API<br/>(Vercel & Cloudflare Ready)"]
-  end
-
-  subgraph Storage ["Relational Data Layer"]
+  subgraph Backend ["Backend & Database (Full-Stack Mode)"]
+    SRV["🌐 Node.js REST API<br/>(Express Port 3000)"]
     DB[("💾 3NF Relational Vault<br/>domains & error_logs")]
     VIEW["📊 Analytics View<br/>(v_domain_summary)"]
   end
 
   UI --> MEM
   MEM -- "Cache Miss" --> KEY
-  KEY --> EDGE
-  EDGE --> DB
+  KEY --> UI
+  UI -. "Sync (When Active)" .-> SRV
+  SRV --> DB
   DB --> VIEW
   VIEW -.-> UI
   MEM -- "Cache Hit (<1ms)" --> UI
@@ -76,7 +78,7 @@ flowchart LR
 
   class UI,MEM cyan;
   class KEY violet;
-  class EDGE emerald;
+  class SRV emerald;
   class DB,VIEW amber;
 ```
 
@@ -99,7 +101,7 @@ TraceVault replaces traditional multi-step model configuration menus with a fric
 
 ## 💾 Relational Data Architecture (3NF)
 
-The TraceVault storage schema strictly adheres to **Third Normal Form (3NF)** to ensure transactional integrity, eliminate data redundancy, and provide instant analytical views:
+When running in full-stack mode, the TraceVault storage schema strictly adheres to **Third Normal Form (3NF)** to ensure transactional integrity, eliminate data redundancy, and provide instant analytical views:
 
 ```
 ┌─────────────────────────┐          1:N          ┌────────────────────────────────────────┐
@@ -130,29 +132,35 @@ The TraceVault storage schema strictly adheres to **Third Normal Form (3NF)** to
 
 ---
 
-## 🚀 One-Click Cloud Deployment
+## 🌐 Live Web App & Deployment
 
-TraceVault is engineered to run anywhere—from modern edge networks to static cloud CDNs.
+### 1. One-Click Live App (GitHub Pages)
 
-### Deploy to Vercel
+TraceVault is deployed as a zero-dependency static application on GitHub Pages:
 
-TraceVault includes native `vercel.json` configuration for zero-friction serverless edge deployments:
+- **Live URL:** [https://mhkh361.github.io/Tracevault/](https://mhkh361.github.io/Tracevault/)
+- **Zero-Server Standalone:** Detects static hosting environments and transparently utilizes high-performance browser `localStorage` and memory caching.
+- **Automated CI/CD:** GitHub Actions automatically deploys updates on push to `main`.
+
+### 2. Local Full-Stack Setup (Node.js + MySQL 3306)
+
+For local development with the complete MySQL relational engine:
 
 ```bash
-# Deploy to Vercel via CLI
-npx vercel
+# Clone the repository
+git clone https://github.com/mhkh361/Tracevault.git
+cd Tracevault
+
+# Install dependencies
+npm install
+
+# Initialize MySQL Schema, View, Stored Procedure & Trigger
+node setup-mysql.js
+
+# Start local server
+npm start
+# Active at http://localhost:3000
 ```
-
-Or connect your GitHub repository directly in the [Vercel Dashboard](https://vercel.com/new) for automated CI/CD continuous deployment.
-
-### Deploy to Cloudflare Pages / Edge Hosting
-
-TraceVault's client-first single-page architecture can be deployed instantly to Cloudflare Pages, Netlify, or any modern edge CDN:
-
-1. Push your repository to GitHub.
-2. Select **Cloudflare Pages** &rarr; **Create a Project** &rarr; **Connect to Git**.
-3. Set the build output directory to `public/`.
-4. Deploy in seconds with global edge acceleration.
 
 ---
 
