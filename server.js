@@ -316,11 +316,15 @@ async function bootstrapMySQL(conn) {
     const [tables] = await conn.query("SHOW TABLES LIKE 'error_logs'");
     if (tables.length === 0 && fs.existsSync(SQL_FILE_PATH)) {
       const sqlContent = fs.readFileSync(SQL_FILE_PATH, 'utf8');
-      const stmts = sqlContent
-        .replace(/DELIMITER \/\/[\s\S]*?DELIMITER ;/g, '')
+      const noComments = sqlContent
+        .replace(/--.*$/gm, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/DELIMITER \/\/[\s\S]*?DELIMITER ;/g, '');
+
+      const stmts = noComments
         .split(';')
         .map(s => s.trim())
-        .filter(s => s.length > 0 && !s.startsWith('--'));
+        .filter(s => s.length > 0);
 
       for (const stmt of stmts) {
         try {

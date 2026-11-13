@@ -27,6 +27,11 @@ const SQL_PATH = path.join(__dirname, 'database.sql');
 async function checkAndAttemptStartMySQL() {
   const commonPaths = [
     'C:\\xampp\\mysql\\bin\\mysqld.exe',
+    'C:\\Program Files\\MariaDB 13.0\\bin\\mysqld.exe',
+    'C:\\Program Files\\MariaDB 12.0\\bin\\mysqld.exe',
+    'C:\\Program Files\\MariaDB 11.4\\bin\\mysqld.exe',
+    'C:\\Program Files\\MariaDB 10.11\\bin\\mysqld.exe',
+    'C:\\Program Files\\MariaDB 10.6\\bin\\mysqld.exe',
     'C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqld.exe',
     'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysqld.exe',
     'C:\\Program Files\\MySQL\\MySQL Server 8.1\\bin\\mysqld.exe',
@@ -89,18 +94,22 @@ async function run() {
       console.log(`[setup-mysql] Executing schema & seeds from database.sql...`);
       const sqlContent = fs.readFileSync(SQL_PATH, 'utf8');
 
-      // Strip DELIMITER statements for mysql2 compatibility
-      const cleaned = sqlContent
-        .replace(/DELIMITER \/\/[\s\S]*?DELIMITER ;/g, '')
+      // Strip line comments, block comments, and DELIMITER blocks for mysql2 compatibility
+      const noComments = sqlContent
+        .replace(/--.*$/gm, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/DELIMITER \/\/[\s\S]*?DELIMITER ;/g, '');
+
+      const stmts = noComments
         .split(';')
         .map(s => s.trim())
-        .filter(s => s.length > 0 && !s.startsWith('--'));
+        .filter(s => s.length > 0);
 
-      for (const stmt of cleaned) {
+      for (const stmt of stmts) {
         try {
           await rootConn.query(stmt);
         } catch (e) {
-          // Ignore table already exists or minor duplicate notices
+          // Ignore notices
         }
       }
 
