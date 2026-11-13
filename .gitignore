@@ -9,6 +9,10 @@ node_modules/
 # Personal Local Vault Data
 data/real-vault.json
 
+# Internal Documentation & IDE Config
+LAB_REPORT.md
+.vscode/
+
 # Logs & OS files
 npm-debug.log*
 .DS_Store

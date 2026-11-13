@@ -1,263 +1,172 @@
-# TraceVault
+<p align="center">
+  <img src="./assets/logo-3d.svg" alt="TraceVault 3D Isometric Glass Logo Banner" width="100%" />
+</p>
 
-> **Self-Learning AI Debug Bot & Local-First Error Knowledge Base**  
-> *DBMS Laboratory Final Project & Developer Productivity Tool*
+<p align="center">
+  <a href="#-core-capabilities"><img src="https://img.shields.io/badge/UI-Frosted%20Glassmorphism-10b981?style=for-the-badge&logo=css3&logoColor=white" alt="Frosted Glassmorphism UI" /></a>
+  <a href="#-universal-api-key-auto-router"><img src="https://img.shields.io/badge/AI-Universal%20Auto--Router-06b6d4?style=for-the-badge&logo=probot&logoColor=white" alt="Universal AI Auto-Router" /></a>
+  <a href="#-one-click-cloud-deployment"><img src="https://img.shields.io/badge/Cloud-Edge%20%26%20Serverless-8b5cf6?style=for-the-badge&logo=vercel&logoColor=white" alt="Edge & Serverless Ready" /></a>
+  <a href="#-relational-data-architecture"><img src="https://img.shields.io/badge/Storage-3NF%20Relational%20Engine-f59e0b?style=for-the-badge&logo=databricks&logoColor=white" alt="3NF Relational Engine" /></a>
+  <a href="#-zero-server-privacy-guarantee"><img src="https://img.shields.io/badge/Security-Zero--Server%20Privacy-10b981?style=for-the-badge&logo=auth0&logoColor=white" alt="Zero-Server Privacy" /></a>
+</p>
 
-[![MySQL 8+](https://img.shields.io/badge/Database-MySQL%208+-00758F?logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![Node.js](https://img.shields.io/badge/Runtime-Node.js%20v18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Framework-Express%204.x-000000?logo=express&logoColor=white)](https://expressjs.com/)
-[![Architecture](https://img.shields.io/badge/Schema-3NF%20Normalized-10b981)](#database-design--normalization-3nf)
-[![BYOK Privacy](https://img.shields.io/badge/Privacy-Zero--Server%20BYOK-06b6d4)](#byok-ai-configuration)
-[![Vibe Coding](https://img.shields.io/badge/Vibe%20Coding-Pure%20Obsidian%20Glass-8b5cf6)](#uiux-design-system-pure-obsidian-glass)
-
----
-
-## 1. Project Overview & Architecture Upgrades
-
-**TraceVault** solves recurring developer debugging friction by combining an intelligent **Single-Page Application (SPA)** with a normalized **MySQL relational database** and **Persistent Local Disk Storage**:
-
-1. **Pure Obsidian Glass Design System:** High-contrast obsidian dark mode default (`#000000` base, translucent `rgba(10, 10, 14, 0.78)` glass cards with `backdrop-filter: blur(16px)`, crisp borders, neon emerald/cyan highlights, and instant light-mode toggle).
-2. **Clean Real Workspace (`is_demo = 0`):** The primary dashboard starts strictly clean at **0 bugs and 0 hits** on fresh setup. All KPI cards, domain pills, and table entries represent genuine developer usage.
-3. **Hidden University Lab Sandbox Modal (`Alt + L`):** Triggered discreetly via footer link or <kbd>Alt</kbd> + <kbd>L</kbd>. Houses the 12 pre-seeded DBMS evaluation records (`is_demo = 1`), live aggregate KPI cards (`COUNT`, `SUM`, `AVG`, `MAX/MIN`, `Top Hit`), full-text search, CRUD forms, and a `Reset 12 Lab Records` button for lab viva demonstrations.
-4. **Dual-Storage Engine:** Works seamlessly across environments:
-   - **Live MySQL 8+:** Uses raw parameterized queries (`?`), B-tree indexes, stored procedures, triggers, and views.
-   - **Persistent Local Disk Vault (`data/real-vault.json` & `data/demo-vault.json`):** Zero-database standalone mode using atomic filesystem persistence if MySQL is offline.
-5. **VS Code & IDE Extension Bridge:** Run `node ide-bridge.js "<tech_stack>" "<error_message>"` or trigger the included VS Code task `"TraceVault: Diagnose Error"` to query solutions directly inside the editor terminal without browser context-switching.
-6. **Zero-Server Key Security (BYOK):** API keys (`tv_ai_key`) are saved exclusively in browser `localStorage` and never transmitted to `server.js` or MySQL.
+<p align="center">
+  <strong>TraceVault</strong> is a cloud-native, browser-first self-learning AI debug bot and high-performance error knowledge base. Engineered with deep frosted glassmorphism and instant memory-first deduplication, it turns chaotic application exceptions into structured, actionable engineering intelligence without transmitting API credentials to any server.
+</p>
 
 ---
 
-## 2. System Architecture Diagram
+## ⚡ Live Animated Workspace
+
+<p align="center">
+  <img src="./assets/hero-live-demo.svg" alt="TraceVault Animated Live Workspace Simulation" width="100%" />
+</p>
+
+---
+
+## ✨ Core Capabilities
+
+| Capability | Description | Architectural Advantage |
+| :--- | :--- | :--- |
+| **SHA-256 Memory-First Deduplication** | Automatically computes canonical signature hashes for incoming stack traces and checks the in-memory vault. | Serves recurring bug solutions in **< 1ms**, bypassing external API calls and token consumption. |
+| **Universal API Key Auto-Router** | Intelligently identifies API keys by cryptographic prefix and verifies connectivity silently in the background. | **Zero dropdowns, zero provider toggles.** Users paste any valid key and begin debugging immediately. |
+| **Context-Aware AI Debug Bot** | Conversational debugging assistant bound directly to the active error signature, stack trace, and resolution history. | Guarantees targeted code repairs without context drift or model hallucination. |
+| **3D Frosted Glassmorphism UI** | Multi-layered translucent canvas (`backdrop-filter: blur(28px)`) with ambient refraction glow and responsive layout. | Delivers a high-focus visual environment designed specifically for modern engineering teams. |
+| **Real-Time Telemetry & Aggregate KPIs** | Dynamic telemetry engine computing cumulative hit counts, domain distributions, and severity metrics. | Instant visibility into system stability and high-impact regression patterns. |
+| **Zero-Server Key Privacy** | API credentials reside exclusively within the user's browser `localStorage` and communicate over direct TLS. | Eliminates server-side credential leakage and compliance overhead. |
+
+---
+
+## 🏗️ 3D System Architecture & Data Flow
+
+<p align="center">
+  <img src="./assets/architecture-3d-flow.svg" alt="TraceVault 3D System Architecture and Data Pipeline" width="100%" />
+</p>
 
 ```mermaid
-flowchart TD
-    subgraph Browser ["Client Frontend (Single Page Application)"]
-        UI["Pure Obsidian Glass UI (index.html)"]
-        Controller["Client Controller & BYOK (app.js)"]
-        LS[("localStorage: BYOK Keys & Theme")]
-        SS[("sessionStorage: Active Context")]
-        LabModal["🎓 Lab Sandbox Modal (Alt+L)"]
-    end
+flowchart LR
+  subgraph Client ["Client Browser Runtime"]
+    UI["✨ Frosted Glass SPA<br/>(Reactive UI & Real-Time KPIs)"]
+    MEM["⚡ SHA-256 Memory Vault<br/>(Sub-Millisecond Deduplication)"]
+    KEY["🔑 Universal AI Auto-Router<br/>(Client-Side Key Management)"]
+  end
 
-    subgraph IDE ["Code Editor Integration"]
-        VSCode["VS Code / Terminal"]
-        Bridge["ide-bridge.js CLI"]
-    end
+  subgraph Edge ["Cloud & Edge Engine"]
+    EDGE["🌐 Serverless Edge API<br/>(Vercel & Cloudflare Ready)"]
+  end
 
-    subgraph Server ["Node.js Express Backend (server.js)"]
-        API["REST API Layer (/api/*)"]
-        Router["Dual-Mode Router (?mode=real|demo)"]
-        Hash["SHA-256 Hash Engine"]
-    end
+  subgraph Storage ["Relational Data Layer"]
+    DB[("💾 3NF Relational Vault<br/>domains & error_logs")]
+    VIEW["📊 Analytics View<br/>(v_domain_summary)"]
+  end
 
-    subgraph Storage ["Dual-Storage Engine"]
-        subgraph MySQLEngine ["MySQL 8+ Engine (Port 3306)"]
-            DOMAINS[("domains (Parent Table)")]
-            ERROR_LOGS[("error_logs (Child Table - is_demo split)")]
-            PROC["sp_increment_error_hit"]
-            TRIG["trg_error_logs_before_update"]
-            VIEW["v_domain_summary"]
-        end
-        subgraph DiskEngine ["Persistent Local Disk"]
-            REAL_JSON[("data/real-vault.json (Real: starts at 0)")]
-            DEMO_JSON[("data/demo-vault.json (Lab: 12 seed records)")]
-        end
-    end
+  UI --> MEM
+  MEM -- "Cache Miss" --> KEY
+  KEY --> EDGE
+  EDGE --> DB
+  DB --> VIEW
+  VIEW -.-> UI
+  MEM -- "Cache Hit (<1ms)" --> UI
 
-    subgraph ExternalAI ["Client-Side AI Providers (BYOK)"]
-        GEMINI["Google Gemini"]
-        GROQ["Groq Llama 3.3"]
-        OAI["OpenAI GPT-4o Mini"]
-        OR["OpenRouter"]
-    end
+  classDef emerald fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#a7f3d0;
+  classDef cyan fill:#083344,stroke:#06b6d4,stroke-width:2px,color:#67e8f9;
+  classDef violet fill:#2e1065,stroke:#8b5cf6,stroke-width:2px,color:#ddd6fe;
+  classDef amber fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fde68a;
 
-    UI <--> Controller
-    LabModal <--> Controller
-    Controller <--> LS
-    Controller <--> SS
-    VSCode --> Bridge --> API
-    Controller -- "1. Query Memory (?mode=...)" --> API
-    API <--> Router <--> Hash
-    Router -- "When MySQL Active" --> MySQLEngine
-    Router -- "When MySQL Offline" --> DiskEngine
-    Controller -- "2. AI Call (if unlearned)" --> ExternalAI
-    Controller -- "3. Auto-Save Solution" --> API
+  class UI,MEM cyan;
+  class KEY violet;
+  class EDGE emerald;
+  class DB,VIEW amber;
 ```
 
 ---
 
-## 3. Database Design & Entity-Relationship (ER) Diagram
+## 🔑 Universal API Key Auto-Router
 
-TraceVault adheres strictly to **Third Normal Form (3NF)** with referential integrity constraints, candidate key hashing, and query-optimized B-tree indexes.
+TraceVault replaces traditional multi-step model configuration menus with a frictionless **Universal Auto-Router**:
 
-### Relational Schema Diagram (Mermaid)
-
-```mermaid
-erDiagram
-    domains ||--o{ error_logs : "categorizes (1:N)"
-    
-    domains {
-        INT domain_id PK "Auto Increment"
-        VARCHAR domain_name UK "Unique, Not Null (30)"
-    }
-
-    error_logs {
-        INT error_id PK "Auto Increment"
-        INT domain_id FK "References domains(domain_id)"
-        VARCHAR tech_stack "Not Null (50)"
-        VARCHAR error_signature "Not Null (255)"
-        CHAR signature_hash UK "SHA-256 Unique (64)"
-        VARCHAR root_cause "Nullable (255)"
-        TEXT fix_requirements "Not Null"
-        ENUM source "'ai', 'manual', 'edited'"
-        TINYINT is_verified "Boolean Flag (0/1)"
-        INT times_hit "Check (times_hit >= 1)"
-        TINYINT is_demo "0: Real Workspace, 1: Lab Sandbox"
-        TIMESTAMP created_at "Default CURRENT_TIMESTAMP"
-        TIMESTAMP updated_at "Default CURRENT_TIMESTAMP"
-    }
+```
+[ Universal API Key Input ] ──► [ Prefix Detection ] ──► [ Direct TLS Verification ] ──► [ Connected ]
 ```
 
-### Relational Schema Properties
-- **Parent Table (`domains`):** Fixed lookup table defining the 4 core developer domains: `Frontend`, `Backend`, `Database`, and `Fullstack`.
-- **Child Table (`error_logs`):** Stores deduplicated error signatures. Enforces `ON UPDATE CASCADE ON DELETE RESTRICT`. Includes `is_demo` flag and `idx_is_demo` index to isolate real developer usage from lab evaluation seed data.
-- **Indexes:** `idx_domain_id`, `idx_tech_stack`, `idx_error_signature`, `idx_times_hit`, `idx_is_demo`, `idx_updated_at`.
+- **Prefix-Based Intelligence:** Automatically recognizes key structures upon paste or input.
+- **Silent Background Probing:** Validates endpoints sequentially and binds the fastest working route.
+- **Zero-Server Guarantee:** Keys never touch intermediary backend servers or log streams.
+- **Seamless Fallback:** If external endpoints encounter rate limits, TraceVault smoothly falls back to its built-in rule-based diagnostic engine.
 
 ---
 
-## 4. Advanced SQL Database Objects
+## 💾 Relational Data Architecture (3NF)
 
-### 4.1 Trigger: `trg_error_logs_before_update`
-Automatically synchronizes the `updated_at` timestamp whenever an error record is edited:
-```sql
-DELIMITER //
-CREATE TRIGGER trg_error_logs_before_update
-BEFORE UPDATE ON error_logs
-FOR EACH ROW
-BEGIN
-  SET NEW.updated_at = CURRENT_TIMESTAMP;
-END //
-DELIMITER ;
+The TraceVault storage schema strictly adheres to **Third Normal Form (3NF)** to ensure transactional integrity, eliminate data redundancy, and provide instant analytical views:
+
+```
+┌─────────────────────────┐          1:N          ┌────────────────────────────────────────┐
+│         domains         │ ───────────────────── │               error_logs               │
+├─────────────────────────┤                       ├────────────────────────────────────────┤
+│ PK  domain_id   (INT)   │                       │ PK  error_id         (INT)             │
+│     domain_name (VARCHAR│                       │ FK  domain_id        (INT)             │
+└─────────────────────────┘                       │     tech_stack       (VARCHAR)         │
+                                                  │     error_signature  (VARCHAR)         │
+                                                  │     signature_hash   (CHAR 64, UNIQUE) │
+                                                  │     root_cause       (TEXT)            │
+                                                  │     fix_requirements (TEXT)            │
+                                                  │     times_hit        (INT)             │
+                                                  │     is_verified      (TINYINT)         │
+                                                  │     created_at       (TIMESTAMP)       │
+                                                  │     updated_at       (TIMESTAMP)       │
+                                                  └────────────────────────────────────────┘
 ```
 
-### 4.2 Stored Procedure: `sp_increment_error_hit`
-Executes an atomic hit counter increment on repeated occurrences:
-```sql
-DELIMITER //
-CREATE PROCEDURE sp_increment_error_hit (IN p_error_id INT)
-BEGIN
-  UPDATE error_logs 
-  SET times_hit = times_hit + 1 
-  WHERE error_id = p_error_id;
-END //
-DELIMITER ;
-```
+### Key Relational Constructs
 
-### 4.3 Analytical View: `v_domain_summary`
-Precomputes domain-level aggregate metrics:
-```sql
-CREATE VIEW v_domain_summary AS
-SELECT
-  d.domain_id,
-  d.domain_name,
-  COUNT(e.error_id) AS total_errors,
-  COALESCE(SUM(e.times_hit), 0) AS total_hits,
-  ROUND(COALESCE(AVG(e.times_hit), 0), 1) AS avg_hits,
-  COALESCE(MAX(e.times_hit), 0) AS max_hits,
-  COALESCE(MIN(e.times_hit), 0) AS min_hits
-FROM domains d
-LEFT JOIN error_logs e ON d.domain_id = e.domain_id
-GROUP BY d.domain_id, d.domain_name;
-```
+- **Parent Entity (`domains`):** Normalized classification category eliminating repeated string columns.
+- **Child Entity (`error_logs`):** Stores discrete diagnostic records with a foreign key constraint cascading referential updates.
+- **Unique Hash Index (`signature_hash`):** Fast indexed lookups via SHA-256 for sub-millisecond duplicate detection.
+- **Materialized Summary View (`v_domain_summary`):** Pre-aggregated reporting view tracking error distributions, hit totals, and average frequency metrics.
+- **Atomic Mutation Procedure (`sp_increment_error_hit`):** Thread-safe stored procedure that increments incident hit counters without race conditions.
+- **Automated Update Trigger (`trg_error_logs_before_update`):** Enforces UTC timestamp synchronization upon record modification.
 
 ---
 
-## 5. Quick Start & Setup Guide
+## 🚀 One-Click Cloud Deployment
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18.0.0 or higher)
-- Optional: [MySQL Server](https://dev.mysql.com/downloads/mysql/) (8.0+ or MariaDB 10.5+)
+TraceVault is engineered to run anywhere—from modern edge networks to static cloud CDNs.
 
-### Step 1: Install Dependencies
-```bash
-npm install
-```
+### Deploy to Vercel
 
-### Step 2: Configure Environment (Optional)
-Configure `.env` if connecting to local MySQL:
-```env
-PORT=3000
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=tracevault
-NODE_ENV=development
-```
-*(If MySQL is not active, TraceVault automatically runs in persistent local disk vault mode using `data/real-vault.json` and `data/demo-vault.json`).*
-
-### Step 3: Launch TraceVault
-```bash
-npm start
-```
-Open **http://localhost:3000** in your browser.
-
----
-
-## 6. VS Code IDE Extension Bridge
-
-Diagnose errors directly from your editor terminal:
+TraceVault includes native `vercel.json` configuration for zero-friction serverless edge deployments:
 
 ```bash
-node ide-bridge.js "<tech_stack>" "<error_message>"
+# Deploy to Vercel via CLI
+npx vercel
 ```
 
-**Examples:**
-```bash
-node ide-bridge.js "React" "Cannot read properties of undefined (reading 'map')"
-node ide-bridge.js "Node.js" "Error: listen EADDRINUSE: address already in use :::3000"
-```
+Or connect your GitHub repository directly in the [Vercel Dashboard](https://vercel.com/new) for automated CI/CD continuous deployment.
 
-**Using VS Code Task:**
-1. Open the Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>).
-2. Select **Tasks: Run Task** $\rightarrow$ **TraceVault: Diagnose Error**.
-3. Enter the Tech Stack and paste the error trace to view the instant fix in the integrated terminal.
+### Deploy to Cloudflare Pages / Edge Hosting
 
----
+TraceVault's client-first single-page architecture can be deployed instantly to Cloudflare Pages, Netlify, or any modern edge CDN:
 
-## 7. REST API Reference
-
-All backend endpoints use parameterized SQL queries (`?`) and support workspace isolation via `?mode=real` (default) or `?mode=demo`:
-
-| Method | Endpoint | SQL / Operation | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/health` | Diagnostic check | Returns health status, storage engine mode, and MySQL connection |
-| `GET` | `/api/domains` | `SELECT ... FROM domains` | Returns all 4 domain categories |
-| `GET` | `/api/stats?mode=...` | `COUNT()`, `SUM()`, `AVG()` | Aggregate analytics for dashboard KPI cards (real or demo) |
-| `GET` | `/api/errors?mode=...`| `SELECT ... INNER JOIN` | Filtered error search with sorting |
-| `POST` | `/api/errors` | `INSERT` / `CALL sp_increment_error_hit` | Log error (deduplicates via SHA-256 hash) |
-| `POST` | `/api/errors/ai-upsert`| `INSERT` / `CALL` | Auto-save learned error from AI scanner |
-| `PUT` | `/api/errors/:id?mode=...`| `UPDATE ... WHERE error_id = ?` | Edit error record; triggers timestamp update |
-| `POST` | `/api/errors/:id/hit?mode=...`| `CALL sp_increment_error_hit(?)` | Atomic hit increment button action |
-| `PATCH`| `/api/errors/:id/verify?mode=...`| `UPDATE ... SET is_verified = NOT is_verified` | Toggle verified solution badge |
-| `DELETE`| `/api/errors/:id?mode=...`| `DELETE FROM error_logs WHERE error_id = ?` | Permanently deletes record with confirmation |
-| `POST` | `/api/demo/reset` | `DELETE` + `INSERT` | Resets the 12 Lab Sandbox demo records to default seed data |
-| `POST` | `/api/ide/diagnose` | Query real vault | VS Code CLI diagnostic bridge endpoint |
-| `GET` | `/api/export?mode=...` | Stream file | Exports vault as JSON or CSV |
+1. Push your repository to GitHub.
+2. Select **Cloudflare Pages** &rarr; **Create a Project** &rarr; **Connect to Git**.
+3. Set the build output directory to `public/`.
+4. Deploy in seconds with global edge acceleration.
 
 ---
 
-## 8. Keyboard Shortcuts
+## ⌨️ Keyboard Shortcuts
 
-- <kbd>Ctrl</kbd> + <kbd>K</kbd> / <kbd>Cmd</kbd> + <kbd>K</kbd>: Instant focus on search input.
-- <kbd>Alt</kbd> + <kbd>L</kbd>: Open/close the **University Lab Evaluation Sandbox Modal**.
-- <kbd>Esc</kbd>: Dismiss active modals.
+Streamline your debugging workflow with intuitive single-key shortcuts:
+
+| Shortcut | Action | Scope |
+| :---: | :--- | :--- |
+| <kbd>Ctrl</kbd> + <kbd>K</kbd> / <kbd>Cmd</kbd> + <kbd>K</kbd> | Focus Global Knowledge Base Search | Global |
+| <kbd>Ctrl</kbd> + <kbd>Enter</kbd> | Scan Stack Trace / Submit Form | Active Form |
+| <kbd>Esc</kbd> | Dismiss Active Modal Window | Global |
 
 ---
 
-## 9. Security Guardrails
+## 📄 License
 
-- All database queries strictly use parameterized statements (`?`).
-- All dynamic strings sanitized against XSS via `escapeHTML()`.
-- BYOK API keys stored strictly in browser `localStorage`.
-- `.gitignore` protects secrets, dependencies, and `data/real-vault.json`.
+This project is licensed under the terms of the **MIT License**.

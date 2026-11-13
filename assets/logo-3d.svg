@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 240" fill="none">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="840" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#060913" />
+      <stop offset="50%" stop-color="#0a1024" />
+      <stop offset="100%" stop-color="#060913" />
+    </linearGradient>
+
+    <!-- Neon Glow Filters -->
+    <filter id="coreGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur1" />
+      <feGaussianBlur stdDeviation="24" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="badgeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Gradients -->
+    <linearGradient id="titleGrad" x1="240" y1="70" x2="680" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="45%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#a78bfa" />
+    </linearGradient>
+
+    <linearGradient id="cubeTop" x1="50" y1="38" x2="206" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45" />
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.15" />
+    </linearGradient>
+
+    <linearGradient id="cubeLeft" x1="50" y1="83" x2="128" y2="218" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.4" />
+      <stop offset="60%" stop-color="#0a1024" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.3" />
+    </linearGradient>
+
+    <linearGradient id="cubeRight" x1="206" y1="83" x2="128" y2="218" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.45" />
+      <stop offset="60%" stop-color="#060913" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.25" />
+    </linearGradient>
+
+    <linearGradient id="quantumCore" x1="97" y1="92" x2="159" y2="164" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+
+    <radialGradient id="ambientCyan" cx="128" cy="120" r="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.5" />
+      <stop offset="50%" stop-color="#10b981" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#060913" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="ambientViolet" cx="720" cy="50" r="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#060913" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <style>
+    @keyframes floatCube {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(1.2deg); }
+    }
+    @keyframes pulseCore {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+    @keyframes neonGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4)); }
+      50% { filter: drop-shadow(0 0 22px rgba(6, 182, 212, 0.75)); }
+    }
+    @keyframes orbitRings {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .floating-cube {
+      transform-origin: 128px 128px;
+      animation: floatCube 4.5s ease-in-out infinite;
+    }
+    .pulsing-core {
+      transform-origin: 128px 128px;
+      animation: pulseCore 3s ease-in-out infinite;
+    }
+    .brand-text {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .code-text {
+      font-family: 'JetBrains Mono', Consolas, 'Fira Code', monospace;
+    }
+  </style>
+
+  <!-- Canvas Container with Specular Glass Border -->
+  <rect x="2" y="2" width="836" height="236" rx="20" fill="url(#bgGrad)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" />
+  <rect x="2" y="2" width="836" height="236" rx="20" stroke="url(#titleGrad)" stroke-width="1" stroke-opacity="0.3" />
+
+  <!-- Ambient Light Orbs -->
+  <circle cx="128" cy="120" r="110" fill="url(#ambientCyan)" />
+  <circle cx="720" cy="50" r="160" fill="url(#ambientViolet)" />
+
+  <!-- ================= LEFT: ANIMATED 3D ISOMETRIC GLASS CUBE ================= -->
+  <g class="floating-cube">
+    <!-- Back Translucent Wireframe -->
+    <path d="M128 38 L50 83 L50 173 L128 128 Z" fill="rgba(6, 182, 212, 0.08)" stroke="rgba(6, 182, 212, 0.4)" stroke-width="1.5" stroke-dasharray="4 3" />
+    <path d="M128 38 L206 83 L206 173 L128 128 Z" fill="rgba(16, 185, 129, 0.08)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="1.5" stroke-dasharray="4 3" />
+    <path d="M128 128 L50 173 L128 218 L206 173 Z" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5" stroke-dasharray="4 3" />
+
+    <!-- Pulsing Inner Quantum Core -->
+    <g class="pulsing-core" filter="url(#coreGlow)">
+      <path d="M128 92 L159 110 L128 128 L97 110 Z" fill="#38bdf8" stroke="rgba(255, 255, 255, 0.9)" stroke-width="1.5" />
+      <path d="M97 110 L128 128 L128 164 L97 146 Z" fill="#06b6d4" stroke="rgba(255, 255, 255, 0.7)" stroke-width="1.5" />
+      <path d="M128 128 L159 110 L159 146 L128 164 Z" fill="#10b981" stroke="rgba(255, 255, 255, 0.7)" stroke-width="1.5" />
+      <circle cx="128" cy="128" r="7" fill="#ffffff" />
+    </g>
+
+    <!-- Outer Translucent Frosted Glass Faces -->
+    <path d="M50 83 L128 128 L128 218 L50 173 Z" fill="url(#cubeLeft)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2" />
+    <path d="M128 128 L206 83 L206 173 L128 218 Z" fill="url(#cubeRight)" stroke="rgba(255, 255, 255, 0.28)" stroke-width="2" />
+    <path d="M128 38 L206 83 L128 128 L50 83 Z" fill="url(#cubeTop)" stroke="rgba(255, 255, 255, 0.55)" stroke-width="2.5" />
+
+    <!-- Specular Highlight Bevels -->
+    <path d="M128 38 L50 83 L128 128" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95" />
+    <path d="M128 38 L206 83" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.8" />
+    <path d="M128 128 L128 218" stroke="rgba(255, 255, 255, 0.85)" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Glass Nodes -->
+    <circle cx="128" cy="38" r="4" fill="#ffffff" filter="url(#coreGlow)" />
+    <circle cx="50" cy="83" r="3.5" fill="#06b6d4" />
+    <circle cx="206" cy="83" r="3.5" fill="#10b981" />
+    <circle cx="128" cy="218" r="3.5" fill="#a78bfa" />
+    <circle cx="128" cy="128" r="4.5" fill="#ffffff" />
+  </g>
+
+  <!-- ================= RIGHT: BRANDING TYPOGRAPHY & PILLS ================= -->
+  <g class="brand-text">
+    <!-- Version Tag -->
+    <rect x="240" y="38" width="132" height="24" rx="12" fill="rgba(16, 185, 129, 0.12)" stroke="rgba(16, 185, 129, 0.4)" stroke-width="1" />
+    <circle cx="252" cy="50" r="4" fill="#10b981" />
+    <text x="264" y="54" fill="#6ee7b7" font-size="11" font-weight="700" letter-spacing="0.08em">PRODUCTION CLOUD</text>
+
+    <!-- App Title with Gradient -->
+    <text x="240" y="104" font-size="46" font-weight="900" letter-spacing="-0.03em" fill="url(#titleGrad)">TraceVault</text>
+
+    <!-- Subtitle -->
+    <text x="240" y="132" font-size="14.5" font-weight="500" fill="#94a3b8" letter-spacing="-0.01em">
+      Self-Learning AI Debug Bot &amp; Cloud-Native Error Knowledge Base
+    </text>
+
+    <!-- Feature Pills -->
+    <g transform="translate(240, 156)">
+      <!-- Pill 1: Frosted Glass UI -->
+      <rect x="0" y="0" width="136" height="28" rx="8" fill="rgba(255, 255, 255, 0.05)" stroke="rgba(255, 255, 255, 0.14)" stroke-width="1" />
+      <text x="12" y="18" fill="#e2e8f0" font-size="11" font-weight="600">✨ Frosted Glass UI</text>
+
+      <!-- Pill 2: Universal AI Router -->
+      <rect x="146" y="0" width="156" height="28" rx="8" fill="rgba(6, 182, 212, 0.08)" stroke="rgba(6, 182, 212, 0.3)" stroke-width="1" />
+      <text x="158" y="18" fill="#38bdf8" font-size="11" font-weight="600">🔑 Universal AI Router</text>
+
+      <!-- Pill 3: Edge & Cloud Ready -->
+      <rect x="312" y="0" width="138" height="28" rx="8" fill="rgba(16, 185, 129, 0.08)" stroke="rgba(16, 185, 129, 0.3)" stroke-width="1" />
+      <text x="324" y="18" fill="#34d399" font-size="11" font-weight="600">🌐 Edge / Vercel Ready</text>
+
+      <!-- Pill 4: Zero-Server Privacy -->
+      <rect x="460" y="0" width="112" height="28" rx="8" fill="rgba(139, 92, 246, 0.08)" stroke="rgba(139, 92, 246, 0.3)" stroke-width="1" />
+      <text x="472" y="18" fill="#c084fc" font-size="11" font-weight="600">🔒 Zero-Server</text>
+    </g>
+
+    <text x="240" y="214" class="code-text" font-size="11.5" fill="#64748b">
+      SHA-256 Deduplication <tspan fill="#38bdf8">•</tspan> 3NF Relational Architecture <tspan fill="#38bdf8">•</tspan> Zero Dependencies First
+    </text>
+  </g>
+</svg>
