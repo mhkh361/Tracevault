@@ -439,9 +439,7 @@ Error: listen EADDRINUSE: address already in use :::3000
     // BYOK Modal
     modalByokConfig: document.getElementById('modal-byok-config'),
     btnCloseByokModal: document.getElementById('btn-close-byok-modal'),
-    byokProviderSelect: document.getElementById('byok-provider-select'),
-    byokModelSelect: document.getElementById('byok-model-select'),
-    byokModelInput: document.getElementById('byok-model-input'),
+    byokBtnLabel: document.getElementById('byok-btn-label'),
     byokKeyInput: document.getElementById('byok-key-input'),
     byokDetectedBadge: document.getElementById('byok-detected-badge'),
     btnToggleKeyVisibility: document.getElementById('btn-toggle-key-visibility'),
@@ -450,11 +448,18 @@ Error: listen EADDRINUSE: address already in use :::3000
     btnSaveByok: document.getElementById('btn-save-byok'),
     btnClearByok: document.getElementById('btn-clear-byok'),
 
-    // MySQL Sync Modal
+    // MySQL Sync & Inspector Modal
     modalMysqlSync: document.getElementById('modal-mysql-sync'),
     btnCloseMysqlModal: document.getElementById('btn-close-mysql-modal'),
     btnCloseMysqlFooter: document.getElementById('btn-close-mysql-footer'),
-    btnCheckMysqlNow: document.getElementById('btn-check-mysql-now'),
+    btnRunSqlPing: document.getElementById('btn-run-sql-ping'),
+    sqlPingLatency: document.getElementById('sql-ping-latency'),
+    sqlPingResult: document.getElementById('sql-ping-result'),
+    modalDbStatusBadge: document.getElementById('modal-db-status-badge'),
+    inspectHost: document.getElementById('inspect-host'),
+    inspectDb: document.getElementById('inspect-db'),
+    inspectDriver: document.getElementById('inspect-driver'),
+    inspectNorm: document.getElementById('inspect-norm'),
 
     toastContainer: document.getElementById('toast-container')
   };
@@ -835,7 +840,7 @@ Error: listen EADDRINUSE: address already in use :::3000
 
   function renderDemoTable(records) {
     if (!records || records.length === 0) {
-      el.labTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">No demo records found. Click 'Reset 12 Lab Records' to restore default seed data.</td></tr>`;
+      el.labTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">No demo records found. Click '↻ Reset Demo Data' to restore default sample records.</td></tr>`;
       return;
     }
 
@@ -913,32 +918,31 @@ Error: listen EADDRINUSE: address already in use :::3000
     if (!key) return null;
     const cleanKey = key.trim();
     if (cleanKey.startsWith('AIza')) {
-      return { provider: 'gemini', model: 'gemini-2.5-flash', label: 'Google Gemini (Free: gemini-2.5-flash)' };
+      return { provider: 'gemini', model: 'gemini-2.5-flash', fallback: 'gemini-1.5-flash', label: 'Google Gemini' };
     }
     if (cleanKey.startsWith('gsk_')) {
-      return { provider: 'groq', model: 'llama-3.3-70b-versatile', label: 'Groq (Free: llama-3.3-70b-versatile)' };
+      return { provider: 'groq', model: 'llama-3.3-70b-versatile', fallback: 'llama3-70b-8192', label: 'Groq' };
     }
     if (cleanKey.startsWith('sk-or-')) {
-      return { provider: 'openrouter', model: 'deepseek/deepseek-r1:free', label: 'OpenRouter (Free: deepseek/deepseek-r1:free)' };
+      return { provider: 'openrouter', model: 'deepseek/deepseek-r1:free', fallback: 'meta-llama/llama-3.3-70b-instruct:free', label: 'OpenRouter' };
     }
     if (cleanKey.startsWith('sk-')) {
-      return { provider: 'openai', model: 'gpt-4o-mini', label: 'OpenAI (gpt-4o-mini)' };
+      return { provider: 'openai', model: 'gpt-4o-mini', fallback: 'gpt-3.5-turbo', label: 'OpenAI' };
     }
     return null;
   }
 
   function handleKeyInput() {
+    if (!el.byokKeyInput) return;
     const key = el.byokKeyInput.value.trim();
     const detected = detectProviderFromKey(key);
+    if (!el.byokDetectedBadge) return;
     if (detected) {
       el.byokDetectedBadge.textContent = `✓ Auto-detected: ${detected.label}`;
       el.byokDetectedBadge.className = 'detected-badge';
       el.byokDetectedBadge.style.display = 'inline-block';
-      el.byokProviderSelect.value = detected.provider;
-      if (el.byokModelSelect) el.byokModelSelect.value = detected.model;
-      if (el.byokModelInput) el.byokModelInput.value = detected.model;
     } else if (key) {
-      el.byokDetectedBadge.textContent = 'Custom API Key';
+      el.byokDetectedBadge.textContent = 'Universal API Key';
       el.byokDetectedBadge.className = 'detected-badge';
       el.byokDetectedBadge.style.display = 'inline-block';
     } else {
@@ -951,13 +955,21 @@ Error: listen EADDRINUSE: address already in use :::3000
   // BULLETPROOF BYOK AI ENGINE (AUTO-RETRY CHAIN & FAULT-TOLERANT PARSER)
   // =====================================================================
   async function callAiProviderWithFallback(domainId, techStack, trace) {
-    const provider = localStorage.getItem('tv_ai_provider') || 'gemini';
-    const chosenModel = localStorage.getItem('tv_ai_model') || PROVIDER_DEFAULTS[provider] || 'gemini-2.5-flash';
     const apiKey = localStorage.getItem('tv_ai_key');
 
     // Offline / No Key Fallback
     if (!apiKey || apiKey.trim() === '') {
       return runHeuristicDiagnosis(domainId, techStack, trace);
+    }
+
+    let provider = localStorage.getItem('tv_ai_provider');
+    let chosenModel = localStorage.getItem('tv_ai_model');
+    if (!provider) {
+      const detected = detectProviderFromKey(apiKey);
+      provider = detected ? detected.provider : 'gemini';
+      chosenModel = detected ? detected.model : 'gemini-2.5-flash';
+    } else if (!chosenModel) {
+      chosenModel = PROVIDER_DEFAULTS[provider] || 'gemini-2.5-flash';
     }
 
     const chain = MODEL_FALLBACK_CHAINS[provider] || [chosenModel];
@@ -1435,11 +1447,11 @@ Error: listen EADDRINUSE: address already in use :::3000
 
     if (state.isStaticMode) {
       saveStaticRecords('demo', [...SEED_DEMO_RECORDS]);
-      showToast('12 Lab Evaluation demo records reset to default!', 'success');
+      showToast('Demo data reset to default', 'success');
       await fetchStats('demo');
       await fetchErrors('demo');
       el.btnLabReset.disabled = false;
-      el.btnLabReset.textContent = '↺ Reset 12 Lab Records';
+      el.btnLabReset.textContent = '↻ Reset Demo Data';
       return;
     }
 
@@ -1448,7 +1460,7 @@ Error: listen EADDRINUSE: address already in use :::3000
       const json = await res.json();
 
       if (json.success) {
-        showToast('12 Lab Evaluation demo records reset to default!', 'success');
+        showToast('Demo data reset to default', 'success');
         await fetchStats('demo');
         await fetchErrors('demo');
       } else {
@@ -1458,7 +1470,7 @@ Error: listen EADDRINUSE: address already in use :::3000
       showToast('Error resetting demo records: ' + e.message, 'error');
     } finally {
       el.btnLabReset.disabled = false;
-      el.btnLabReset.textContent = '↺ Reset 12 Lab Records';
+      el.btnLabReset.textContent = '↻ Reset Demo Data';
     }
   }
 
@@ -1516,7 +1528,9 @@ Error: listen EADDRINUSE: address already in use :::3000
     const msgDiv = document.createElement('div');
     msgDiv.className = `chat-message ${role === 'user' ? 'user-message' : 'bot-message'}`;
 
-    const avatar = role === 'user' ? '👤' : '🤖';
+    const avatar = role === 'user'
+      ? '👤'
+      : '<img src="app-icon.svg?v=cube_v6" class="bot-avatar-img" alt="TraceVault AI" style="width: 22px; height: 22px; display: block;" />';
     msgDiv.innerHTML = `
       <div class="message-avatar">${avatar}</div>
       <div class="message-content markdown-body">
@@ -1875,7 +1889,7 @@ Provide direct, concise code examples and solutions.`
     el.modalLabSandbox.classList.remove('hidden');
     fetchStats('demo');
     fetchErrors('demo');
-    showToast('Entered DBMS Lab Evaluation Sandbox (is_demo = 1)', 'info');
+    showToast('Opened Live Demo Workspace', 'info');
   }
 
   function closeLabModal() {
@@ -1887,38 +1901,32 @@ Provide direct, concise code examples and solutions.`
   // =====================================================================
   function initByokStatus() {
     const key = localStorage.getItem('tv_ai_key');
+    const labelEl = el.byokBtnLabel || document.getElementById('byok-btn-label');
     if (key && key.trim() !== '') {
-      el.byokStatusPill.textContent = 'Active';
-      el.byokStatusPill.className = 'byok-indicator active';
+      if (labelEl) labelEl.textContent = 'AI Connected';
+      if (el.byokStatusPill) {
+        el.byokStatusPill.textContent = 'Connected';
+        el.byokStatusPill.className = 'byok-indicator active';
+      }
     } else {
-      el.byokStatusPill.textContent = 'Offline';
-      el.byokStatusPill.className = 'byok-indicator';
+      if (labelEl) labelEl.textContent = 'AI Key';
+      if (el.byokStatusPill) {
+        el.byokStatusPill.textContent = 'Offline';
+        el.byokStatusPill.className = 'byok-indicator';
+      }
     }
   }
 
   function openByokModal() {
-    const prov = localStorage.getItem('tv_ai_provider') || 'gemini';
-    const mod = localStorage.getItem('tv_ai_model') || PROVIDER_DEFAULTS[prov];
     const key = localStorage.getItem('tv_ai_key') || '';
-
-    el.byokProviderSelect.value = prov;
-    if (el.byokModelSelect) el.byokModelSelect.value = mod;
-    if (el.byokModelInput) el.byokModelInput.value = mod;
-    el.byokKeyInput.value = key;
-    el.testKeyResult.textContent = '';
+    if (el.byokKeyInput) el.byokKeyInput.value = key;
+    if (el.testKeyResult) el.testKeyResult.textContent = '';
     handleKeyInput();
     el.modalByokConfig.classList.remove('hidden');
   }
 
   function closeByokModal() {
     el.modalByokConfig.classList.add('hidden');
-  }
-
-  function handleProviderChange() {
-    const prov = el.byokProviderSelect.value;
-    const defaultMod = PROVIDER_DEFAULTS[prov] || 'gemini-2.5-flash';
-    if (el.byokModelSelect) el.byokModelSelect.value = defaultMod;
-    if (el.byokModelInput) el.byokModelInput.value = defaultMod;
   }
 
   function toggleKeyVisibility() {
@@ -1928,97 +1936,183 @@ Provide direct, concise code examples and solutions.`
   }
 
   function saveByokSettings() {
-    const prov = el.byokProviderSelect.value;
-    const mod = el.byokModelSelect?.value || el.byokModelInput?.value.trim() || PROVIDER_DEFAULTS[prov];
     const key = el.byokKeyInput.value.trim();
+    if (!key) {
+      clearByokSettings();
+      closeByokModal();
+      return;
+    }
+
+    const detected = detectProviderFromKey(key);
+    const prov = detected ? detected.provider : (localStorage.getItem('tv_ai_provider') || 'gemini');
+    const mod = detected ? detected.model : (localStorage.getItem('tv_ai_model') || PROVIDER_DEFAULTS[prov] || 'gemini-2.5-flash');
 
     localStorage.setItem('tv_ai_provider', prov);
     localStorage.setItem('tv_ai_model', mod);
-    if (key) {
-      localStorage.setItem('tv_ai_key', key);
-    } else {
-      localStorage.removeItem('tv_ai_key');
-    }
+    localStorage.setItem('tv_ai_key', key);
 
     initByokStatus();
     closeByokModal();
-    showToast('BYOK AI configuration saved to browser localStorage!', 'success');
+    showToast('AI Key connected successfully!', 'success');
   }
 
   function clearByokSettings() {
     localStorage.removeItem('tv_ai_key');
-    el.byokKeyInput.value = '';
+    if (el.byokKeyInput) el.byokKeyInput.value = '';
     handleKeyInput();
     initByokStatus();
-    el.testKeyResult.textContent = 'Key removed from localStorage.';
-    el.testKeyResult.style.color = 'var(--text-muted)';
-    showToast('API Key removed. Running offline heuristic analysis.', 'info');
+    if (el.testKeyResult) {
+      el.testKeyResult.textContent = 'Disconnected. Key removed.';
+      el.testKeyResult.style.color = 'var(--text-muted)';
+    }
+    closeByokModal();
+    showToast('AI Key disconnected. Running offline heuristic analyzer.', 'info');
+  }
+
+  async function probeProvider(provider, model, key) {
+    if (provider === 'gemini') {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: 'Say OK' }] }] })
+      });
+      if (res.ok) return true;
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    let ep = 'https://api.openai.com/v1/chat/completions';
+    if (provider === 'groq') ep = 'https://api.groq.com/openai/v1/chat/completions';
+    if (provider === 'openrouter') ep = 'https://openrouter.ai/api/v1/chat/completions';
+
+    const res = await fetch(ep, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({ model: model, messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 5 })
+    });
+    if (res.ok) return true;
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
   }
 
   async function testAiKey() {
-    const prov = el.byokProviderSelect.value;
-    const mod = el.byokModelSelect?.value || el.byokModelInput?.value.trim() || PROVIDER_DEFAULTS[prov];
     const key = el.byokKeyInput.value.trim();
-
     if (!key) {
       el.testKeyResult.textContent = '❌ Please enter an API key first.';
       el.testKeyResult.style.color = 'var(--accent-rose)';
       return;
     }
 
-    el.testKeyResult.textContent = '⏳ Testing connection to ' + mod + '...';
+    el.testKeyResult.textContent = '⏳ Testing connection with universal router...';
     el.testKeyResult.style.color = 'var(--accent-cyan)';
 
-    try {
-      if (prov === 'gemini') {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent?key=${key}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: 'Say OK' }] }] })
-        });
-        if (res.ok) {
-          el.testKeyResult.textContent = `✅ Gemini Connection Verified! Model: ${mod}`;
-          el.testKeyResult.style.color = 'var(--accent-emerald)';
-        } else {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `HTTP ${res.status}`);
-        }
-      } else {
-        let ep = 'https://api.openai.com/v1/chat/completions';
-        if (prov === 'groq') ep = 'https://api.groq.com/openai/v1/chat/completions';
-        if (prov === 'openrouter') ep = 'https://openrouter.ai/api/v1/chat/completions';
-
-        const res = await fetch(ep, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-          body: JSON.stringify({ model: mod, messages: [{ role: 'user', content: 'Say OK' }], max_tokens: 5 })
-        });
-        if (res.ok) {
-          el.testKeyResult.textContent = `✅ ${prov.toUpperCase()} Connection Verified! Model: ${mod}`;
-          el.testKeyResult.style.color = 'var(--accent-emerald)';
-        } else {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `HTTP ${res.status}`);
-        }
+    const detected = detectProviderFromKey(key);
+    const candidates = [];
+    if (detected) {
+      candidates.push({ provider: detected.provider, model: detected.model, label: detected.label });
+      if (detected.fallback) candidates.push({ provider: detected.provider, model: detected.fallback, label: detected.label });
+    }
+    const defaultCandidates = [
+      { provider: 'gemini', model: 'gemini-2.5-flash', label: 'Google Gemini' },
+      { provider: 'gemini', model: 'gemini-1.5-flash', label: 'Google Gemini 1.5' },
+      { provider: 'groq', model: 'llama-3.3-70b-versatile', label: 'Groq' },
+      { provider: 'openrouter', model: 'deepseek/deepseek-r1:free', label: 'OpenRouter' },
+      { provider: 'openai', model: 'gpt-4o-mini', label: 'OpenAI' }
+    ];
+    for (const c of defaultCandidates) {
+      if (!candidates.some(x => x.provider === c.provider && x.model === c.model)) {
+        candidates.push(c);
       }
-    } catch (e) {
-      el.testKeyResult.textContent = `❌ Test failed: ${e.message}`;
+    }
+
+    let verified = null;
+    let lastError = null;
+    for (const candidate of candidates) {
+      try {
+        await probeProvider(candidate.provider, candidate.model, key);
+        verified = candidate;
+        break;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+
+    if (verified) {
+      el.testKeyResult.textContent = `✅ Connected to ${verified.label}!`;
+      el.testKeyResult.style.color = 'var(--accent-emerald)';
+      localStorage.setItem('tv_ai_provider', verified.provider);
+      localStorage.setItem('tv_ai_model', verified.model);
+      localStorage.setItem('tv_ai_key', key);
+      initByokStatus();
+    } else {
+      el.testKeyResult.textContent = `❌ Verification failed: ${lastError?.message || 'Invalid key'}`;
       el.testKeyResult.style.color = 'var(--accent-rose)';
     }
   }
 
   // =====================================================================
-  // MYSQL SYNC MODAL CONTROLS
+  // MYSQL 3306 LIVE INSPECTOR & REAL-TIME SQL PING
   // =====================================================================
-  function openMysqlModal() {
+  async function openMysqlModal() {
     if (el.modalMysqlSync) {
       el.modalMysqlSync.classList.remove('hidden');
+      await runLiveSqlPing();
     }
   }
 
   function closeMysqlModal() {
     if (el.modalMysqlSync) {
       el.modalMysqlSync.classList.add('hidden');
+    }
+  }
+
+  async function runLiveSqlPing() {
+    if (!el.btnRunSqlPing || !el.sqlPingResult) return;
+    el.btnRunSqlPing.disabled = true;
+    el.btnRunSqlPing.textContent = '⏳ Pinging MySQL...';
+    if (el.sqlPingLatency) el.sqlPingLatency.textContent = '... ms';
+
+    const t0 = performance.now();
+    try {
+      const res = await fetch('/api/mysql/ping');
+      const data = await res.json();
+      const elapsed = Math.round(performance.now() - t0);
+      const latency = data.latency_ms ?? elapsed;
+
+      if (el.sqlPingLatency) {
+        el.sqlPingLatency.textContent = `${latency} ms`;
+        el.sqlPingLatency.className = latency < 50 ? 'badge badge-primary' : 'badge badge-accent';
+      }
+
+      if (data.success) {
+        el.sqlPingResult.textContent = JSON.stringify(data.result, null, 2);
+        el.sqlPingResult.style.color = '#a7f3d0';
+        if (el.modalDbStatusBadge) {
+          el.modalDbStatusBadge.textContent = '● MySQL 3306 Live';
+          el.modalDbStatusBadge.className = 'badge badge-primary';
+        }
+        if (data.metadata) {
+          if (el.inspectHost) el.inspectHost.textContent = data.metadata.host;
+          if (el.inspectDb) el.inspectDb.textContent = data.metadata.database;
+          if (el.inspectDriver) el.inspectDriver.textContent = data.metadata.driver;
+          if (el.inspectNorm) el.inspectNorm.textContent = data.metadata.normalization;
+        }
+      } else {
+        el.sqlPingResult.textContent = `Error: ${data.error || 'Connection failed'}`;
+        el.sqlPingResult.style.color = 'var(--accent-rose)';
+        if (el.modalDbStatusBadge) {
+          el.modalDbStatusBadge.textContent = '○ Offline';
+          el.modalDbStatusBadge.className = 'badge badge-subtle';
+        }
+      }
+    } catch (err) {
+      const elapsed = Math.round(performance.now() - t0);
+      if (el.sqlPingLatency) el.sqlPingLatency.textContent = `${elapsed} ms`;
+      el.sqlPingResult.textContent = `Connection error: ${err.message}`;
+      el.sqlPingResult.style.color = 'var(--accent-rose)';
+    } finally {
+      el.btnRunSqlPing.disabled = false;
+      el.btnRunSqlPing.textContent = '⚡ Run Live SQL Ping';
     }
   }
 
@@ -2089,29 +2183,21 @@ Provide direct, concise code examples and solutions.`
     if (el.btnCloseMysqlFooter) {
       el.btnCloseMysqlFooter.addEventListener('click', closeMysqlModal);
     }
-    if (el.btnCheckMysqlNow) {
-      el.btnCheckMysqlNow.addEventListener('click', async () => {
-        el.btnCheckMysqlNow.textContent = 'Checking...';
-        const health = await checkDatabaseHealth();
-        el.btnCheckMysqlNow.textContent = 'Check Connection Now';
-        if (health.db_connected) {
-          showToast('🟢 Connected to MySQL Port 3306!', 'success');
-        } else {
-          showToast('⚡ Running on local disk vault. MySQL 3306 is not active.', 'info');
-        }
-      });
+    if (el.btnRunSqlPing) {
+      el.btnRunSqlPing.addEventListener('click', runLiveSqlPing);
     }
 
     // BYOK Modal
     el.openByokModalBtn.addEventListener('click', openByokModal);
     el.btnCloseByokModal.addEventListener('click', closeByokModal);
-    el.byokProviderSelect.addEventListener('change', handleProviderChange);
-    el.byokKeyInput.addEventListener('input', handleKeyInput);
-    el.byokKeyInput.addEventListener('paste', () => setTimeout(handleKeyInput, 50));
-    el.btnToggleKeyVisibility.addEventListener('click', toggleKeyVisibility);
-    el.btnSaveByok.addEventListener('click', saveByokSettings);
-    el.btnClearByok.addEventListener('click', clearByokSettings);
-    el.btnTestAiKey.addEventListener('click', testAiKey);
+    if (el.byokKeyInput) {
+      el.byokKeyInput.addEventListener('input', handleKeyInput);
+      el.byokKeyInput.addEventListener('paste', () => setTimeout(handleKeyInput, 50));
+    }
+    if (el.btnToggleKeyVisibility) el.btnToggleKeyVisibility.addEventListener('click', toggleKeyVisibility);
+    if (el.btnSaveByok) el.btnSaveByok.addEventListener('click', saveByokSettings);
+    if (el.btnClearByok) el.btnClearByok.addEventListener('click', clearByokSettings);
+    if (el.btnTestAiKey) el.btnTestAiKey.addEventListener('click', testAiKey);
 
     // Keyboard Shortcuts: Ctrl+K / Cmd+K (Search) & Alt+L (Lab Sandbox)
     document.addEventListener('keydown', (e) => {
@@ -2186,7 +2272,9 @@ Provide direct, concise code examples and solutions.`
     el.btnClearChat.addEventListener('click', () => {
       el.chatMessages.innerHTML = `
         <div class="chat-message bot-message">
-          <div class="message-avatar">🤖</div>
+          <div class="message-avatar">
+            <img src="app-icon.svg?v=cube_v6" class="bot-avatar-img" alt="TraceVault AI" style="width: 22px; height: 22px; display: block;" />
+          </div>
           <div class="message-content">
             <p>Session chat cleared. Select an error row or scan broken code to debug!</p>
           </div>

@@ -447,6 +447,55 @@ app.get('/api/health', (req, res) => {
 });
 
 /**
+ * GET /api/mysql/ping
+ * Real-time SQL ping & metadata for MySQL 3306 Live Connection Inspector
+ */
+app.get('/api/mysql/ping', async (req, res) => {
+  const startTime = Date.now();
+  const sqlQuery = "SELECT 1 AS ping, DATABASE() AS active_db, VERSION() AS mysql_version, NOW() AS server_time, (SELECT COUNT(*) FROM error_logs) AS total_vault_records;";
+  
+  if (!isDbConnected || !pool) {
+    return res.status(503).json({
+      success: false,
+      error: 'MySQL server not connected on port ' + dbConfig.port,
+      sql: sqlQuery,
+      latency_ms: Date.now() - startTime
+    });
+  }
+
+  try {
+    const [rows] = await pool.query(sqlQuery);
+    const latencyMs = Date.now() - startTime;
+    return res.json({
+      success: true,
+      sql: sqlQuery,
+      latency_ms: latencyMs,
+      result: rows[0],
+      metadata: {
+        host: `${dbConfig.host}:${dbConfig.port}`,
+        database: dbConfig.database,
+        driver: 'mysql2/promise (Prepared Statements)',
+        normalization: '3NF (Third Normal Form)',
+        tables: [
+          { name: 'domains', type: 'Parent / Primary Key (domain_id)' },
+          { name: 'error_logs', type: 'Child / Foreign Key (domain_id -> domains.domain_id)' }
+        ],
+        view: 'v_domain_summary (Domain error count & hit metrics)',
+        stored_procedure: 'sp_increment_error_hit(IN p_error_id INT)',
+        trigger: 'trg_error_logs_before_update (Auto-updates updated_at timestamp)'
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: err.message,
+      sql: sqlQuery,
+      latency_ms: Date.now() - startTime
+    });
+  }
+});
+
+/**
  * GET /api/domains
  */
 app.get('/api/domains', async (req, res) => {
