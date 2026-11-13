@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TraceVault | Production Developer Vault &amp; DBMS Lab Knowledge Base</title>
+  <meta name="description" content="Production-grade, single-page developer error knowledge base and self-learning debugging bot for DBMS lab.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=obsidian_v4">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Main Application Wrapper -->
+  <div class="app-layout">
+    
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-logo">
+          <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#10b981" fill-opacity="0.15"/>
+            <path d="M7 11L16 6L25 11L16 16L7 11Z" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 16L16 21L25 16" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 21L16 26L25 21" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="brand-titles">
+            <div class="brand-main">
+              <span class="brand-title">TraceVault</span>
+              <span class="badge badge-primary">Production Vault</span>
+            </div>
+            <p class="brand-subtitle">Pure Obsidian Glass &bull; Self-Learning AI Debug Bot</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="quick-search-box" id="quick-search-trigger">
+          <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+          </svg>
+          <input type="text" id="global-search-input" placeholder="Quick search errors, stacks, or causes..." autocomplete="off">
+          <kbd class="shortcut-pill">Ctrl+K</kbd>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- MySQL Port 3306 Live Status & Sync Trigger -->
+        <button class="mysql-status-btn" id="mysql-status-trigger" title="MySQL Port 3306 Live Status &amp; Sync Info">
+          <span class="mysql-dot" id="mysql-status-dot"></span>
+          <span id="mysql-status-text">⚡ Sync MySQL</span>
+        </button>
+
+        <!-- Export Dropdown -->
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-btn" id="export-dropdown-btn">
+            <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            Export
+          </button>
+          <div class="dropdown-content" id="export-menu">
+            <button class="dropdown-item" id="export-json-btn">📥 Export Real Vault (JSON)</button>
+            <button class="dropdown-item" id="export-csv-btn">📊 Export Real Vault (CSV)</button>
+          </div>
+        </div>
+
+        <!-- BYOK Config Button -->
+        <button class="btn btn-secondary" id="open-byok-modal-btn">
+          <span class="key-icon">🔑</span>
+          <span class="btn-label">AI Key</span>
+          <span class="byok-indicator" id="byok-status-pill">Offline</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="btn btn-icon theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+          <span id="theme-icon">🌓</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER (REAL WORKSPACE: STARTS AT 0) -->
+    <main class="app-main">
+
+      <!-- SECTION 1: REAL WORKSPACE KPI AGGREGATE STRIP & DOMAIN PILLS -->
+      <section class="kpi-section">
+        <div class="kpi-cards-grid">
+          
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">TOTAL UNIQUE BUGS</span>
+              <span class="kpi-fn-tag">COUNT()</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-value" id="kpi-total-errors">0</span>
+              <span class="kpi-meta">Active In Real Workspace</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">RESOLVED INCIDENTS</span>
+              <span class="kpi-fn-tag">SUM()</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-value highlight-emerald" id="kpi-total-hits">0</span>
+              <span class="kpi-meta">Cumulative Times Hit</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">AVERAGE OCCURRENCE</span>
+              <span class="kpi-fn-tag">AVG()</span>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-value" id="kpi-avg-hits">0.0</span>
+              <span class="kpi-meta">Hits per Error Signature</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title">HIT SPREAD</span>
+              <span class="kpi-fn-tag">MAX() / MIN()</span>
+            </div>
+            <div class="kpi-body">
+              <div class="kpi-split-value">
+                <span class="split-item"><small>MAX</small> <strong id="kpi-max-hits">0</strong></span>
+                <span class="split-divider">/</span>
+                <span class="split-item"><small>MIN</small> <strong id="kpi-min-hits">0</strong></span>
+              </div>
+              <span class="kpi-meta">Frequency Distribution</span>
+            </div>
+          </div>
+
+          <div class="kpi-card kpi-card-featured">
+            <div class="kpi-header">
+              <span class="kpi-title">MOST FREQUENT BUG</span>
+              <span class="badge badge-accent">Top Hit</span>
+            </div>
+            <div class="kpi-body">
+              <div class="top-bug-title" id="kpi-top-bug-name">No bugs recorded yet</div>
+              <div class="top-bug-meta">
+                <span class="badge badge-outline" id="kpi-top-bug-stack">-</span>
+                <span class="hit-count" id="kpi-top-bug-hits">0 hits</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Real Workspace Domain Breakdown Bar -->
+        <div class="domain-strip">
+          <div class="domain-strip-label">
+            <span class="label-icon">⚡</span>
+            <span>Domain Breakdown (Click to filter table):</span>
+          </div>
+          <div class="domain-pills-list" id="domain-pills-container">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: TWO-COLUMN INTERACTIVE WORKSPACE -->
+      <section class="workspace-grid">
+
+        <!-- COLUMN 1: PANEL A (AI Error Scanner & Manual Log Tabs) -->
+        <div class="panel panel-workspace" id="panel-scanner-entry">
+          <div class="panel-header">
+            <div class="tab-buttons-group">
+              <button class="tab-btn active" data-tab="tab-ai-scanner" id="btn-tab-scanner">
+                <span class="tab-icon">🤖</span> AI Error Scanner
+              </button>
+              <button class="tab-btn" data-tab="tab-manual-entry" id="btn-tab-manual">
+                <span class="tab-icon">✍️</span> Manual Log Entry
+              </button>
+            </div>
+            <div class="panel-badge-info">
+              <span class="badge badge-subtle" id="workspace-mode-badge">Memory-First Hashing</span>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            
+            <!-- TAB 1: AI SCANNER -->
+            <div class="tab-pane active" id="tab-ai-scanner">
+              
+              <!-- Quick Sample Loader -->
+              <div class="form-row-compact sample-loader-row">
+                <label for="sample-error-select" class="field-label-small">
+                  <span>🚀 Quick Test Preset:</span>
+                </label>
+                <select id="sample-error-select" class="form-control form-control-sm">
+                  <option value="">-- Choose a sample stack trace to test --</option>
+                  <option value="react_map">Frontend (React): Cannot read properties of undefined (reading 'map')</option>
+                  <option value="js_const">Frontend (JS): Uncaught TypeError: Assignment to constant variable</option>
+                  <option value="node_eaddrinuse">Backend (Node.js): Error: listen EADDRINUSE: address already in use :::3000</option>
+                  <option value="express_headers">Backend (Express): Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers</option>
+                  <option value="mysql_1452">Database (MySQL): Error 1452: Foreign key constraint fails</option>
+                  <option value="cors_error">Fullstack (API): Blocked by CORS policy: No Access-Control-Allow-Origin</option>
+                </select>
+              </div>
+
+              <form id="ai-scanner-form" class="scanner-form">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="scan-domain-select">Domain Category <span class="required">*</span></label>
+                    <select id="scan-domain-select" class="form-control" required>
+                      <option value="1">1. Frontend</option>
+                      <option value="2">2. Backend</option>
+                      <option value="3">3. Database</option>
+                      <option value="4">4. Fullstack</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="scan-tech-input">Tech Stack / Runtime <span class="required">*</span></label>
+                    <input type="text" id="scan-tech-input" class="form-control" placeholder="e.g., React, Express, MySQL, Next.js" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="scan-trace-textarea">
+                    Broken Code / Error Message / Stack Trace <span class="required">*</span>
+                  </label>
+                  <textarea id="scan-trace-textarea" class="form-control code-font" rows="5" placeholder="Paste your terminal error, console log, or stack trace here..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" id="btn-scan-analyze">
+                    <span class="btn-spinner hidden" id="scan-spinner"></span>
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">Analyze &amp; Fix</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary" id="btn-clear-scan">
+                    Clear Input
+                  </button>
+                </div>
+              </form>
+
+              <!-- Scanner Output Results Box -->
+              <div class="scanner-result-box hidden" id="scanner-result-box">
+                <div class="result-header">
+                  <div class="result-source-indicator" id="result-source-badge">
+                    <!-- Populated dynamically -->
+                  </div>
+                  <button class="btn btn-xs btn-outline" id="btn-copy-result-fix">
+                    📋 Copy Fix
+                  </button>
+                </div>
+
+                <div class="result-content">
+                  <div class="result-item">
+                    <span class="result-label">Identified Error Signature:</span>
+                    <div class="result-signature code-font" id="res-signature"></div>
+                  </div>
+
+                  <div class="result-item">
+                    <span class="result-label">Root Cause Analysis:</span>
+                    <div class="result-text" id="res-root-cause"></div>
+                  </div>
+
+                  <div class="result-item">
+                    <span class="result-label">Actionable Fix &amp; Prevention Steps:</span>
+                    <div class="result-fix markdown-body" id="res-fix-steps"></div>
+                  </div>
+                </div>
+
+                <div class="result-footer">
+                  <button class="btn btn-sm btn-primary" id="btn-send-to-chat">
+                    💬 Ask Debug Bot Follow-up
+                  </button>
+                  <span class="result-db-info" id="res-db-status-info">Auto-synchronized with Vault.</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- TAB 2: MANUAL ENTRY -->
+            <div class="tab-pane" id="tab-manual-entry">
+              <form id="manual-entry-form" class="manual-form">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="manual-domain-select">Domain Category <span class="required">*</span></label>
+                    <select id="manual-domain-select" class="form-control" required>
+                      <option value="1">1. Frontend</option>
+                      <option value="2">2. Backend</option>
+                      <option value="3">3. Database</option>
+                      <option value="4">4. Fullstack</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="manual-tech-input">Tech Stack <span class="required">*</span></label>
+                    <input type="text" id="manual-tech-input" class="form-control" placeholder="e.g. Node.js, Django, Postgres" required>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="manual-signature-input">Canonical Error Signature <span class="required">*</span></label>
+                  <input type="text" id="manual-signature-input" class="form-control code-font" placeholder="Exact error headline or exception signature" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="manual-cause-input">Root Cause Summary</label>
+                  <input type="text" id="manual-cause-input" class="form-control" placeholder="Concise 1-sentence explanation of why this bug occurred">
+                </div>
+
+                <div class="form-group">
+                  <label for="manual-fix-textarea">Fix Steps &amp; Solution <span class="required">*</span></label>
+                  <textarea id="manual-fix-textarea" class="form-control code-font" rows="4" placeholder="1. Step one&#10;2. Step two&#10;3. Prevention note" required></textarea>
+                </div>
+
+                <div class="form-group-checkbox">
+                  <label class="checkbox-container">
+                    <input type="checkbox" id="manual-verified-check">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">Mark immediately as Verified Solution</span>
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-accent" id="btn-save-manual">
+                    <span class="btn-icon">💾</span> Save to Real Vault
+                  </button>
+                  <button type="reset" class="btn btn-secondary">
+                    Reset Form
+                  </button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- COLUMN 2: PANEL B (Context-Aware Debug Bot Chat) -->
+        <div class="panel panel-chat" id="panel-bot-chat">
+          <div class="panel-header">
+            <div class="chat-header-title">
+              <span class="bot-status-dot"></span>
+              <span class="title-text">Context-Aware Debug Bot</span>
+            </div>
+            <div class="chat-header-actions">
+              <button class="btn btn-xs btn-outline" id="btn-clear-chat" title="Clear current session messages">
+                🧹 Clear Chat
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Context Strip -->
+          <div class="active-context-bar" id="active-context-bar">
+            <div class="context-info">
+              <span class="context-label">ACTIVE CONTEXT:</span>
+              <span class="context-tag" id="active-context-name">None loaded (Select a row or scan an error)</span>
+            </div>
+            <button class="btn-detach hidden" id="btn-detach-context" title="Detach context">✕</button>
+          </div>
+
+          <!-- Quick Prompt Chips Strip -->
+          <div class="prompt-chips-bar">
+            <button class="prompt-chip" data-prompt="Explain Root Cause in simple terms">
+              🔍 Explain Root Cause
+            </button>
+            <button class="prompt-chip" data-prompt="Write clean, corrected code for this bug">
+              💻 Write Corrected Code
+            </button>
+            <button class="prompt-chip" data-prompt="Show 3-step prevention checklist to avoid this">
+              🛡️ Prevention Checklist
+            </button>
+            <button class="prompt-chip" data-prompt="Write a unit test to catch this regression">
+              🧪 Generate Test Case
+            </button>
+          </div>
+
+          <!-- Chat Messages Area -->
+          <div class="chat-messages-container" id="chat-messages">
+            <div class="chat-message bot-message">
+              <div class="message-avatar">🤖</div>
+              <div class="message-content">
+                <p>Hello! I am your <strong>TraceVault Debug Assistant</strong>.</p>
+                <p>Scan an error in <strong>Panel A</strong> or click <strong>💬 Chat</strong> on any table record below to bind context. I will diagnose the issue and generate targeted code fixes without hallucinating.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Footer -->
+          <div class="chat-footer">
+            <form id="chat-input-form" class="chat-form">
+              <input type="text" id="chat-user-input" class="chat-input" placeholder="Ask anything about this error, request code fixes, or explain logic..." autocomplete="off">
+              <button type="submit" class="btn btn-primary btn-send" id="btn-send-chat">
+                <svg class="send-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECTION 3: REAL KNOWLEDGE BASE TABLE (PANEL C) -->
+      <section class="table-section">
+        <div class="panel panel-table">
+          
+          <div class="table-controls-header">
+            <div class="table-title-area">
+              <h2 class="section-heading">Real Developer Knowledge Base</h2>
+              <span class="records-counter" id="records-counter-badge">0 records loaded</span>
+            </div>
+
+            <!-- Table Filter Toolbar -->
+            <div class="filter-toolbar">
+              
+              <!-- Search Filter -->
+              <div class="filter-control search-filter-box">
+                <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Filter signatures, stacks, causes...">
+              </div>
+
+              <!-- Domain Filter -->
+              <div class="filter-control">
+                <select id="filter-domain" class="form-control form-control-sm">
+                  <option value="all">All Domains</option>
+                  <option value="1">Frontend</option>
+                  <option value="2">Backend</option>
+                  <option value="3">Database</option>
+                  <option value="4">Fullstack</option>
+                </select>
+              </div>
+
+              <!-- Tech Stack Filter -->
+              <div class="filter-control">
+                <input type="text" id="filter-tech" class="form-control form-control-sm" placeholder="Tech stack...">
+              </div>
+
+              <!-- Verified Status Filter -->
+              <div class="filter-control">
+                <select id="filter-verified" class="form-control form-control-sm">
+                  <option value="all">All Status</option>
+                  <option value="1">✓ Verified Only</option>
+                  <option value="0">⏳ Unverified Only</option>
+                </select>
+              </div>
+
+              <!-- Sort Filter -->
+              <div class="filter-control">
+                <select id="filter-sort" class="form-control form-control-sm">
+                  <option value="hits">Sort: Most Hits</option>
+                  <option value="updated">Sort: Recently Updated</option>
+                  <option value="id_desc">Sort: Newest First</option>
+                  <option value="id_asc">Sort: Oldest First</option>
+                </select>
+              </div>
+
+              <!-- Reset Button -->
+              <button class="btn btn-sm btn-secondary" id="btn-reset-filters" title="Reset all filters">
+                ↺ Reset
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="table-responsive">
+            <table class="vault-table" id="vault-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">ID</th>
+                  <th style="width: 105px;">Domain</th>
+                  <th style="width: 110px;">Tech Stack</th>
+                  <th style="width: 280px;">Signature &amp; Root Cause</th>
+                  <th style="width: 320px;">Fix Requirements</th>
+                  <th style="width: 95px;">Source / Ver</th>
+                  <th style="width: 80px;" class="text-center">Hits</th>
+                  <th style="width: 220px;" class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="vault-table-body">
+                <!-- Dynamically populated via app.js -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div class="empty-state hidden" id="table-empty-state">
+            <div class="empty-icon">📂</div>
+            <h3>Your developer vault is clean (0 records)</h3>
+            <p>Paste a broken stack trace in the AI Error Scanner above or add an error manually to start building your personal debugging memory!</p>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER WITH SUBTLE LAB EVALUATION TRIGGER -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span>TraceVault v2.0 &bull; Production Developer Suite</span>
+      </div>
+      <div class="footer-center">
+        <span>Dual-Storage Engine: Local Disk Vault + Live MySQL 8+ Bridge</span>
+      </div>
+      <div class="footer-right">
+        <!-- Subtle University Lab Demo Sandbox Trigger -->
+        <button class="footer-lab-trigger" id="open-lab-modal-btn" title="Open DBMS Lab Evaluation Sandbox (Alt+L)">
+          <span>🎓</span> Lab Sandbox (Alt+L)
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODALS -->
+  <!-- ===================================================================== -->
+
+  <!-- 1. FULLSCREEN DBMS LAB EVALUATION SANDBOX MODAL (Alt + L) -->
+  <div class="modal-overlay hidden" id="modal-lab-sandbox">
+    <div class="modal-dialog modal-dialog-lab">
+      
+      <div class="modal-header">
+        <div class="brand-main">
+          <span class="modal-title">🎓 DBMS Laboratory Evaluation Sandbox</span>
+          <span class="badge badge-accent">Isolated Mode: is_demo = 1</span>
+        </div>
+        <div class="modal-header-actions">
+          <button class="btn btn-sm btn-outline" id="btn-lab-reset" title="Reset the 12 evaluation records to default">
+            ↺ Reset 12 Lab Records
+          </button>
+          <button class="btn-close-modal" id="btn-close-lab-modal">✕</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Lab SQL Banner -->
+        <div class="lab-banner-info">
+          <div class="lab-banner-text">
+            <strong>DBMS Lab Evaluator View:</strong> This sandbox tests relational 3NF queries, triggers, stored procedures, and views across the 12 pre-seeded lab records without polluting your real workspace.
+          </div>
+          <div class="lab-sql-hint">
+            Query: SELECT * FROM error_logs WHERE is_demo = 1 INNER JOIN domains;
+          </div>
+        </div>
+
+        <!-- Lab Aggregate Summary Cards -->
+        <div class="kpi-cards-grid" style="margin-bottom: 16px;">
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-title">DEMO BUGS</span><span class="kpi-fn-tag">COUNT()</span></div>
+            <div class="kpi-body"><span class="kpi-value" id="lab-kpi-total">12</span><span class="kpi-meta">Lab Seed Records</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-title">TOTAL HITS</span><span class="kpi-fn-tag">SUM()</span></div>
+            <div class="kpi-body"><span class="kpi-value highlight-emerald" id="lab-kpi-hits">87</span><span class="kpi-meta">Cumulative Resolved</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-title">AVG HITS</span><span class="kpi-fn-tag">AVG()</span></div>
+            <div class="kpi-body"><span class="kpi-value" id="lab-kpi-avg">7.3</span><span class="kpi-meta">Hits per Record</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-title">SPREAD</span><span class="kpi-fn-tag">MAX/MIN</span></div>
+            <div class="kpi-body">
+              <div class="kpi-split-value">
+                <span class="split-item"><small>MAX</small> <strong id="lab-kpi-max">15</strong></span>
+                <span class="split-divider">/</span>
+                <span class="split-item"><small>MIN</small> <strong id="lab-kpi-min">2</strong></span>
+              </div>
+              <span class="kpi-meta">Frequency Range</span>
+            </div>
+          </div>
+          <div class="kpi-card kpi-card-featured">
+            <div class="kpi-header"><span class="kpi-title">TOP FREQUENT BUG</span><span class="badge badge-accent">Top Hit</span></div>
+            <div class="kpi-body">
+              <div class="top-bug-title" id="lab-kpi-top-name">Loading top bug...</div>
+              <div class="top-bug-meta"><span class="badge badge-outline" id="lab-kpi-top-stack">-</span><span class="hit-count" id="lab-kpi-top-hits">0 hits</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lab Quick Add Form -->
+        <div class="lab-quick-add-drawer">
+          <div class="drawer-title">
+            <span>➕ Test SQL INSERT into Demo Sandbox</span>
+          </div>
+          <form id="lab-quick-add-form" class="form-grid-2">
+            <div class="form-group" style="margin-bottom: 0;">
+              <select id="lab-add-domain" class="form-control form-control-sm" required>
+                <option value="1">1. Frontend</option>
+                <option value="2">2. Backend</option>
+                <option value="3">3. Database</option>
+                <option value="4">4. Fullstack</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="lab-add-tech" class="form-control form-control-sm" placeholder="Tech Stack (e.g. Redis, Vue, GraphQL)" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0; grid-column: 1 / -1;">
+              <input type="text" id="lab-add-signature" class="form-control form-control-sm code-font" placeholder="Canonical Error Signature (e.g. Redis connection timeout)" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="lab-add-cause" class="form-control form-control-sm" placeholder="Root Cause Summary">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="lab-add-fix" class="form-control form-control-sm code-font" placeholder="Fix Steps" required>
+            </div>
+            <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-sm btn-primary">
+                Execute INSERT Query
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Lab Filter Bar -->
+        <div class="filter-toolbar" style="margin-bottom: 12px;">
+          <div class="filter-control search-filter-box">
+            <input type="text" id="lab-filter-search" class="form-control form-control-sm" placeholder="Search lab records...">
+          </div>
+          <div class="filter-control">
+            <select id="lab-filter-domain" class="form-control form-control-sm">
+              <option value="all">All Domains</option>
+              <option value="1">Frontend</option>
+              <option value="2">Backend</option>
+              <option value="3">Database</option>
+              <option value="4">Fullstack</option>
+            </select>
+          </div>
+          <div class="filter-control">
+            <select id="lab-filter-sort" class="form-control form-control-sm">
+              <option value="hits">Sort: Most Hits</option>
+              <option value="updated">Sort: Recently Updated</option>
+              <option value="id_desc">Sort: Newest ID</option>
+              <option value="id_asc">Sort: Oldest ID</option>
+            </select>
+          </div>
+          <button class="btn btn-sm btn-secondary" id="btn-lab-reset-filters">
+            ↺ Clear
+          </button>
+        </div>
+
+        <!-- Lab Table -->
+        <div class="table-responsive" style="max-height: 380px;">
+          <table class="vault-table" id="lab-table">
+            <thead>
+              <tr>
+                <th style="width: 45px;">ID</th>
+                <th style="width: 95px;">Domain</th>
+                <th style="width: 100px;">Tech Stack</th>
+                <th style="width: 250px;">Signature &amp; Root Cause</th>
+                <th style="width: 260px;">Fix Requirements</th>
+                <th style="width: 85px;">Source</th>
+                <th style="width: 70px;" class="text-center">Hits</th>
+                <th style="width: 180px;" class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="lab-table-body">
+              <!-- Dynamically populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <span style="font-size: 0.725rem; color: var(--text-dim); margin-right: auto;">
+          Press <kbd class="shortcut-pill">Esc</kbd> or <kbd class="shortcut-pill">Alt+L</kbd> to exit lab sandbox.
+        </span>
+        <button type="button" class="btn btn-secondary" id="btn-close-lab-footer">Close Sandbox</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. EDIT RECORD MODAL -->
+  <div class="modal-overlay hidden" id="modal-edit-record">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Error Record</h3>
+        <button class="btn-close-modal" id="btn-close-edit-modal">✕</button>
+      </div>
+      <form id="edit-record-form" class="modal-form">
+        <input type="hidden" id="edit-error-id">
+        <input type="hidden" id="edit-error-mode" value="real">
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="edit-domain-select">Domain Category <span class="required">*</span></label>
+            <select id="edit-domain-select" class="form-control" required>
+              <option value="1">1. Frontend</option>
+              <option value="2">2. Backend</option>
+              <option value="3">3. Database</option>
+              <option value="4">4. Fullstack</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-tech-input">Tech Stack <span class="required">*</span></label>
+            <input type="text" id="edit-tech-input" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-signature-input">Canonical Error Signature <span class="required">*</span></label>
+          <input type="text" id="edit-signature-input" class="form-control code-font" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-cause-input">Root Cause Analysis</label>
+          <input type="text" id="edit-cause-input" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-fix-textarea">Fix Requirements &amp; Steps <span class="required">*</span></label>
+          <textarea id="edit-fix-textarea" class="form-control code-font" rows="5" required></textarea>
+        </div>
+
+        <div class="form-group-checkbox">
+          <label class="checkbox-container">
+            <input type="checkbox" id="edit-verified-check">
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Mark as Verified Solution (✓)</span>
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-edit">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-edit">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. DELETE CONFIRMATION MODAL -->
+  <div class="modal-overlay hidden" id="modal-delete-confirm">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h3 class="modal-title modal-danger-title">🗑️ Confirm Record Deletion</h3>
+        <button class="btn-close-modal" id="btn-close-delete-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this error log?</p>
+        <div class="delete-preview-box">
+          <div class="preview-sig" id="delete-preview-signature">Cannot read properties of undefined</div>
+          <div class="preview-id" id="delete-preview-id">Record ID: #1</div>
+        </div>
+        <p class="warning-text">⚠️ This will permanently remove the record from the database vault. This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-delete">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete">Delete Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. BYOK AI CONFIGURATION MODAL -->
+  <div class="modal-overlay hidden" id="modal-byok-config">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 BYOK AI Provider Settings</h3>
+        <button class="btn-close-modal" id="btn-close-byok-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="byok-notice">
+          <strong>🔒 Zero-Server Privacy Guarantee:</strong> Your API key is stored exclusively in your browser's <code>localStorage</code>. It is never logged to MySQL, never written to disk, and used solely for direct client-to-API requests.
+        </div>
+
+        <div class="form-group">
+          <label for="byok-key-input">API Key</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="byok-key-input" class="form-control code-font" placeholder="Paste your API key (e.g. AIza..., gsk_..., sk-or-..., sk-...)">
+            <button type="button" class="btn-toggle-eye" id="btn-toggle-key-visibility" title="Show/Hide Key">👁️</button>
+          </div>
+          <div id="byok-detected-badge" class="detected-badge hidden"></div>
+          <small class="form-hint">Pasting your key auto-detects the provider and assigns a verified free model. Free offline heuristic fallback runs when no key is entered.</small>
+        </div>
+
+        <details class="model-override-details" id="model-override-accordion">
+          <summary class="model-override-summary">⚙️ Change Model (Optional - 16 Free &amp; Paid Models)</summary>
+          <div style="margin-top: 12px;">
+            <div class="form-group" style="margin-bottom: 8px;">
+              <label for="byok-provider-select">Provider Override</label>
+              <select id="byok-provider-select" class="form-control">
+                <option value="gemini">Google Gemini (Recommended Free)</option>
+                <option value="groq">Groq (Ultra-Fast Free)</option>
+                <option value="openrouter">OpenRouter (Multi-Model Gateway)</option>
+                <option value="openai">OpenAI</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="byok-model-select">Model Override</label>
+              <select id="byok-model-select" class="form-control code-font">
+                <optgroup label="🟢 FREE MODELS (10 Models)">
+                  <option value="gemini-2.5-flash">Google: gemini-2.5-flash (Default Free)</option>
+                  <option value="gemini-2.0-flash">Google: gemini-2.0-flash (Free)</option>
+                  <option value="gemini-1.5-flash">Google: gemini-1.5-flash (Free)</option>
+                  <option value="llama-3.3-70b-versatile">Groq: llama-3.3-70b-versatile (Free)</option>
+                  <option value="llama-3.1-8b-instant">Groq: llama-3.1-8b-instant (Free)</option>
+                  <option value="qwen-2.5-coder-32b">Groq: qwen-2.5-coder-32b (Free)</option>
+                  <option value="deepseek/deepseek-r1:free">OpenRouter: deepseek/deepseek-r1:free (Free)</option>
+                  <option value="deepseek/deepseek-chat:free">OpenRouter: deepseek/deepseek-chat:free (Free)</option>
+                  <option value="qwen/qwen-2.5-coder-32b-instruct:free">OpenRouter: qwen-2.5-coder-32b-instruct:free (Free)</option>
+                  <option value="meta-llama/llama-3.3-70b-instruct:free">OpenRouter: llama-3.3-70b-instruct:free (Free)</option>
+                </optgroup>
+                <optgroup label="⚡ PRO / PAID MODELS (6 Models)">
+                  <option value="gpt-4o-mini">OpenAI: gpt-4o-mini</option>
+                  <option value="gpt-4o">OpenAI: gpt-4o</option>
+                  <option value="gemini-1.5-pro">Google: gemini-1.5-pro</option>
+                  <option value="claude-3-5-haiku">OpenRouter: anthropic/claude-3-5-haiku</option>
+                  <option value="claude-3-5-sonnet">OpenRouter: anthropic/claude-3-5-sonnet</option>
+                  <option value="deepseek/deepseek-r1">OpenRouter: deepseek/deepseek-r1 (Paid tier)</option>
+                </optgroup>
+              </select>
+              <input type="text" id="byok-model-input" class="form-control code-font hidden" style="margin-top: 6px;" placeholder="Custom model name">
+            </div>
+          </div>
+        </details>
+
+        <div class="test-connection-box">
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-test-ai-key">
+            ⚡ Test Connection
+          </button>
+          <span class="test-result-status" id="test-key-result"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-clear-byok">Clear Key</button>
+        <button type="button" class="btn btn-primary" id="btn-save-byok">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MYSQL TWO-STEP SYNC INFO MODAL -->
+  <div class="modal-overlay hidden" id="modal-mysql-sync">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">⚡ MySQL Port 3306 Live Sync</h3>
+        <button class="btn-close-modal" id="btn-close-mysql-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+          TraceVault operates with high-performance local disk storage and automatically connects to MySQL 8+ on port 3306 with zero-click schema initialization and two-way live data mirroring.
+        </p>
+
+        <div class="mysql-sync-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Start MySQL on Localhost (Port 3306)</strong>
+            <p>Start XAMPP, MySQL Server 8.0, or Docker MySQL container. TraceVault's background poller will automatically detect it.</p>
+          </div>
+        </div>
+
+        <div class="mysql-sync-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Automatic Bootstrap &amp; Two-Way Sync</strong>
+            <p>Once detected, TraceVault auto-creates the <code>tracevault</code> database, executes <code>database.sql</code>, imports existing local bugs, and mirrors all future CRUD actions directly into MySQL Workbench.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; padding: 10px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; font-size: 0.75rem; color: var(--accent-emerald);">
+          ✓ Terminal helper: You can also run <code>npm run db:setup</code> in terminal to attempt auto-starting local MySQL and verify connection.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-mysql-footer">Close</button>
+        <button type="button" class="btn btn-primary" id="btn-check-mysql-now">Check Connection Now</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=obsidian_v4"></script>
+</body>
+</html>

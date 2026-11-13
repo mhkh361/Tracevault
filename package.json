@@ -1,0 +1,15 @@
+{
+  "name": "tracevault",
+  "version": "2.0.0",
+  "description": "Self-Learning AI Debug Bot & Local-First Error Knowledge Base",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "db:setup": "node setup-mysql.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql2": "^3.11.0"
+  }
+}

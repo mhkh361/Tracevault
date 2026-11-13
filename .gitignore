@@ -1,0 +1,15 @@
+# Environment & Secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Personal Local Vault Data
+data/real-vault.json
+
+# Logs & OS files
+npm-debug.log*
+.DS_Store
+Thumbs.db

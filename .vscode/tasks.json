@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "TraceVault: Diagnose Error",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/ide-bridge.js",
+        "${input:techStack}",
+        "${input:errorMessage}"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "techStack",
+      "type": "promptString",
+      "description": "Enter the Tech Stack (e.g., React, Express, MySQL, Node.js):",
+      "default": "JavaScript"
+    },
+    {
+      "id": "errorMessage",
+      "type": "promptString",
+      "description": "Paste the Error Message or Stack Trace to diagnose:"
+    }
+  ]
+}
