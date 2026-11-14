@@ -609,14 +609,18 @@ Error: listen EADDRINUSE: address already in use :::3000
     if (!el.toastContainer) return;
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
-    toast.innerHTML = `<span>${icon}</span> <span>${escapeHTML(message)}</span>`;
+    const iconSvg = type === 'success'
+      ? `<svg class="toast-svg toast-success" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 10l3.5 3.5L15 6"/></svg>`
+      : type === 'error'
+      ? `<svg class="toast-svg toast-error" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="8"/><line x1="13" y1="7" x2="7" y2="13"/><line x1="7" y1="7" x2="13" y2="13"/></svg>`
+      : `<svg class="toast-svg toast-info" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="8"/><line x1="10" y1="9" x2="10" y2="14"/><line x1="10" y1="6" x2="10.01" y2="6"/></svg>`;
+    toast.innerHTML = `<span class="toast-icon-wrap">${iconSvg}</span> <span class="toast-text">${escapeHTML(message)}</span>`;
     el.toastContainer.appendChild(toast);
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(10px)';
-      setTimeout(() => toast.remove(), 250);
+      toast.style.transform = 'translateY(8px)';
+      setTimeout(() => toast.remove(), 200);
     }, duration);
   }
 
@@ -879,9 +883,10 @@ Error: listen EADDRINUSE: address already in use :::3000
             data-action="toggle-verify" 
             data-id="${r.error_id}"
             data-mode="${mode}"
-            title="Click to toggle verified status"
+            title="Click to toggle verification status"
           >
-            ${isVerified ? '✓ Verified' : '⏳ Review'}
+            <span class="status-indicator-dot ${isVerified ? 'verified-dot' : 'review-dot'}"></span>
+            ${isVerified ? 'Verified' : 'In Review'}
           </div>
         </td>
         <td class="hits-cell">
@@ -889,21 +894,22 @@ Error: listen EADDRINUSE: address already in use :::3000
         </td>
         <td>
           <div class="table-actions">
-            <button class="btn btn-xs btn-primary" data-action="hit" data-id="${r.error_id}" data-mode="${mode}" title="Atomic +1 Hit">
+            <button class="btn btn-xs btn-primary btn-hit" data-action="hit" data-id="${r.error_id}" data-mode="${mode}" title="Increment occurrence count">
               +1 Hit
             </button>
             ${mode === 'real' ? `
-            <button class="btn btn-xs btn-secondary" data-action="chat" data-id="${r.error_id}" data-mode="${mode}" title="Ask Debug Bot about this bug">
-              💬 Chat
+            <button class="btn btn-xs btn-secondary" data-action="chat" data-id="${r.error_id}" data-mode="${mode}" title="Ask assistant about this error">
+              <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 13a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Chat
             </button>` : ''}
-            <button class="btn btn-xs btn-outline" data-action="copy" data-id="${r.error_id}" data-mode="${mode}" title="Copy signature and fix">
-              📋
+            <button class="btn btn-xs btn-outline btn-icon-only" data-action="copy" data-id="${r.error_id}" data-mode="${mode}" title="Copy fix to clipboard">
+              <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 13V4a1 1 0 0 1 1-1h9"/></svg>
             </button>
-            <button class="btn btn-xs btn-secondary" data-action="edit" data-id="${r.error_id}" data-mode="${mode}" title="Edit record in modal">
-              ✏️
+            <button class="btn btn-xs btn-secondary btn-icon-only" data-action="edit" data-id="${r.error_id}" data-mode="${mode}" title="Edit incident">
+              <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M14.5 2.5a2.121 2.121 0 0 1 3 3L10 13l-4 1 1-4 7.5-7.5z"/></svg>
             </button>
-            <button class="btn btn-xs btn-danger" data-action="delete" data-id="${r.error_id}" data-mode="${mode}" title="Delete record with confirmation">
-              🗑️
+            <button class="btn btn-xs btn-danger btn-icon-only" data-action="delete" data-id="${r.error_id}" data-mode="${mode}" title="Delete incident">
+              <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 17 6"/><path d="M15 6v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m2 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
             </button>
           </div>
         </td>
@@ -1303,13 +1309,19 @@ Error: listen EADDRINUSE: address already in use :::3000
 
     if (res.source === 'memory') {
       el.resultSourceBadge.innerHTML = `
-        <span class="badge badge-primary">⚡ RETRIEVED FROM VAULT MEMORY</span>
-        <span class="badge badge-outline">0 Tokens Used</span>
+        <span class="badge badge-primary">
+          <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="11 2 3 11 10 11 9 18 17 9 10 9 11 2"/></svg>
+          Vault Memory Match
+        </span>
+        <span class="badge badge-subtle">Sub-millisecond</span>
       `;
     } else {
       el.resultSourceBadge.innerHTML = `
-        <span class="badge badge-accent">🤖 ANALYZED BY BYOK AI</span>
-        <span class="badge badge-primary">Auto-Saved to Vault</span>
+        <span class="badge badge-accent">
+          <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="12" height="12" rx="2"/><circle cx="8" cy="9" r="1" fill="currentColor"/><circle cx="12" cy="9" r="1" fill="currentColor"/><line x1="7" y1="13" x2="13" y2="13"/></svg>
+          AI Diagnosed
+        </span>
+        <span class="badge badge-subtle">Auto-saved to vault</span>
       `;
     }
 
@@ -1529,8 +1541,8 @@ Error: listen EADDRINUSE: address already in use :::3000
     msgDiv.className = `chat-message ${role === 'user' ? 'user-message' : 'bot-message'}`;
 
     const avatar = role === 'user'
-      ? '👤'
-      : '<img src="app-icon.svg?v=cube_v6" class="bot-avatar-img" alt="TraceVault AI" style="width: 22px; height: 22px; display: block;" />';
+      ? `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 17v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>`
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="14" rx="3"/><line x1="8" y1="9" x2="8.01" y2="9"/><line x1="16" y1="9" x2="16.01" y2="9"/><path d="M9 13h6"/></svg>`;
     msgDiv.innerHTML = `
       <div class="message-avatar">${avatar}</div>
       <div class="message-content markdown-body">
