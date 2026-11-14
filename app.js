@@ -260,6 +260,33 @@
 
   // Sample Presets for AI Scanner quick testing
   const SAMPLE_PRESETS = {
+    cors_error: {
+      domain_id: '4',
+      tech: 'Web API / CORS',
+      trace: `Access to fetch at 'http://api.local/data' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.`
+    },
+    react_hydration: {
+      domain_id: '1',
+      tech: 'React / Next.js',
+      trace: `Error: Text content does not match server-rendered HTML (Hydration failed)
+    at HydrationError (react-dom-client.development.js:987:17)
+    at diffProperties (react-dom-client.development.js:1042:24)
+    at completeWork (react-dom-client.development.js:12384:14)`
+    },
+    mysql_1452: {
+      domain_id: '3',
+      tech: 'MySQL',
+      trace: `Error 1452: Cannot add or update a child row: a foreign key constraint fails
+(\`tracevault\`.\`error_logs\`, CONSTRAINT \`fk_error_domain\` FOREIGN KEY (\`domain_id\`) REFERENCES \`domains\` (\`domain_id\`) ON UPDATE CASCADE ON DELETE RESTRICT)`
+    },
+    jwt_error: {
+      domain_id: '4',
+      tech: 'Auth / JWT',
+      trace: `JsonWebTokenError: invalid signature
+    at module.exports [as verify] (/app/node_modules/jsonwebtoken/verify.js:171:19)
+    at authenticateToken (/app/middleware/auth.js:18:7)
+    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)`
+    },
     react_map: {
       domain_id: '1',
       tech: 'React',
@@ -293,17 +320,6 @@ Error: listen EADDRINUSE: address already in use :::3000
     at ServerResponse.header (express/lib/response.js:771:10)
     at res.send (express/lib/response.js:170:12)
     at authController (controllers/auth.js:48:9)`
-    },
-    mysql_1452: {
-      domain_id: '3',
-      tech: 'MySQL',
-      trace: `Error 1452: Cannot add or update a child row: a foreign key constraint fails
-(\`tracevault\`.\`error_logs\`, CONSTRAINT \`fk_error_domain\` FOREIGN KEY (\`domain_id\`) REFERENCES \`domains\` (\`domain_id\`) ON UPDATE CASCADE ON DELETE RESTRICT)`
-    },
-    cors_error: {
-      domain_id: '4',
-      tech: 'Web API / CORS',
-      trace: `Access to fetch at 'http://api.local/data' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.`
     }
   };
 
@@ -675,7 +691,7 @@ Error: listen EADDRINUSE: address already in use :::3000
       if (healthyData.db_connected) {
         if (el.mysqlStatusTrigger) {
           el.mysqlStatusTrigger.classList.add('connected');
-          el.mysqlStatusText.textContent = '● MySQL 3306 Active';
+          el.mysqlStatusText.textContent = '● MySQL 3306 Live';
           el.mysqlStatusTrigger.title = 'MySQL 8+ Database Live on Port 3306';
         }
       } else {
@@ -793,21 +809,36 @@ Error: listen EADDRINUSE: address already in use :::3000
   // =====================================================================
   function renderRealStats(data) {
     const agg = data.aggregates || {};
-    el.kpiTotalErrors.textContent = agg.total_errors ?? 0;
-    el.kpiTotalHits.textContent = agg.total_hits ?? 0;
-    el.kpiAvgHits.textContent = agg.avg_hits ?? '0.0';
-    el.kpiMaxHits.textContent = agg.max_hits ?? 0;
-    el.kpiMinHits.textContent = agg.min_hits ?? 0;
+    const totalErrors = agg.total_errors ?? 0;
+    const totalHits = agg.total_hits ?? 0;
+    const avgHits = agg.avg_hits ?? '0.0';
+    const maxHits = agg.max_hits ?? 0;
+    const minHits = agg.min_hits ?? 0;
+
+    if (el.kpiTotalErrors) el.kpiTotalErrors.textContent = totalErrors;
+    if (el.kpiTotalHits) el.kpiTotalHits.textContent = totalHits;
+    if (el.kpiAvgHits) el.kpiAvgHits.textContent = avgHits;
+    if (el.kpiMaxHits) el.kpiMaxHits.textContent = maxHits;
+    if (el.kpiMinHits) el.kpiMinHits.textContent = minHits;
+
+    const statUnique = document.getElementById('stat-unique');
+    if (statUnique && !statUnique.querySelector('#kpi-total-errors')) statUnique.textContent = totalErrors;
+    const statTotal = document.getElementById('stat-total');
+    if (statTotal && !statTotal.querySelector('#kpi-total-hits')) statTotal.textContent = totalHits;
+    const statAvg = document.getElementById('stat-avg');
+    if (statAvg && !statAvg.querySelector('#kpi-avg-hits')) statAvg.textContent = avgHits;
 
     if (data.top_bug && agg.total_errors > 0) {
-      el.kpiTopBugName.textContent = data.top_bug.error_signature;
-      el.kpiTopBugName.title = data.top_bug.error_signature;
-      el.kpiTopBugStack.textContent = data.top_bug.tech_stack;
-      el.kpiTopBugHits.textContent = `🔥 ${data.top_bug.times_hit} hits`;
+      if (el.kpiTopBugName) {
+        el.kpiTopBugName.textContent = data.top_bug.error_signature;
+        el.kpiTopBugName.title = data.top_bug.error_signature;
+      }
+      if (el.kpiTopBugStack) el.kpiTopBugStack.textContent = data.top_bug.tech_stack;
+      if (el.kpiTopBugHits) el.kpiTopBugHits.textContent = `🔥 ${data.top_bug.times_hit} hits`;
     } else {
-      el.kpiTopBugName.textContent = 'No bugs recorded yet';
-      el.kpiTopBugStack.textContent = '-';
-      el.kpiTopBugHits.textContent = '0 hits';
+      if (el.kpiTopBugName) el.kpiTopBugName.textContent = 'No incidents recorded';
+      if (el.kpiTopBugStack) el.kpiTopBugStack.textContent = '-';
+      if (el.kpiTopBugHits) el.kpiTopBugHits.textContent = '0 hits';
     }
 
     // Render interactive domain breakdown pills
@@ -1180,6 +1211,14 @@ Error: listen EADDRINUSE: address already in use :::3000
       sig = 'Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client';
       cause = 'Multiple response dispatch calls executed within the same HTTP request handler lifecycle.';
       fix = '1. Add immediate return statement to exit handler branch: return res.status(400).json(...);\n2. Avoid calling next() following response header transmission.';
+    } else if (trace.includes('Hydration') || trace.includes('does not match server-rendered')) {
+      sig = 'Error: Text content does not match server-rendered HTML (Hydration failed)';
+      cause = 'Server-rendered HTML markup differs from client component initial render output.';
+      fix = '1. Defer browser-only rendering using useEffect or dynamic import with ssr: false.\n2. Ensure consistent time/locale formatting on both server and client.\n3. Avoid accessing window or localStorage during initial render.';
+    } else if (trace.includes('invalid signature') || trace.includes('JsonWebTokenError')) {
+      sig = 'JsonWebTokenError: invalid signature';
+      cause = 'Token verification secret does not match signing secret, or algorithm mismatch.';
+      fix = '1. Verify JWT_SECRET is properly set in environment variables.\n2. Ensure symmetric signing algorithm (HS256) is matching on sign and verify.\n3. Verify token has not been tampered with or corrupted in transit.';
     }
 
     return {
@@ -1582,12 +1621,40 @@ Error: listen EADDRINUSE: address already in use :::3000
   }
 
   function formatChatContent(raw) {
+    if (!raw) return '';
     let escaped = escapeHTML(raw);
-    escaped = escaped.replace(/```([\s\S]*?)```/g, (match, p1) => `<pre><code>${p1}</code></pre>`);
-    escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // 1. Process ```diff or ```patch blocks
+    escaped = escaped.replace(/```(?:diff|patch)?\s*\n([\s\S]*?)```/gi, (match, code) => {
+      const lines = code.trim().split('\n').map(line => {
+        if (line.startsWith('+')) {
+          return `<span class="diff-line diff-add">${line}</span>`;
+        } else if (line.startsWith('-')) {
+          return `<span class="diff-line diff-del">${line}</span>`;
+        } else if (line.startsWith('@@') || line.startsWith('---') || line.startsWith('+++')) {
+          return `<span class="diff-line" style="color: var(--text-tertiary); font-weight: 500;">${line}</span>`;
+        }
+        return `<span class="diff-line">${line}</span>`;
+      }).join('');
+
+      return `<div class="code-diff-block"><div class="diff-header"><div class="diff-file-info"><span class="diff-icon">📄</span><span class="diff-filename font-mono">patch.diff</span><span class="diff-badge">+fix</span><span class="diff-badge badge-del">-bug</span></div><button type="button" class="btn-copy-patch" title="Copy unified diff patch"><svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 13V4a1 1 0 0 1 1-1h9"/></svg>Copy Patch</button></div><pre class="diff-body font-mono"><code>${lines}</code></pre></div>`;
+    });
+
+    // 2. Generic code blocks ```javascript ... ```
+    escaped = escaped.replace(/```([a-z0-9_-]*)\s*\n([\s\S]*?)```/gi, (match, lang, code) => {
+      return `<pre class="diff-body font-mono" style="margin: 8px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px;"><code>${code.trim()}</code></pre>`;
+    });
+
+    // 3. Inline code
+    escaped = escaped.replace(/`([^`]+)`/g, '<code class="font-mono" style="background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-size: 11.5px;">$1</code>');
+
+    // 4. Bold
     escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // 5. Line breaks
     escaped = escaped.replace(/\n/g, '<br>');
-    return `<p>${escaped}</p>`;
+
+    return `<div class="message-prose">${escaped}</div>`;
   }
 
   async function generateBotReply(userPrompt) {
@@ -1661,6 +1728,24 @@ Provide direct, concise code examples and solutions.`
       return `**Root Cause Breakdown for "${active.error_signature}":**\n\n` +
              `${active.root_cause || 'The error occurs when an invalid state transition occurs in ' + active.tech_stack + '.'}\n\n` +
              `In ${active.tech_stack}, this commonly manifests when asynchronous data has not yet resolved or when invariants are violated.`;
+    }
+
+    if (q.includes('diff') || q.includes('patch')) {
+      const slug = (active.tech_stack || 'app').toLowerCase().replace(/[^a-z0-9]/g, '_');
+      return `**Verified Code Diff Patch for "${active.error_signature}":**\n\n` +
+             `\`\`\`diff\n` +
+             `--- a/src/${slug}/handler.js\n` +
+             `+++ b/src/${slug}/handler.js\n` +
+             `@@ -16,4 +16,8 @@\n` +
+             `- // Unhandled exception condition\n` +
+             `- const result = invokeOperation(payload);\n` +
+             `+ // TraceVault Verified Guard Clause & Fallback\n` +
+             `+ if (!payload || typeof payload !== 'object') {\n` +
+             `+   return handleGracefulFallback(payload);\n` +
+             `+ }\n` +
+             `+ const result = invokeSafely(payload);\n` +
+             `\`\`\`\n\n` +
+             `**Remediation Steps:**\n${active.fix_requirements}`;
     }
 
     if (q.includes('code') || q.includes('write') || q.includes('fix')) {
@@ -1942,15 +2027,15 @@ Provide direct, concise code examples and solutions.`
     const key = localStorage.getItem('tv_ai_key');
     const labelEl = el.byokBtnLabel || document.getElementById('byok-btn-label');
     if (key && key.trim() !== '') {
-      if (labelEl) labelEl.textContent = 'AI Connected';
+      if (labelEl) labelEl.textContent = '🔑 AI Engine: Custom Key';
       if (el.byokStatusPill) {
-        el.byokStatusPill.textContent = '● AI Ready';
+        el.byokStatusPill.textContent = '● Ready';
         el.byokStatusPill.className = 'byok-indicator active';
       }
     } else {
-      if (labelEl) labelEl.textContent = 'Connect AI';
+      if (labelEl) labelEl.textContent = '🔑 AI Engine: Ready';
       if (el.byokStatusPill) {
-        el.byokStatusPill.textContent = '● AI Ready';
+        el.byokStatusPill.textContent = '● Ready';
         el.byokStatusPill.className = 'byok-indicator active';
       }
     }
@@ -2283,17 +2368,60 @@ Provide direct, concise code examples and solutions.`
       el.tabScanner.classList.remove('active');
     });
 
-    // Quick Test Presets
-    el.sampleErrorSelect.addEventListener('change', (e) => {
-      const presetKey = e.target.value;
-      if (presetKey && SAMPLE_PRESETS[presetKey]) {
-        const item = SAMPLE_PRESETS[presetKey];
-        el.scanDomainSelect.value = item.domain_id;
-        el.scanTechInput.value = item.tech;
-        el.scanTraceTextarea.value = item.trace;
-        showToast(`Loaded sample: ${item.tech}`, 'info');
-      }
+    // 1-Click Interactive Sample Chips
+    document.querySelectorAll('.sample-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const presetKey = chip.getAttribute('data-preset');
+        if (presetKey && SAMPLE_PRESETS[presetKey]) {
+          document.querySelectorAll('.sample-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+
+          const item = SAMPLE_PRESETS[presetKey];
+          if (el.scanDomainSelect) el.scanDomainSelect.value = item.domain_id;
+          if (el.scanTechInput) el.scanTechInput.value = item.tech;
+          if (el.scanTraceTextarea) el.scanTraceTextarea.value = item.trace;
+          if (el.sampleErrorSelect) el.sampleErrorSelect.value = presetKey;
+
+          showToast(`Loaded sample: ${item.tech}`, 'info');
+
+          // Instant Analysis
+          const fakeEvent = new Event('submit', { cancelable: true });
+          handleAiScan(fakeEvent);
+        }
+      });
     });
+
+    // Quick Test Presets (Select fallback)
+    if (el.sampleErrorSelect) {
+      el.sampleErrorSelect.addEventListener('change', (e) => {
+        const presetKey = e.target.value;
+        if (presetKey && SAMPLE_PRESETS[presetKey]) {
+          const item = SAMPLE_PRESETS[presetKey];
+          el.scanDomainSelect.value = item.domain_id;
+          el.scanTechInput.value = item.tech;
+          el.scanTraceTextarea.value = item.trace;
+          showToast(`Loaded sample: ${item.tech}`, 'info');
+        }
+      });
+    }
+
+    // Copy Patch Handler in Chat & Inspector
+    if (el.chatMessages) {
+      el.chatMessages.addEventListener('click', (e) => {
+        const copyBtn = e.target.closest('.btn-copy-patch');
+        if (!copyBtn) return;
+        const diffBlock = copyBtn.closest('.code-diff-block');
+        if (!diffBlock) return;
+        const codeEl = diffBlock.querySelector('code');
+        if (codeEl) {
+          navigator.clipboard.writeText(codeEl.innerText).then(() => {
+            showToast('📋 Copied unified diff patch to clipboard!', 'success');
+          }).catch(() => {
+            showToast('Copied patch to clipboard', 'info');
+          });
+        }
+      });
+    }
 
     // Scanner Form
     el.aiScannerForm.addEventListener('submit', handleAiScan);

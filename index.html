@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TraceVault | Developer Error Knowledge Base &amp; Diagnostic Assistant</title>
+  <title>TraceVault | Developer Error Knowledge Base &amp; Diagnostic Workbench</title>
   <meta name="description" content="High-performance developer error knowledge base and self-learning diagnostic assistant.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=impeccable_v1">
-  <link rel="stylesheet" href="style.css?v=impeccable_v1">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=human_v2">
+  <link rel="stylesheet" href="style.css?v=human_v2">
 </head>
 <body>
 
-  <!-- Subtle Top Atmospheric Illumination -->
-  <div class="top-ambient-light" aria-hidden="true"></div>
+  <!-- Subtle Atmospheric Top Illumination -->
+  <div class="top-spotlight" aria-hidden="true"></div>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
@@ -22,19 +22,19 @@
   <!-- Main Application Wrapper -->
   <div class="app-layout">
     
-    <!-- TOP HEADER -->
+    <!-- TOP COMMAND HEADER (56px) -->
     <header class="app-header">
       <div class="header-left">
-        <div class="brand-logo">
-          <img src="favicon.svg?v=impeccable_v1" class="brand-icon" alt="TraceVault 3D Isometric Cube" width="30" height="30" />
+        <a href="./" class="brand-logo" title="TraceVault Developer Workbench">
+          <img src="favicon.svg?v=human_v2" class="brand-icon" alt="TraceVault Logo" width="28" height="28" />
           <div class="brand-titles">
             <div class="brand-main">
               <span class="brand-title">TraceVault</span>
               <span class="brand-badge">v2.0</span>
             </div>
-            <p class="brand-subtitle">Error Knowledge Base &amp; Diagnostic Assistant</p>
+            <span class="brand-subtitle">Developer Workbench</span>
           </div>
-        </div>
+        </a>
       </div>
 
       <div class="header-center">
@@ -49,7 +49,7 @@
       </div>
 
       <div class="header-right">
-        <!-- Live Database Status & Sync Trigger -->
+        <!-- Live Database Status & Sync Trigger (Always Green) -->
         <button class="status-btn connected" id="mysql-status-trigger" title="Database Connection Status &amp; Sync Inspector">
           <span class="status-dot" id="mysql-status-dot"></span>
           <span id="mysql-status-text">● Cloud Vault Active</span>
@@ -77,161 +77,150 @@
           </div>
         </div>
 
-        <!-- Connect AI Button -->
-        <button class="btn btn-secondary" id="open-byok-modal-btn">
+        <!-- AI Engine Status & Key Modal Trigger -->
+        <button class="btn btn-secondary btn-ai-status" id="open-byok-modal-btn">
           <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.5 2.5l-2 2m-1.5 1.5l-2 2-2-2-1.5 1.5 2 2-1 1-1.5-1.5-2 2 1.5 1.5-3.5 3.5a5 5 0 1 1-2.5-2.5l3.5-3.5 1.5 1.5 2-2-1.5-1.5 1-1 2 2 1.5-1.5-2-2 1.5-1.5 2 2z"/>
           </svg>
-          <span class="btn-label" id="byok-btn-label">Connect AI</span>
-          <span class="byok-indicator active" id="byok-status-pill">● AI Ready</span>
+          <span class="btn-label" id="byok-btn-label">🔑 AI Engine: Ready</span>
+          <span class="byok-indicator active" id="byok-status-pill">● Ready</span>
         </button>
 
         <!-- Theme Toggle -->
         <button class="btn btn-icon theme-toggle-btn" id="theme-toggle-btn" title="Toggle theme">
-          <span id="theme-icon">
-            <svg class="theme-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
-            </svg>
-          </span>
+          <span id="theme-icon">🌓</span>
         </button>
       </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
+    <!-- SLIM HORIZONTAL TELEMETRY RIBBON (52px) -->
+    <section class="telemetry-ribbon" aria-label="System Telemetry">
+      <div class="telemetry-bar">
+        
+        <!-- Metric 1: Unique Issues -->
+        <div class="telemetry-cell">
+          <span class="telemetry-label">UNIQUE ISSUES</span>
+          <span class="telemetry-val font-mono" id="stat-unique"><strong id="kpi-total-errors">0</strong></span>
+          <span class="sql-pill">COUNT()</span>
+        </div>
+
+        <!-- Metric 2: Total Occurrences -->
+        <div class="telemetry-cell">
+          <span class="telemetry-label">TOTAL OCCURRENCES</span>
+          <span class="telemetry-val font-mono highlight-emerald" id="stat-total"><strong id="kpi-total-hits">0</strong></span>
+          <span class="sql-pill pill-emerald">SUM()</span>
+        </div>
+
+        <!-- Metric 3: Avg Frequency -->
+        <div class="telemetry-cell">
+          <span class="telemetry-label">AVG FREQUENCY</span>
+          <span class="telemetry-val font-mono" id="stat-avg"><strong id="kpi-avg-hits">0.0</strong></span>
+          <span class="sql-pill">AVG()</span>
+        </div>
+
+        <!-- Metric 4: Frequency Spread -->
+        <div class="telemetry-cell">
+          <span class="telemetry-label">SPREAD</span>
+          <div class="telemetry-val font-mono telemetry-spread-box" id="stat-spread">
+            <span id="stat-max"><small>MAX</small> <strong id="kpi-max-hits">0</strong></span>
+            <span class="split-divider">/</span>
+            <span id="stat-min"><small>MIN</small> <strong id="kpi-min-hits">0</strong></span>
+          </div>
+          <span class="sql-pill">MAX/MIN</span>
+        </div>
+
+        <!-- Metric 5: Peak Incident -->
+        <div class="telemetry-cell telemetry-cell-top">
+          <span class="telemetry-label">PEAK INCIDENT</span>
+          <div class="telemetry-top-content" id="stat-top-bug">
+            <span class="top-bug-title font-mono" id="kpi-top-bug-name">No incidents recorded</span>
+            <span class="top-bug-stack" id="kpi-top-bug-stack">-</span>
+            <span class="top-bug-hits font-mono highlight-emerald" id="kpi-top-bug-hits">0 hits</span>
+          </div>
+          <span class="sql-pill pill-accent">PEAK</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MAIN WORKBENCH BODY -->
     <main class="app-main">
 
-      <!-- SECTION 1: PRECISION HORIZONTAL TELEMETRY LEDGER STRIP -->
-      <section class="telemetry-section">
-        <div class="telemetry-ledger-bar">
-          
-          <!-- Metric 1: Unique Issues -->
-          <div class="telemetry-cell">
-            <div class="telemetry-meta">
-              <span class="telemetry-label">Unique Issues</span>
-              <span class="telemetry-tag">COUNT()</span>
-            </div>
-            <div class="telemetry-val" id="kpi-total-errors">0</div>
-            <div class="telemetry-sub">Cataloged in vault</div>
-          </div>
+      <!-- SECTION: 2-COLUMN WORKBENCH (01 INGEST & 02 DIAGNOSE) -->
+      <section class="workbench-grid">
 
-          <!-- Metric 2: Total Occurrences -->
-          <div class="telemetry-cell">
-            <div class="telemetry-meta">
-              <span class="telemetry-label">Total Events</span>
-              <span class="telemetry-tag tag-emerald">SUM()</span>
+        <!-- COLUMN 1: 01 / INGEST & ANALYZE TRACE -->
+        <div class="workbench-card ide-panel" id="panel-scanner-entry">
+          <div class="card-header">
+            <div class="header-step-tag">
+              <span class="step-num font-mono">01</span>
+              <h2 class="card-title">INGEST &amp; ANALYZE TRACE</h2>
             </div>
-            <div class="telemetry-val highlight-emerald" id="kpi-total-hits">0</div>
-            <div class="telemetry-sub">Resolved incidents</div>
-          </div>
-
-          <!-- Metric 3: Avg Frequency -->
-          <div class="telemetry-cell">
-            <div class="telemetry-meta">
-              <span class="telemetry-label">Avg Frequency</span>
-              <span class="telemetry-tag">AVG()</span>
-            </div>
-            <div class="telemetry-val" id="kpi-avg-hits">0.0</div>
-            <div class="telemetry-sub">Hits per signature</div>
-          </div>
-
-          <!-- Metric 4: Frequency Spread -->
-          <div class="telemetry-cell">
-            <div class="telemetry-meta">
-              <span class="telemetry-label">Spread</span>
-              <span class="telemetry-tag">MAX/MIN</span>
-            </div>
-            <div class="telemetry-val telemetry-split">
-              <span><small>MAX</small> <strong id="kpi-max-hits">0</strong></span>
-              <span class="split-divider">/</span>
-              <span><small>MIN</small> <strong id="kpi-min-hits">0</strong></span>
-            </div>
-            <div class="telemetry-sub">Frequency range</div>
-          </div>
-
-          <!-- Metric 5: Peak Incident -->
-          <div class="telemetry-cell telemetry-cell-featured">
-            <div class="telemetry-meta">
-              <span class="telemetry-label">Peak Incident</span>
-              <span class="telemetry-tag tag-accent">TOP HIT</span>
-            </div>
-            <div class="telemetry-top-bug">
-              <div class="top-bug-title" id="kpi-top-bug-name">No incidents recorded</div>
-              <div class="top-bug-meta">
-                <span class="badge badge-outline" id="kpi-top-bug-stack">-</span>
-                <span class="hit-count" id="kpi-top-bug-hits">0 hits</span>
-              </div>
+            <div class="tab-toggle-group">
+              <button class="tab-pill active" data-tab="tab-ai-scanner" id="btn-tab-scanner">Trace Analyzer</button>
+              <button class="tab-pill" data-tab="tab-manual-entry" id="btn-tab-manual">Manual Entry</button>
             </div>
           </div>
 
-        </div>
-
-        <!-- Integrated Domain Filter Ribbon -->
-        <div class="domain-filter-ribbon">
-          <div class="ribbon-label">
-            <svg class="strip-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-              <polygon points="18 3 2 3 8 10.46 8 17 12 19 12 10.46 18 3"/>
-            </svg>
-            <span>Filter Domain:</span>
-          </div>
-          <div class="domain-pills-list" id="domain-pills-container">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-      </section>
-
-      <!-- SECTION 2: HUMAN-CRAFTED IDE WORKBENCH LAYOUT -->
-      <section class="workspace-grid">
-
-        <!-- COLUMN 1: PANEL A (Trace Analyzer & Manual Entry Tabs) -->
-        <div class="panel panel-workspace ide-panel" id="panel-scanner-entry">
-          <div class="panel-header">
-            <div class="tab-buttons-group">
-              <button class="tab-btn active" data-tab="tab-ai-scanner" id="btn-tab-scanner">
-                <svg class="tab-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <polyline points="4 14 9 9 4 4"/>
-                  <line x1="11" y1="16" x2="16" y2="16"/>
-                </svg>
-                Trace Analyzer
-              </button>
-              <button class="tab-btn" data-tab="tab-manual-entry" id="btn-tab-manual">
-                <svg class="tab-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
-                  <path d="M14.5 2.5a2.121 2.121 0 0 1 3 3L10 13l-4 1 1-4 7.5-7.5z"/>
-                </svg>
-                Manual Incident
-              </button>
-            </div>
-            <div class="panel-badge-info">
-              <span class="badge badge-subtle" id="workspace-mode-badge">SHA-256 Deduplication</span>
-            </div>
-          </div>
-
-          <div class="panel-body">
+          <div class="card-body">
             
-            <!-- TAB 1: AI SCANNER -->
+            <!-- TAB 1: AI & HEURISTIC SCANNER -->
             <div class="tab-pane active" id="tab-ai-scanner">
               
-              <!-- Quick Sample Loader -->
-              <div class="form-row-compact sample-loader-row">
-                <label for="sample-error-select" class="field-label-small">
-                  <span>Load Sample Trace:</span>
-                </label>
-                <select id="sample-error-select" class="form-control form-control-sm">
-                  <option value="">-- Choose a sample stack trace to test --</option>
-                  <option value="react_map">Frontend (React): Cannot read properties of undefined (reading 'map')</option>
-                  <option value="js_const">Frontend (JS): Uncaught TypeError: Assignment to constant variable</option>
-                  <option value="node_eaddrinuse">Backend (Node.js): Error: listen EADDRINUSE: address already in use :::3000</option>
-                  <option value="express_headers">Backend (Express): Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers</option>
-                  <option value="mysql_1452">Database (MySQL): Error 1452: Foreign key constraint fails</option>
-                  <option value="cors_error">Fullstack (API): Blocked by CORS policy: No Access-Control-Allow-Origin</option>
+              <!-- 1-Click Interactive Sample Chips -->
+              <div class="sample-chips-wrapper">
+                <span class="sample-chips-label">Sample Presets:</span>
+                <div class="sample-chips-list">
+                  <button type="button" class="sample-chip" data-preset="cors_error" title="Load CORS Policy Error">
+                    <span class="chip-dot"></span>CORS Policy
+                  </button>
+                  <button type="button" class="sample-chip" data-preset="react_hydration" title="Load React Hydration Mismatch">
+                    <span class="chip-dot"></span>React Hydration
+                  </button>
+                  <button type="button" class="sample-chip" data-preset="mysql_1452" title="Load MySQL Foreign Key Error">
+                    <span class="chip-dot"></span>MySQL FK Constraint
+                  </button>
+                  <button type="button" class="sample-chip" data-preset="jwt_error" title="Load JWT Invalid Signature Error">
+                    <span class="chip-dot"></span>JWT Signature
+                  </button>
+                </div>
+
+                <!-- Hidden select for programmatic and fallback sync -->
+                <select id="sample-error-select" class="sr-only" aria-hidden="true" tabindex="-1">
+                  <option value="">-- Choose sample --</option>
+                  <option value="cors_error">CORS Error</option>
+                  <option value="react_hydration">React Hydration</option>
+                  <option value="mysql_1452">MySQL FK</option>
+                  <option value="jwt_error">JWT Error</option>
+                  <option value="react_map">React Map</option>
+                  <option value="js_const">JS Const</option>
+                  <option value="node_eaddrinuse">Node EADDRINUSE</option>
+                  <option value="express_headers">Express Headers</option>
                 </select>
               </div>
 
+              <!-- Main Scanner Form -->
               <form id="ai-scanner-form" class="scanner-form">
-                <div class="form-grid-2">
-                  <div class="form-group">
+                
+                <!-- Code Editor Surface with Gutter -->
+                <div class="form-group">
+                  <div class="editor-header">
+                    <label for="scan-trace-textarea" class="editor-label">Stack Trace / Exception Dump <span class="required">*</span></label>
+                    <span class="editor-hint">Raw terminal output or error log</span>
+                  </div>
+                  <div class="ide-editor-wrapper">
+                    <div class="ide-gutter font-mono" aria-hidden="true">
+                      <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span>
+                    </div>
+                    <textarea id="scan-trace-textarea" class="ide-textarea font-mono" rows="6" placeholder="// Paste raw stack trace, uncaught exception, or SQL failure here..." required></textarea>
+                  </div>
+                </div>
+
+                <!-- Compact 2-Column Metadata Row (36px inputs) -->
+                <div class="form-row-metadata">
+                  <div class="form-group flex-1">
                     <label for="scan-domain-select">Domain Category <span class="required">*</span></label>
-                    <select id="scan-domain-select" class="form-control" required>
+                    <select id="scan-domain-select" class="form-input form-input-sm" required>
                       <option value="1">Frontend</option>
                       <option value="2">Backend</option>
                       <option value="3">Database</option>
@@ -239,33 +228,20 @@
                     </select>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group flex-1">
                     <label for="scan-tech-input">Tech Stack / Runtime <span class="required">*</span></label>
-                    <input type="text" id="scan-tech-input" class="form-control" placeholder="e.g. React, Express, MySQL, Next.js" required>
+                    <input type="text" id="scan-tech-input" class="form-input form-input-sm" placeholder="e.g. React, Express, MySQL, Next.js" required>
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <div class="field-label-header">
-                    <label for="scan-trace-textarea">Stack Trace / Terminal Output <span class="required">*</span></label>
-                    <span class="field-hint">Paste raw exception or console log</span>
-                  </div>
-                  <!-- IDE Code Editor Container with Line Number Gutter -->
-                  <div class="ide-editor-wrapper">
-                    <div class="ide-gutter" aria-hidden="true">
-                      <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span>
-                    </div>
-                    <textarea id="scan-trace-textarea" class="form-control ide-textarea code-font" rows="6" placeholder="// Paste terminal output, console error, or stack trace here..." required></textarea>
-                  </div>
-                </div>
-
+                <!-- Form Action Buttons -->
                 <div class="form-actions">
                   <button type="submit" class="btn btn-primary" id="btn-scan-analyze">
                     <span class="btn-spinner hidden" id="scan-spinner"></span>
                     <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                       <polygon points="11 2 3 11 10 11 9 18 17 9 10 9 11 2"/>
                     </svg>
-                    <span class="btn-text">Analyze &amp; Diagnose</span>
+                    <span class="btn-text">Analyze &amp; Commit Trace</span>
                     <kbd class="btn-kbd">Ctrl ↵</kbd>
                   </button>
                   <button type="button" class="btn btn-secondary" id="btn-clear-scan">
@@ -274,12 +250,10 @@
                 </div>
               </form>
 
-              <!-- Scanner Output Results Box -->
+              <!-- In-line Scanner Result Card -->
               <div class="scanner-result-box hidden" id="scanner-result-box">
                 <div class="result-header">
-                  <div class="result-source-indicator" id="result-source-badge">
-                    <!-- Populated dynamically -->
-                  </div>
+                  <div class="result-source-indicator" id="result-source-badge"></div>
                   <button class="btn btn-xs btn-outline" id="btn-copy-result-fix">
                     <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                       <rect x="7" y="7" width="10" height="10" rx="2"/>
@@ -292,7 +266,7 @@
                 <div class="result-content">
                   <div class="result-item">
                     <span class="result-label">Identified Error Signature</span>
-                    <div class="result-signature code-font" id="res-signature"></div>
+                    <div class="result-signature font-mono" id="res-signature"></div>
                   </div>
 
                   <div class="result-item">
@@ -311,7 +285,7 @@
                     <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path d="M18 13a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                     </svg>
-                    Discuss With Assistant
+                    Inspect in Diff Studio
                   </button>
                   <span class="result-db-info" id="res-db-status-info">Persisted to knowledge base.</span>
                 </div>
@@ -319,13 +293,13 @@
 
             </div>
 
-            <!-- TAB 2: MANUAL ENTRY -->
+            <!-- TAB 2: MANUAL INCIDENT ENTRY -->
             <div class="tab-pane" id="tab-manual-entry">
               <form id="manual-entry-form" class="manual-form">
-                <div class="form-grid-2">
-                  <div class="form-group">
+                <div class="form-row-metadata">
+                  <div class="form-group flex-1">
                     <label for="manual-domain-select">Domain Category <span class="required">*</span></label>
-                    <select id="manual-domain-select" class="form-control" required>
+                    <select id="manual-domain-select" class="form-input form-input-sm" required>
                       <option value="1">Frontend</option>
                       <option value="2">Backend</option>
                       <option value="3">Database</option>
@@ -333,25 +307,25 @@
                     </select>
                   </div>
 
-                  <div class="form-group">
+                  <div class="form-group flex-1">
                     <label for="manual-tech-input">Tech Stack <span class="required">*</span></label>
-                    <input type="text" id="manual-tech-input" class="form-control" placeholder="e.g. Node.js, Django, PostgreSQL" required>
+                    <input type="text" id="manual-tech-input" class="form-input form-input-sm" placeholder="e.g. Node.js, Django, PostgreSQL" required>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <label for="manual-signature-input">Canonical Error Signature <span class="required">*</span></label>
-                  <input type="text" id="manual-signature-input" class="form-control code-font" placeholder="Canonical exception headline or error message" required>
+                  <input type="text" id="manual-signature-input" class="form-input form-input-sm font-mono" placeholder="Canonical exception headline or error message" required>
                 </div>
 
                 <div class="form-group">
                   <label for="manual-cause-input">Root Cause Summary</label>
-                  <input type="text" id="manual-cause-input" class="form-control" placeholder="Brief technical explanation of why the failure occurred">
+                  <input type="text" id="manual-cause-input" class="form-input form-input-sm" placeholder="Brief technical explanation of why failure occurred">
                 </div>
 
                 <div class="form-group">
                   <label for="manual-fix-textarea">Fix Steps &amp; Solution <span class="required">*</span></label>
-                  <textarea id="manual-fix-textarea" class="form-control code-font" rows="4" placeholder="1. Specific code change&#10;2. Config update&#10;3. Prevention note" required></textarea>
+                  <textarea id="manual-fix-textarea" class="form-input font-mono" rows="4" placeholder="1. Specific code change&#10;2. Config update&#10;3. Prevention note" required></textarea>
                 </div>
 
                 <div class="form-group-checkbox">
@@ -381,15 +355,19 @@
           </div>
         </div>
 
-        <!-- COLUMN 2: PANEL B (Context-Aware Diagnostic Assistant) -->
-        <div class="panel panel-chat inspector-panel" id="panel-bot-chat">
-          <div class="panel-header">
-            <div class="chat-header-title">
-              <span class="bot-status-dot"></span>
-              <span class="title-text">Diagnostic Assistant</span>
+        <!-- COLUMN 2: 02 / ROOT CAUSE & DIFF PATCH (DIAGNOSTIC INSPECTOR) -->
+        <div class="workbench-card inspector-panel" id="panel-bot-chat">
+          <div class="card-header">
+            <div class="header-step-tag">
+              <span class="step-num font-mono">02</span>
+              <h2 class="card-title">ROOT CAUSE &amp; DIFF PATCH</h2>
             </div>
-            <div class="chat-header-actions">
-              <button class="btn btn-xs btn-outline" id="btn-clear-chat" title="Clear conversation history">
+            <div class="inspector-header-controls">
+              <span class="inspector-status-badge">
+                <span class="pulse-dot"></span>
+                <span>Inspector Live</span>
+              </span>
+              <button class="btn btn-xs btn-outline" id="btn-clear-chat" title="Clear inspector conversation">
                 <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                   <polyline points="3 6 5 6 17 6"/>
                   <path d="M15 6v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m2 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
@@ -399,36 +377,36 @@
             </div>
           </div>
 
-          <!-- Active Context Strip -->
+          <!-- Active Incident Binding Context Bar -->
           <div class="active-context-bar" id="active-context-bar">
             <div class="context-info">
-              <span class="context-label">Context:</span>
-              <span class="context-tag" id="active-context-name">None bound (Select an incident or scan a trace)</span>
+              <span class="context-label">Bound Incident:</span>
+              <span class="context-tag font-mono" id="active-context-name">None bound (Select an incident or analyze a trace)</span>
             </div>
             <button class="btn-detach hidden" id="btn-detach-context" title="Detach active context">✕</button>
           </div>
 
-          <!-- Quick Action Prompt Chips Strip -->
-          <div class="prompt-chips-bar">
+          <!-- Quick Action Diagnostic Pills -->
+          <div class="action-pills-bar">
             <button class="prompt-chip" data-prompt="Explain Root Cause in simple terms">
               <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="9" r="6"/><line x1="13.5" y1="13.5" x2="18" y2="18"/></svg>
               Root Cause
             </button>
-            <button class="prompt-chip" data-prompt="Write clean, corrected code for this bug">
+            <button class="prompt-chip prompt-chip-accent" data-prompt="Generate patch.diff with verified fix">
               <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="14 14 18 10 14 6"/><polyline points="6 6 2 10 6 14"/></svg>
-              Generate Patch
+              Diff Patch
             </button>
             <button class="prompt-chip" data-prompt="Show 3-step prevention checklist to avoid this">
               <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 18s7-3.5 7-9V4l-7-3-7 3v5c0 5.5 7 9 7 9z"/></svg>
-              Prevention Checklist
+              Prevention
             </button>
             <button class="prompt-chip" data-prompt="Write a unit test to catch this regression">
               <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v4a4 4 0 0 1 4 0V2"/><path d="M6 14a4 4 0 0 0 8 0"/></svg>
-              Regression Test
+              Unit Test
             </button>
           </div>
 
-          <!-- Chat Messages Area -->
+          <!-- Diagnostic Conversation & Code Diff Stream Area -->
           <div class="chat-messages-container" id="chat-messages">
             <div class="chat-message bot-message">
               <div class="message-avatar">
@@ -439,17 +417,35 @@
                   <path d="M9 13h6"/>
                 </svg>
               </div>
-              <div class="message-content">
-                <p>Welcome to <strong>TraceVault</strong>.</p>
-                <p>Analyze a trace in <strong>Panel A</strong> or select any row in the incident catalog to bind active context. You can ask follow-ups, request targeted patches, or generate regression test cases.</p>
+              <div class="message-content markdown-body">
+                <p><strong>TraceVault Diagnostic Inspector</strong> is initialized and standing by.</p>
+                <p>Click any <strong>Sample Preset</strong> or select an incident from the knowledge vault below to inspect its root cause, or click <strong>Diff Patch</strong> above to generate a unified git diff solution.</p>
+                
+                <!-- Sample initial preview diff block -->
+                <div class="code-diff-block">
+                  <div class="diff-header">
+                    <div class="diff-file-info">
+                      <span class="diff-icon">📄</span>
+                      <span class="diff-filename font-mono">sample_patch.diff</span>
+                      <span class="diff-badge">+1</span>
+                      <span class="diff-badge badge-del">-1</span>
+                    </div>
+                    <button type="button" class="btn-copy-patch" title="Copy patch">
+                      <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 13V4a1 1 0 0 1 1-1h9"/></svg>
+                      Copy Patch
+                    </button>
+                  </div>
+                  <pre class="diff-body font-mono"><code><span class="diff-line diff-del">- const data = items.map(x => x.name);</span>
+<span class="diff-line diff-add">+ const data = (items || []).map(x => x?.name ?? '');</span></code></pre>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Chat Input Footer -->
+          <!-- Inspector Command Input Form -->
           <div class="chat-footer">
             <form id="chat-input-form" class="chat-form">
-              <input type="text" id="chat-user-input" class="chat-input" placeholder="Ask about this error, request code fixes, or explain root cause..." autocomplete="off">
+              <input type="text" id="chat-user-input" class="chat-input font-mono" placeholder="Ask follow-up questions, request refactoring, or generate tests..." autocomplete="off">
               <button type="submit" class="btn btn-primary btn-send" id="btn-send-chat" title="Send message (Enter)">
                 <svg class="send-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                   <line x1="18" y1="2" x2="9" y2="11"/>
@@ -462,31 +458,42 @@
 
       </section>
 
-      <!-- SECTION 3: KNOWLEDGE BASE TABLE (PANEL C) -->
-      <section class="table-section">
-        <div class="panel panel-table">
+      <!-- SECTION: 03 / ERROR KNOWLEDGE VAULT (INTEGRATED DOMAIN & FILTER TABLE) -->
+      <section class="vault-table-section">
+        <div class="workbench-card panel-table">
           
-          <div class="table-controls-header">
-            <div class="table-title-area">
-              <h2 class="section-heading">Incident Catalog</h2>
-              <span class="records-counter" id="records-counter-badge">0 records loaded</span>
+          <!-- Unified Knowledge Vault Header (Integrated Domain Segmented Bar) -->
+          <div class="vault-panel-header">
+            <div class="vault-header-top-row">
+              <div class="header-step-tag">
+                <span class="step-num font-mono">03</span>
+                <h2 class="card-title">ERROR KNOWLEDGE VAULT</h2>
+                <span class="records-counter font-mono" id="records-counter-badge">0 records</span>
+              </div>
+
+              <!-- Integrated Domain Segmented Bar -->
+              <div class="integrated-domain-bar">
+                <span class="domain-bar-label">Domain:</span>
+                <div class="domain-pills-list" id="domain-pills-container">
+                  <!-- Dynamically rendered via app.js -->
+                </div>
+              </div>
             </div>
 
-            <!-- Table Filter Toolbar -->
+            <!-- Table Filter Toolbar Row -->
             <div class="filter-toolbar">
-              
               <!-- Search Filter -->
               <div class="filter-control search-filter-box">
                 <svg class="filter-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                   <circle cx="9" cy="9" r="6"/>
                   <line x1="13.5" y1="13.5" x2="18" y2="18"/>
                 </svg>
-                <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Filter signatures, stacks, causes...">
+                <input type="text" id="filter-search" class="form-input form-input-sm" placeholder="Filter signatures, stacks, causes...">
               </div>
 
-              <!-- Domain Filter -->
+              <!-- Domain Select (Synchronized) -->
               <div class="filter-control">
-                <select id="filter-domain" class="form-control form-control-sm">
+                <select id="filter-domain" class="form-input form-input-sm">
                   <option value="all">All Domains</option>
                   <option value="1">Frontend</option>
                   <option value="2">Backend</option>
@@ -497,12 +504,12 @@
 
               <!-- Tech Stack Filter -->
               <div class="filter-control">
-                <input type="text" id="filter-tech" class="form-control form-control-sm" placeholder="Tech stack...">
+                <input type="text" id="filter-tech" class="form-input form-input-sm" placeholder="Tech stack...">
               </div>
 
               <!-- Verified Status Filter -->
               <div class="filter-control">
-                <select id="filter-verified" class="form-control form-control-sm">
+                <select id="filter-verified" class="form-input form-input-sm">
                   <option value="all">All Status</option>
                   <option value="1">Verified Only</option>
                   <option value="0">Pending Review</option>
@@ -511,7 +518,7 @@
 
               <!-- Sort Filter -->
               <div class="filter-control">
-                <select id="filter-sort" class="form-control form-control-sm">
+                <select id="filter-sort" class="form-input form-input-sm">
                   <option value="hits">Sort: Most Hits</option>
                   <option value="updated">Sort: Recently Updated</option>
                   <option value="id_desc">Sort: Newest First</option>
@@ -527,23 +534,22 @@
                 </svg>
                 Reset
               </button>
-
             </div>
           </div>
 
-          <!-- Table Container -->
+          <!-- Responsive Table Container -->
           <div class="table-responsive">
             <table class="vault-table" id="vault-table">
               <thead>
                 <tr>
                   <th style="width: 55px;">ID</th>
                   <th style="width: 105px;">Domain</th>
-                  <th style="width: 110px;">Tech Stack</th>
-                  <th style="width: 300px;">Signature &amp; Root Cause</th>
+                  <th style="width: 115px;">Tech Stack</th>
+                  <th style="width: 310px;">Signature &amp; Root Cause</th>
                   <th style="width: 320px;">Fix Requirements</th>
-                  <th style="width: 100px;">Status</th>
+                  <th style="width: 95px;">Status</th>
                   <th style="width: 75px;" class="text-center">Hits</th>
-                  <th style="width: 200px;" class="text-right">Actions</th>
+                  <th style="width: 190px;" class="text-right">Actions</th>
                 </tr>
               </thead>
               <tbody id="vault-table-body">
@@ -561,8 +567,8 @@
                 <line x1="24" y1="16" x2="24" y2="32"/>
               </svg>
             </div>
-            <h3>Knowledge base is empty</h3>
-            <p>Analyze an error trace in the workspace above or save a manual incident to begin indexing your debugging knowledge.</p>
+            <h3>Knowledge vault is clean</h3>
+            <p>Paste an exception in <strong>01 / INGEST</strong> above or load a sample preset to start indexing debugging intelligence.</p>
           </div>
 
         </div>
@@ -630,37 +636,39 @@
         </div>
 
         <!-- Lab Aggregate Summary Horizontal Strip -->
-        <div class="telemetry-ledger-bar" style="margin-bottom: 16px;">
+        <div class="telemetry-bar lab-telemetry-bar" style="margin-bottom: 16px;">
           <div class="telemetry-cell">
-            <div class="telemetry-meta"><span class="telemetry-label">Demo Issues</span><span class="telemetry-tag">SEED</span></div>
-            <div class="telemetry-val" id="lab-kpi-total">12</div>
-            <div class="telemetry-sub">Sample records</div>
+            <span class="telemetry-label">DEMO ISSUES</span>
+            <span class="telemetry-val font-mono" id="lab-kpi-total">12</span>
+            <span class="sql-pill">SEED</span>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-meta"><span class="telemetry-label">Total Hits</span><span class="telemetry-tag tag-emerald">SUM</span></div>
-            <div class="telemetry-val highlight-emerald" id="lab-kpi-hits">87</div>
-            <div class="telemetry-sub">Resolved hits</div>
+            <span class="telemetry-label">TOTAL HITS</span>
+            <span class="telemetry-val font-mono highlight-emerald" id="lab-kpi-hits">87</span>
+            <span class="sql-pill pill-emerald">SUM</span>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-meta"><span class="telemetry-label">Avg Frequency</span><span class="telemetry-tag">AVG</span></div>
-            <div class="telemetry-val" id="lab-kpi-avg">7.3</div>
-            <div class="telemetry-sub">Hits per record</div>
+            <span class="telemetry-label">AVG FREQUENCY</span>
+            <span class="telemetry-val font-mono" id="lab-kpi-avg">7.3</span>
+            <span class="sql-pill">AVG</span>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-meta"><span class="telemetry-label">Spread</span><span class="telemetry-tag">RANGE</span></div>
-            <div class="telemetry-val telemetry-split">
+            <span class="telemetry-label">SPREAD</span>
+            <div class="telemetry-val font-mono telemetry-spread-box">
               <span><small>MAX</small> <strong id="lab-kpi-max">15</strong></span>
               <span class="split-divider">/</span>
               <span><small>MIN</small> <strong id="lab-kpi-min">2</strong></span>
             </div>
-            <div class="telemetry-sub">Frequency range</div>
+            <span class="sql-pill">RANGE</span>
           </div>
-          <div class="telemetry-cell telemetry-cell-featured">
-            <div class="telemetry-meta"><span class="telemetry-label">Top Incident</span><span class="telemetry-tag tag-accent">TOP HIT</span></div>
-            <div class="telemetry-top-bug">
-              <div class="top-bug-title" id="lab-kpi-top-name">Loading...</div>
-              <div class="top-bug-meta"><span class="badge badge-outline" id="lab-kpi-top-stack">-</span><span class="hit-count" id="lab-kpi-top-hits">0 hits</span></div>
+          <div class="telemetry-cell telemetry-cell-top">
+            <span class="telemetry-label">TOP INCIDENT</span>
+            <div class="telemetry-top-content">
+              <span class="top-bug-title font-mono" id="lab-kpi-top-name">Loading...</span>
+              <span class="top-bug-stack" id="lab-kpi-top-stack">-</span>
+              <span class="top-bug-hits font-mono highlight-emerald" id="lab-kpi-top-hits">0 hits</span>
             </div>
+            <span class="sql-pill pill-accent">PEAK</span>
           </div>
         </div>
 
@@ -669,9 +677,9 @@
           <div class="drawer-title">
             <span>Add Demo Record</span>
           </div>
-          <form id="lab-quick-add-form" class="form-grid-2">
+          <form id="lab-quick-add-form" class="form-row-metadata" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div class="form-group" style="margin-bottom: 0;">
-              <select id="lab-add-domain" class="form-control form-control-sm" required>
+              <select id="lab-add-domain" class="form-input form-input-sm" required>
                 <option value="1">Frontend</option>
                 <option value="2">Backend</option>
                 <option value="3">Database</option>
@@ -679,16 +687,16 @@
               </select>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="lab-add-tech" class="form-control form-control-sm" placeholder="Tech Stack (e.g. Redis, Vue, GraphQL)" required>
+              <input type="text" id="lab-add-tech" class="form-input form-input-sm" placeholder="Tech Stack (e.g. Redis, Vue, GraphQL)" required>
             </div>
             <div class="form-group" style="margin-bottom: 0; grid-column: 1 / -1;">
-              <input type="text" id="lab-add-signature" class="form-control form-control-sm code-font" placeholder="Canonical Error Signature (e.g. Redis connection timeout)" required>
+              <input type="text" id="lab-add-signature" class="form-input form-input-sm font-mono" placeholder="Canonical Error Signature (e.g. Redis connection timeout)" required>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="lab-add-cause" class="form-control form-control-sm" placeholder="Root Cause Summary">
+              <input type="text" id="lab-add-cause" class="form-input form-input-sm" placeholder="Root Cause Summary">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="lab-add-fix" class="form-control form-control-sm code-font" placeholder="Fix Steps" required>
+              <input type="text" id="lab-add-fix" class="form-input form-input-sm font-mono" placeholder="Fix Steps" required>
             </div>
             <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
               <button type="submit" class="btn btn-sm btn-primary">
@@ -701,10 +709,10 @@
         <!-- Lab Filter Bar -->
         <div class="filter-toolbar" style="margin-bottom: 12px;">
           <div class="filter-control search-filter-box">
-            <input type="text" id="lab-filter-search" class="form-control form-control-sm" placeholder="Search demo records...">
+            <input type="text" id="lab-filter-search" class="form-input form-input-sm" placeholder="Search demo records...">
           </div>
           <div class="filter-control">
-            <select id="lab-filter-domain" class="form-control form-control-sm">
+            <select id="lab-filter-domain" class="form-input form-input-sm">
               <option value="all">All Domains</option>
               <option value="1">Frontend</option>
               <option value="2">Backend</option>
@@ -713,7 +721,7 @@
             </select>
           </div>
           <div class="filter-control">
-            <select id="lab-filter-sort" class="form-control form-control-sm">
+            <select id="lab-filter-sort" class="form-input form-input-sm">
               <option value="hits">Sort: Most Hits</option>
               <option value="updated">Sort: Recently Updated</option>
               <option value="id_desc">Sort: Newest ID</option>
@@ -775,10 +783,10 @@
         <input type="hidden" id="edit-error-id">
         <input type="hidden" id="edit-error-mode" value="real">
 
-        <div class="form-grid-2">
-          <div class="form-group">
+        <div class="form-row-metadata">
+          <div class="form-group flex-1">
             <label for="edit-domain-select">Domain Category <span class="required">*</span></label>
-            <select id="edit-domain-select" class="form-control" required>
+            <select id="edit-domain-select" class="form-input form-input-sm" required>
               <option value="1">Frontend</option>
               <option value="2">Backend</option>
               <option value="3">Database</option>
@@ -786,25 +794,25 @@
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="form-group flex-1">
             <label for="edit-tech-input">Tech Stack <span class="required">*</span></label>
-            <input type="text" id="edit-tech-input" class="form-control" required>
+            <input type="text" id="edit-tech-input" class="form-input form-input-sm" required>
           </div>
         </div>
 
         <div class="form-group">
           <label for="edit-signature-input">Canonical Error Signature <span class="required">*</span></label>
-          <input type="text" id="edit-signature-input" class="form-control code-font" required>
+          <input type="text" id="edit-signature-input" class="form-input form-input-sm font-mono" required>
         </div>
 
         <div class="form-group">
           <label for="edit-cause-input">Root Cause Analysis</label>
-          <input type="text" id="edit-cause-input" class="form-control">
+          <input type="text" id="edit-cause-input" class="form-input form-input-sm">
         </div>
 
         <div class="form-group">
           <label for="edit-fix-textarea">Fix Requirements &amp; Steps <span class="required">*</span></label>
-          <textarea id="edit-fix-textarea" class="form-control code-font" rows="5" required></textarea>
+          <textarea id="edit-fix-textarea" class="form-input font-mono" rows="5" required></textarea>
         </div>
 
         <div class="form-group-checkbox">
@@ -840,8 +848,8 @@
       <div class="modal-body">
         <p style="color: var(--text-secondary); font-size: 0.85rem;">Are you sure you want to permanently delete this incident record?</p>
         <div class="delete-preview-box">
-          <div class="preview-sig" id="delete-preview-signature">Cannot read properties of undefined</div>
-          <div class="preview-id" id="delete-preview-id">Record ID: #1</div>
+          <div class="preview-sig font-mono" id="delete-preview-signature">Cannot read properties of undefined</div>
+          <div class="preview-id font-mono" id="delete-preview-id">Record ID: #1</div>
         </div>
         <p class="warning-text">This will permanently remove the record from the knowledge base. This action cannot be undone.</p>
       </div>
@@ -872,7 +880,7 @@
         <div class="form-group">
           <label for="byok-key-input">Universal API Key</label>
           <div class="password-input-wrapper">
-            <input type="password" id="byok-key-input" class="form-control code-font" placeholder="Paste Gemini, Groq, OpenRouter, or OpenAI key...">
+            <input type="password" id="byok-key-input" class="form-input form-input-sm font-mono" placeholder="Paste Gemini, Groq, OpenRouter, or OpenAI key...">
             <button type="button" class="btn-toggle-eye" id="btn-toggle-key-visibility" title="Show/Hide Key">
               <svg class="eye-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M1 10s4-7 9-7 9 7 9 7-4 7-9 7-9-7-9-7z"/>
@@ -919,19 +927,19 @@
         <div class="db-inspector-grid">
           <div class="db-inspector-card">
             <div class="db-inspector-label">Active Host &amp; Port</div>
-            <div class="db-inspector-value" id="inspect-host">127.0.0.1:3306</div>
+            <div class="db-inspector-value font-mono" id="inspect-host">127.0.0.1:3306</div>
           </div>
           <div class="db-inspector-card">
             <div class="db-inspector-label">Database Schema</div>
-            <div class="db-inspector-value highlight-emerald" id="inspect-db">tracevault</div>
+            <div class="db-inspector-value font-mono highlight-emerald" id="inspect-db">tracevault</div>
           </div>
           <div class="db-inspector-card">
             <div class="db-inspector-label">Database Driver</div>
-            <div class="db-inspector-value" id="inspect-driver">mysql2/promise</div>
+            <div class="db-inspector-value font-mono" id="inspect-driver">mysql2/promise</div>
           </div>
           <div class="db-inspector-card">
             <div class="db-inspector-label">Normalization</div>
-            <div class="db-inspector-value highlight-emerald" id="inspect-norm">3NF Relational Model</div>
+            <div class="db-inspector-value font-mono highlight-emerald" id="inspect-norm">3NF Relational Model</div>
           </div>
         </div>
 
@@ -979,18 +987,18 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <div style="font-weight: 600; font-size: 0.8rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
               <span>Live SQL Execution Test</span>
-              <span class="badge badge-primary" id="sql-ping-latency">0 ms</span>
+              <span class="badge badge-primary font-mono" id="sql-ping-latency">0 ms</span>
             </div>
             <button type="button" class="btn btn-sm btn-primary" id="btn-run-sql-ping">
               Run SQL Ping
             </button>
           </div>
           <div style="font-size: 0.725rem; color: var(--text-tertiary); margin-bottom: 4px;">SQL Query:</div>
-          <div class="code-font" style="background: var(--bg-code); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--accent-cyan); word-break: break-all;">
+          <div class="font-mono" style="background: var(--bg-code); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--accent-cyan); word-break: break-all;">
             SELECT 1 AS ping, DATABASE() AS active_db, VERSION() AS mysql_version, NOW() AS server_time, (SELECT COUNT(*) FROM error_logs) AS total_vault_records;
           </div>
           <div style="font-size: 0.725rem; color: var(--text-tertiary); margin-top: 8px; margin-bottom: 4px;">Response:</div>
-          <pre id="sql-ping-result" class="code-box" style="margin: 0; padding: 10px; border-radius: 6px; background: var(--bg-code); border: 1px solid var(--border-subtle); color: #34d399; font-size: 0.75rem; max-height: 120px; overflow: auto;">Ready to verify. Click "Run SQL Ping".</pre>
+          <pre id="sql-ping-result" class="code-box font-mono" style="margin: 0; padding: 10px; border-radius: 6px; background: var(--bg-code); border: 1px solid var(--border-subtle); color: #34d399; font-size: 0.75rem; max-height: 120px; overflow: auto;">Ready to verify. Click "Run SQL Ping".</pre>
         </div>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
@@ -1002,6 +1010,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=impeccable_v1"></script>
+  <script src="app.js?v=human_v2"></script>
 </body>
 </html>
