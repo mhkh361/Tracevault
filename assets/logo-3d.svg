@@ -114,23 +114,15 @@
       Self-Learning AI Debug Bot &amp; Cloud-Native Error Knowledge Base
     </text>
 
-    <!-- Feature Pills (Starts x=215, Ends x=534 + 215 = 749 < 860) -->
+    <!-- Feature Pills (Clean 2 Badges) -->
     <g transform="translate(215, 140)">
-      <!-- Pill 1: Frosted Glass UI -->
-      <rect x="0" y="0" width="126" height="26" rx="7" fill="rgba(255, 255, 255, 0.05)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
-      <text x="12" y="17" fill="#e2e8f0" font-size="10.5" font-weight="600">&#10024; Frosted Glass UI</text>
+      <!-- Pill 1: Live Web App -->
+      <rect x="0" y="0" width="160" height="26" rx="7" fill="rgba(16, 185, 129, 0.1)" stroke="rgba(16, 185, 129, 0.35)" stroke-width="1" />
+      <text x="14" y="17" fill="#34d399" font-size="10.5" font-weight="600">&#127760; Live Web App</text>
 
-      <!-- Pill 2: Universal AI Router -->
-      <rect x="134" y="0" width="144" height="26" rx="7" fill="rgba(6, 182, 212, 0.08)" stroke="rgba(6, 182, 212, 0.3)" stroke-width="1" />
-      <text x="144" y="17" fill="#38bdf8" font-size="10.5" font-weight="600">&#128273; Universal AI Router</text>
-
-      <!-- Pill 3: GitHub Pages -->
-      <rect x="286" y="0" width="128" height="26" rx="7" fill="rgba(16, 185, 129, 0.08)" stroke="rgba(16, 185, 129, 0.3)" stroke-width="1" />
-      <text x="296" y="17" fill="#34d399" font-size="10.5" font-weight="600">&#127760; GitHub Pages</text>
-
-      <!-- Pill 4: Zero-Server -->
-      <rect x="422" y="0" width="112" height="26" rx="7" fill="rgba(139, 92, 246, 0.08)" stroke="rgba(139, 92, 246, 0.3)" stroke-width="1" />
-      <text x="432" y="17" fill="#c084fc" font-size="10.5" font-weight="600">&#128274; Zero-Server</text>
+      <!-- Pill 2: MIT License -->
+      <rect x="172" y="0" width="140" height="26" rx="7" fill="rgba(56, 189, 248, 0.1)" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1" />
+      <text x="186" y="17" fill="#38bdf8" font-size="10.5" font-weight="600">&#9878; MIT License</text>
     </g>
 
     <!-- Bottom Metric String -->

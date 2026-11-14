@@ -33,6 +33,17 @@ const REAL_VAULT_PATH = path.join(DATA_DIR, 'real-vault.json');
 const DEMO_VAULT_PATH = path.join(DATA_DIR, 'demo-vault.json');
 const SQL_FILE_PATH = path.join(__dirname, 'database.sql');
 
+// CORS middleware for web clients (including GitHub Pages https://mhkh361.github.io)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // Middleware
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));

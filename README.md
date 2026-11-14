@@ -3,11 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://mhkh361.github.io/Tracevault/"><img src="https://img.shields.io/badge/LIVE%20DEMO-GitHub%20Pages-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Live Demo on GitHub Pages" /></a>
-  <a href="#-core-capabilities"><img src="https://img.shields.io/badge/UI-Frosted%20Glassmorphism-10b981?style=for-the-badge&logo=css3&logoColor=white" alt="Frosted Glassmorphism UI" /></a>
-  <a href="#-universal-api-key-auto-router"><img src="https://img.shields.io/badge/AI-Universal%20Auto--Router-06b6d4?style=for-the-badge&logo=probot&logoColor=white" alt="Universal AI Auto-Router" /></a>
-  <a href="#-relational-data-architecture-3nf"><img src="https://img.shields.io/badge/Storage-3NF%20Relational%20Engine-f59e0b?style=for-the-badge&logo=databricks&logoColor=white" alt="3NF Relational Engine" /></a>
-  <a href="#-zero-server-privacy-guarantee"><img src="https://img.shields.io/badge/Security-Zero--Server%20Privacy-10b981?style=for-the-badge&logo=auth0&logoColor=white" alt="Zero-Server Privacy" /></a>
+  <a href="https://mhkh361.github.io/Tracevault/"><img src="https://img.shields.io/badge/LIVE%20WEB%20APP-GitHub%20Pages-10b981?style=for-the-badge&logo=github&logoColor=white" alt="Live Web App on GitHub Pages" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/LICENSE-MIT-10b981?style=for-the-badge" alt="MIT License" /></a>
 </p>
 
