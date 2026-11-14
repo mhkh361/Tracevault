@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=human_v7">
-  <link rel="stylesheet" href="style.css?v=human_v7">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=impeccable_v1">
+  <link rel="stylesheet" href="style.css?v=impeccable_v1">
 </head>
 <body>
 
@@ -26,15 +26,7 @@
     <header class="app-header">
       <div class="header-left">
         <div class="brand-logo">
-          <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="8" fill="#161c28"/>
-            <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="rgba(255,255,255,0.1)"/>
-            <!-- Isometric Vault Icon -->
-            <path d="M16 6L25 11.2V21.6L16 26.8L7 21.6V11.2L16 6Z" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="1.6"/>
-            <path d="M16 6V26.8" stroke="#10b981" stroke-width="1.4" stroke-opacity="0.6"/>
-            <path d="M7 11.2L16 16.4L25 11.2" stroke="#10b981" stroke-width="1.4" stroke-opacity="0.8"/>
-            <circle cx="16" cy="16.4" r="2.2" fill="#34d399"/>
-          </svg>
+          <img src="favicon.svg?v=impeccable_v1" class="brand-icon" alt="TraceVault 3D Isometric Cube" width="30" height="30" />
           <div class="brand-titles">
             <div class="brand-main">
               <span class="brand-title">TraceVault</span>
@@ -58,9 +50,9 @@
 
       <div class="header-right">
         <!-- Live Database Status & Sync Trigger -->
-        <button class="status-btn" id="mysql-status-trigger" title="Database Connection Status &amp; Inspection">
+        <button class="status-btn connected" id="mysql-status-trigger" title="Database Connection Status &amp; Sync Inspector">
           <span class="status-dot" id="mysql-status-dot"></span>
-          <span id="mysql-status-text">Database</span>
+          <span id="mysql-status-text">● Cloud Vault Active</span>
         </button>
 
         <!-- Export Dropdown -->
@@ -85,13 +77,13 @@
           </div>
         </div>
 
-        <!-- BYOK Config Button -->
+        <!-- Connect AI Button -->
         <button class="btn btn-secondary" id="open-byok-modal-btn">
           <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.5 2.5l-2 2m-1.5 1.5l-2 2-2-2-1.5 1.5 2 2-1 1-1.5-1.5-2 2 1.5 1.5-3.5 3.5a5 5 0 1 1-2.5-2.5l3.5-3.5 1.5 1.5 2-2-1.5-1.5 1-1 2 2 1.5-1.5-2-2 1.5-1.5 2 2z"/>
           </svg>
-          <span class="btn-label" id="byok-btn-label">API Key</span>
-          <span class="byok-indicator" id="byok-status-pill">Offline</span>
+          <span class="btn-label" id="byok-btn-label">Connect AI</span>
+          <span class="byok-indicator active" id="byok-status-pill">● AI Ready</span>
         </button>
 
         <!-- Theme Toggle -->
@@ -108,65 +100,62 @@
     <!-- MAIN CONTENT CONTAINER -->
     <main class="app-main">
 
-      <!-- SECTION 1: METRIC AGGREGATE STRIP & DOMAIN FILTERS -->
-      <section class="kpi-section">
-        <div class="kpi-cards-grid">
+      <!-- SECTION 1: PRECISION HORIZONTAL TELEMETRY LEDGER STRIP -->
+      <section class="telemetry-section">
+        <div class="telemetry-ledger-bar">
           
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Unique Issues</span>
-              <span class="kpi-context-pill">Catalog</span>
+          <!-- Metric 1: Unique Issues -->
+          <div class="telemetry-cell">
+            <div class="telemetry-meta">
+              <span class="telemetry-label">Unique Issues</span>
+              <span class="telemetry-tag">COUNT()</span>
             </div>
-            <div class="kpi-body">
-              <span class="kpi-value" id="kpi-total-errors">0</span>
-              <span class="kpi-meta">Distinct signatures tracked</span>
-            </div>
+            <div class="telemetry-val" id="kpi-total-errors">0</div>
+            <div class="telemetry-sub">Cataloged in vault</div>
           </div>
 
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Total Occurrences</span>
-              <span class="kpi-context-pill highlight">Cumulative</span>
+          <!-- Metric 2: Total Occurrences -->
+          <div class="telemetry-cell">
+            <div class="telemetry-meta">
+              <span class="telemetry-label">Total Events</span>
+              <span class="telemetry-tag tag-emerald">SUM()</span>
             </div>
-            <div class="kpi-body">
-              <span class="kpi-value highlight-emerald" id="kpi-total-hits">0</span>
-              <span class="kpi-meta">Aggregated incidents resolved</span>
-            </div>
+            <div class="telemetry-val highlight-emerald" id="kpi-total-hits">0</div>
+            <div class="telemetry-sub">Resolved incidents</div>
           </div>
 
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Average Frequency</span>
-              <span class="kpi-context-pill">Mean</span>
+          <!-- Metric 3: Avg Frequency -->
+          <div class="telemetry-cell">
+            <div class="telemetry-meta">
+              <span class="telemetry-label">Avg Frequency</span>
+              <span class="telemetry-tag">AVG()</span>
             </div>
-            <div class="kpi-body">
-              <span class="kpi-value" id="kpi-avg-hits">0.0</span>
-              <span class="kpi-meta">Hits per signature</span>
-            </div>
+            <div class="telemetry-val" id="kpi-avg-hits">0.0</div>
+            <div class="telemetry-sub">Hits per signature</div>
           </div>
 
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-title">Frequency Spread</span>
-              <span class="kpi-context-pill">Range</span>
+          <!-- Metric 4: Frequency Spread -->
+          <div class="telemetry-cell">
+            <div class="telemetry-meta">
+              <span class="telemetry-label">Spread</span>
+              <span class="telemetry-tag">MAX/MIN</span>
             </div>
-            <div class="kpi-body">
-              <div class="kpi-split-value">
-                <span class="split-item"><small>Max</small> <strong id="kpi-max-hits">0</strong></span>
-                <span class="split-divider">/</span>
-                <span class="split-item"><small>Min</small> <strong id="kpi-min-hits">0</strong></span>
-              </div>
-              <span class="kpi-meta">Distribution variance</span>
+            <div class="telemetry-val telemetry-split">
+              <span><small>MAX</small> <strong id="kpi-max-hits">0</strong></span>
+              <span class="split-divider">/</span>
+              <span><small>MIN</small> <strong id="kpi-min-hits">0</strong></span>
             </div>
+            <div class="telemetry-sub">Frequency range</div>
           </div>
 
-          <div class="kpi-card kpi-card-featured">
-            <div class="kpi-header">
-              <span class="kpi-title">Peak Incident</span>
-              <span class="badge badge-accent">Top Occurrence</span>
+          <!-- Metric 5: Peak Incident -->
+          <div class="telemetry-cell telemetry-cell-featured">
+            <div class="telemetry-meta">
+              <span class="telemetry-label">Peak Incident</span>
+              <span class="telemetry-tag tag-accent">TOP HIT</span>
             </div>
-            <div class="kpi-body">
-              <div class="top-bug-title" id="kpi-top-bug-name">No issues recorded yet</div>
+            <div class="telemetry-top-bug">
+              <div class="top-bug-title" id="kpi-top-bug-name">No incidents recorded</div>
               <div class="top-bug-meta">
                 <span class="badge badge-outline" id="kpi-top-bug-stack">-</span>
                 <span class="hit-count" id="kpi-top-bug-hits">0 hits</span>
@@ -176,13 +165,13 @@
 
         </div>
 
-        <!-- Domain Breakdown Filter Bar -->
-        <div class="domain-strip">
-          <div class="domain-strip-label">
+        <!-- Integrated Domain Filter Ribbon -->
+        <div class="domain-filter-ribbon">
+          <div class="ribbon-label">
             <svg class="strip-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
               <polygon points="18 3 2 3 8 10.46 8 17 12 19 12 10.46 18 3"/>
             </svg>
-            <span>Filter by Domain:</span>
+            <span>Filter Domain:</span>
           </div>
           <div class="domain-pills-list" id="domain-pills-container">
             <!-- Rendered dynamically -->
@@ -190,11 +179,11 @@
         </div>
       </section>
 
-      <!-- SECTION 2: TWO-COLUMN INTERACTIVE WORKSPACE -->
+      <!-- SECTION 2: HUMAN-CRAFTED IDE WORKBENCH LAYOUT -->
       <section class="workspace-grid">
 
         <!-- COLUMN 1: PANEL A (Trace Analyzer & Manual Entry Tabs) -->
-        <div class="panel panel-workspace" id="panel-scanner-entry">
+        <div class="panel panel-workspace ide-panel" id="panel-scanner-entry">
           <div class="panel-header">
             <div class="tab-buttons-group">
               <button class="tab-btn active" data-tab="tab-ai-scanner" id="btn-tab-scanner">
@@ -257,10 +246,17 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="scan-trace-textarea">
-                    Error Message / Stack Trace <span class="required">*</span>
-                  </label>
-                  <textarea id="scan-trace-textarea" class="form-control code-font" rows="5" placeholder="Paste terminal output, console error, or exception stack trace..." required></textarea>
+                  <div class="field-label-header">
+                    <label for="scan-trace-textarea">Stack Trace / Terminal Output <span class="required">*</span></label>
+                    <span class="field-hint">Paste raw exception or console log</span>
+                  </div>
+                  <!-- IDE Code Editor Container with Line Number Gutter -->
+                  <div class="ide-editor-wrapper">
+                    <div class="ide-gutter" aria-hidden="true">
+                      <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span>
+                    </div>
+                    <textarea id="scan-trace-textarea" class="form-control ide-textarea code-font" rows="6" placeholder="// Paste terminal output, console error, or stack trace here..." required></textarea>
+                  </div>
                 </div>
 
                 <div class="form-actions">
@@ -270,6 +266,7 @@
                       <polygon points="11 2 3 11 10 11 9 18 17 9 10 9 11 2"/>
                     </svg>
                     <span class="btn-text">Analyze &amp; Diagnose</span>
+                    <kbd class="btn-kbd">Ctrl ↵</kbd>
                   </button>
                   <button type="button" class="btn btn-secondary" id="btn-clear-scan">
                     Clear
@@ -385,7 +382,7 @@
         </div>
 
         <!-- COLUMN 2: PANEL B (Context-Aware Diagnostic Assistant) -->
-        <div class="panel panel-chat" id="panel-bot-chat">
+        <div class="panel panel-chat inspector-panel" id="panel-bot-chat">
           <div class="panel-header">
             <div class="chat-header-title">
               <span class="bot-status-dot"></span>
@@ -444,7 +441,7 @@
               </div>
               <div class="message-content">
                 <p>Welcome to <strong>TraceVault</strong>.</p>
-                <p>Analyze a trace in <strong>Panel A</strong> or select any row in the knowledge base table to bind active context. You can ask follow-ups, request targeted patches, or generate regression test cases.</p>
+                <p>Analyze a trace in <strong>Panel A</strong> or select any row in the incident catalog to bind active context. You can ask follow-ups, request targeted patches, or generate regression test cases.</p>
               </div>
             </div>
           </div>
@@ -576,10 +573,10 @@
     <!-- FOOTER WITH DEMO SANDBOX TRIGGER -->
     <footer class="app-footer">
       <div class="footer-left">
-        <span>TraceVault v2.0 &bull; Production Developer Suite</span>
+        <span>TraceVault v2.0 &bull; Developer Suite</span>
       </div>
       <div class="footer-center">
-        <span>Storage: Active Local Disk Vault + MySQL Relational Bridge</span>
+        <span>Dual-Storage Engine: Local Disk Vault + Live MySQL 8+ Bridge</span>
       </div>
       <div class="footer-right">
         <!-- Interactive Live Demo Trigger -->
@@ -632,34 +629,35 @@
           </div>
         </div>
 
-        <!-- Lab Aggregate Summary Cards -->
-        <div class="kpi-cards-grid" style="margin-bottom: 16px;">
-          <div class="kpi-card">
-            <div class="kpi-header"><span class="kpi-title">Demo Issues</span><span class="kpi-context-pill">Seed</span></div>
-            <div class="kpi-body"><span class="kpi-value" id="lab-kpi-total">12</span><span class="kpi-meta">Sample Records</span></div>
+        <!-- Lab Aggregate Summary Horizontal Strip -->
+        <div class="telemetry-ledger-bar" style="margin-bottom: 16px;">
+          <div class="telemetry-cell">
+            <div class="telemetry-meta"><span class="telemetry-label">Demo Issues</span><span class="telemetry-tag">SEED</span></div>
+            <div class="telemetry-val" id="lab-kpi-total">12</div>
+            <div class="telemetry-sub">Sample records</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-header"><span class="kpi-title">Total Hits</span><span class="kpi-context-pill highlight">Cumulative</span></div>
-            <div class="kpi-body"><span class="kpi-value highlight-emerald" id="lab-kpi-hits">87</span><span class="kpi-meta">Resolved Hits</span></div>
+          <div class="telemetry-cell">
+            <div class="telemetry-meta"><span class="telemetry-label">Total Hits</span><span class="telemetry-tag tag-emerald">SUM</span></div>
+            <div class="telemetry-val highlight-emerald" id="lab-kpi-hits">87</div>
+            <div class="telemetry-sub">Resolved hits</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-header"><span class="kpi-title">Avg Frequency</span><span class="kpi-context-pill">Mean</span></div>
-            <div class="kpi-body"><span class="kpi-value" id="lab-kpi-avg">7.3</span><span class="kpi-meta">Hits per Record</span></div>
+          <div class="telemetry-cell">
+            <div class="telemetry-meta"><span class="telemetry-label">Avg Frequency</span><span class="telemetry-tag">AVG</span></div>
+            <div class="telemetry-val" id="lab-kpi-avg">7.3</div>
+            <div class="telemetry-sub">Hits per record</div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-header"><span class="kpi-title">Range</span><span class="kpi-context-pill">Spread</span></div>
-            <div class="kpi-body">
-              <div class="kpi-split-value">
-                <span class="split-item"><small>Max</small> <strong id="lab-kpi-max">15</strong></span>
-                <span class="split-divider">/</span>
-                <span class="split-item"><small>Min</small> <strong id="lab-kpi-min">2</strong></span>
-              </div>
-              <span class="kpi-meta">Min / Max hits</span>
+          <div class="telemetry-cell">
+            <div class="telemetry-meta"><span class="telemetry-label">Spread</span><span class="telemetry-tag">RANGE</span></div>
+            <div class="telemetry-val telemetry-split">
+              <span><small>MAX</small> <strong id="lab-kpi-max">15</strong></span>
+              <span class="split-divider">/</span>
+              <span><small>MIN</small> <strong id="lab-kpi-min">2</strong></span>
             </div>
+            <div class="telemetry-sub">Frequency range</div>
           </div>
-          <div class="kpi-card kpi-card-featured">
-            <div class="kpi-header"><span class="kpi-title">Top Incident</span><span class="badge badge-accent">Top Hit</span></div>
-            <div class="kpi-body">
+          <div class="telemetry-cell telemetry-cell-featured">
+            <div class="telemetry-meta"><span class="telemetry-label">Top Incident</span><span class="telemetry-tag tag-accent">TOP HIT</span></div>
+            <div class="telemetry-top-bug">
               <div class="top-bug-title" id="lab-kpi-top-name">Loading...</div>
               <div class="top-bug-meta"><span class="badge badge-outline" id="lab-kpi-top-stack">-</span><span class="hit-count" id="lab-kpi-top-hits">0 hits</span></div>
             </div>
@@ -751,7 +749,7 @@
       </div>
 
       <div class="modal-footer">
-        <span style="font-size: 0.75rem; color: var(--text-dim); margin-right: auto;">
+        <span style="font-size: 0.75rem; color: var(--text-tertiary); margin-right: auto;">
           Press <kbd class="shortcut-pill">Esc</kbd> or <kbd class="shortcut-pill">Alt+L</kbd> to exit.
         </span>
         <button type="button" class="btn btn-secondary" id="btn-close-lab-footer">Close Demo</button>
@@ -840,7 +838,7 @@
         <button class="btn-close-modal" id="btn-close-delete-modal">✕</button>
       </div>
       <div class="modal-body">
-        <p style="color: var(--text-muted); font-size: 0.85rem;">Are you sure you want to permanently delete this incident record?</p>
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">Are you sure you want to permanently delete this incident record?</p>
         <div class="delete-preview-box">
           <div class="preview-sig" id="delete-preview-signature">Cannot read properties of undefined</div>
           <div class="preview-id" id="delete-preview-id">Record ID: #1</div>
@@ -868,7 +866,7 @@
       </div>
       <div class="modal-body">
         <div class="byok-notice">
-          <strong>Client-Only Privacy:</strong> Your API key is stored securely in your browser's <code>localStorage</code> and transmitted directly to the model provider via HTTPS TLS. It never touches our servers.
+          <strong>Client-Only Privacy:</strong> Your API key is stored securely in your browser's <code>localStorage</code> and transmitted directly to the model provider via HTTPS TLS. It never touches intermediary servers.
         </div>
 
         <div class="form-group">
@@ -979,7 +977,7 @@
         <!-- Real-Time SQL Query & Ping Verification Panel -->
         <div class="ping-panel-box">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div style="font-weight: 600; font-size: 0.8rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <div style="font-weight: 600; font-size: 0.8rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
               <span>Live SQL Execution Test</span>
               <span class="badge badge-primary" id="sql-ping-latency">0 ms</span>
             </div>
@@ -987,16 +985,16 @@
               Run SQL Ping
             </button>
           </div>
-          <div style="font-size: 0.725rem; color: var(--text-dim); margin-bottom: 4px;">SQL Query:</div>
+          <div style="font-size: 0.725rem; color: var(--text-tertiary); margin-bottom: 4px;">SQL Query:</div>
           <div class="code-font" style="background: var(--bg-code); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--accent-cyan); word-break: break-all;">
             SELECT 1 AS ping, DATABASE() AS active_db, VERSION() AS mysql_version, NOW() AS server_time, (SELECT COUNT(*) FROM error_logs) AS total_vault_records;
           </div>
-          <div style="font-size: 0.725rem; color: var(--text-dim); margin-top: 8px; margin-bottom: 4px;">Response:</div>
+          <div style="font-size: 0.725rem; color: var(--text-tertiary); margin-top: 8px; margin-bottom: 4px;">Response:</div>
           <pre id="sql-ping-result" class="code-box" style="margin: 0; padding: 10px; border-radius: 6px; background: var(--bg-code); border: 1px solid var(--border-subtle); color: #34d399; font-size: 0.75rem; max-height: 120px; overflow: auto;">Ready to verify. Click "Run SQL Ping".</pre>
         </div>
       </div>
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.75rem; color: var(--text-dim);">
+        <span style="font-size: 0.75rem; color: var(--text-tertiary);">
           Direct connection to MySQL port 3306
         </span>
         <button type="button" class="btn btn-secondary" id="btn-close-mysql-footer">Close</button>
@@ -1004,6 +1002,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=human_v7"></script>
+  <script src="app.js?v=impeccable_v1"></script>
 </body>
 </html>

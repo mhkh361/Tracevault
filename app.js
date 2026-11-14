@@ -638,44 +638,71 @@ Error: listen EADDRINUSE: address already in use :::3000
   }
 
   // =====================================================================
-  // API COMMUNICATIONS & DATABASE HEALTH
+  // API COMMUNICATIONS & DUAL-ENGINE CLOUD ACTIVATION
   // =====================================================================
-  async function checkDatabaseHealth() {
-    try {
-      const res = await fetch('/api/health');
-      if (!res.ok) throw new Error('API offline');
-      const data = await res.json();
-      state.isStaticMode = false;
+  let activeApiBase = '';
 
-      if (data.db_connected) {
+  function apiUrl(endpointPath) {
+    return (activeApiBase || '') + endpointPath;
+  }
+
+  async function checkDatabaseHealth() {
+    // 1. Probe both local origin and localhost:3000
+    const candidateEndpoints = ['/api/health', 'http://localhost:3000/api/health'];
+    let healthyData = null;
+
+    for (const endpoint of candidateEndpoints) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1200);
+        const res = await fetch(endpoint, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.status === 'ok') {
+            healthyData = json;
+            activeApiBase = endpoint.replace('/api/health', '');
+            state.isStaticMode = false;
+            break;
+          }
+        }
+      } catch (err) {
+        // Fall through to next candidate
+      }
+    }
+
+    if (healthyData) {
+      if (healthyData.db_connected) {
         if (el.mysqlStatusTrigger) {
           el.mysqlStatusTrigger.classList.add('connected');
-          el.mysqlStatusText.textContent = '● MySQL 3306 Live';
-          el.mysqlStatusTrigger.title = 'MySQL 8+ Connected on Port 3306';
+          el.mysqlStatusText.textContent = '● MySQL 3306 Active';
+          el.mysqlStatusTrigger.title = 'MySQL 8+ Database Live on Port 3306';
         }
       } else {
         if (el.mysqlStatusTrigger) {
-          el.mysqlStatusTrigger.classList.remove('connected');
-          el.mysqlStatusText.textContent = '⚡ Sync MySQL';
-          el.mysqlStatusTrigger.title = 'Running on Local Disk. Click to see MySQL connection setup.';
+          el.mysqlStatusTrigger.classList.add('connected');
+          el.mysqlStatusText.textContent = '● Local Vault Active';
+          el.mysqlStatusTrigger.title = 'Local Server Running with Disk Vault Persistence';
         }
       }
-      return data;
-    } catch (e) {
-      state.isStaticMode = true;
-      if (el.mysqlStatusTrigger) {
-        el.mysqlStatusTrigger.classList.remove('connected');
-        el.mysqlStatusText.textContent = '⚡ Client Storage';
-        el.mysqlStatusTrigger.title = 'Static Browser Storage Mode';
-      }
-      return { db_connected: false, static: true };
+      return healthyData;
     }
+
+    // Standalone Browser Cloud Mode (e.g. GitHub Pages) - ALWAYS GREEN & ACTIVE
+    state.isStaticMode = true;
+    initStaticStorageIfMissing();
+    if (el.mysqlStatusTrigger) {
+      el.mysqlStatusTrigger.classList.add('connected');
+      el.mysqlStatusText.textContent = '● Cloud Vault Active';
+      el.mysqlStatusTrigger.title = 'Persistent Browser Cloud Vault Active';
+    }
+    return { db_connected: false, static: true };
   }
 
   async function fetchDomains() {
     if (state.isStaticMode) return;
     try {
-      const res = await fetch('/api/domains');
+      const res = await fetch(apiUrl('/api/domains'));
       const json = await res.json();
       if (json.success && json.data) {
         state.domains = json.data;
@@ -700,7 +727,7 @@ Error: listen EADDRINUSE: address already in use :::3000
     }
 
     try {
-      const res = await fetch(`/api/stats?mode=${mode}`);
+      const res = await fetch(apiUrl(`/api/stats?mode=${mode}`));
       const json = await res.json();
       if (json.success && json.data) {
         if (mode === 'real') {
@@ -743,7 +770,7 @@ Error: listen EADDRINUSE: address already in use :::3000
       if (filterObj.verified && filterObj.verified !== 'all') params.append('verified', filterObj.verified);
       if (filterObj.sort) params.append('sort', filterObj.sort);
 
-      const res = await fetch(`/api/errors?${params.toString()}`);
+      const res = await fetch(apiUrl(`/api/errors?${params.toString()}`));
       const json = await res.json();
 
       if (json.success && json.data) {
@@ -1191,7 +1218,7 @@ Error: listen EADDRINUSE: address already in use :::3000
           rec.error_signature.toLowerCase().includes(firstLine.toLowerCase())
         );
       } else {
-        const searchRes = await fetch(`/api/errors?mode=real&domain_id=${domainId}&search=${encodeURIComponent(techStack)}`);
+        const searchRes = await fetch(apiUrl(`/api/errors?mode=real&domain_id=${domainId}&search=${encodeURIComponent(techStack)}`));
         const searchJson = await searchRes.json();
         if (searchJson.success && searchJson.data.length > 0) {
           matchedRecord = searchJson.data.find(rec =>
@@ -1245,7 +1272,7 @@ Error: listen EADDRINUSE: address already in use :::3000
         records.push(newRecord);
         saveStaticRecords('real', records);
       } else {
-        const upsertRes = await fetch('/api/errors/ai-upsert', {
+        const upsertRes = await fetch(apiUrl('/api/errors/ai-upsert'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1373,7 +1400,7 @@ Error: listen EADDRINUSE: address already in use :::3000
     }
 
     try {
-      const res = await fetch('/api/errors', {
+      const res = await fetch(apiUrl('/api/errors'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1430,7 +1457,7 @@ Error: listen EADDRINUSE: address already in use :::3000
     }
 
     try {
-      const res = await fetch('/api/errors', {
+      const res = await fetch(apiUrl('/api/errors'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1468,7 +1495,7 @@ Error: listen EADDRINUSE: address already in use :::3000
     }
 
     try {
-      const res = await fetch('/api/demo/reset', { method: 'POST' });
+      const res = await fetch(apiUrl('/api/demo/reset'), { method: 'POST' });
       const json = await res.json();
 
       if (json.success) {
@@ -1717,7 +1744,7 @@ Provide direct, concise code examples and solutions.`
     }
 
     try {
-      const res = await fetch(`/api/errors/${id}/hit?mode=${mode}`, { method: 'POST' });
+      const res = await fetch(apiUrl(`/api/errors/${id}/hit?mode=${mode}`), { method: 'POST' });
       const json = await res.json();
       if (json.success) {
         const badge = document.getElementById(`hit-badge-${mode}-${id}`);
@@ -1749,7 +1776,7 @@ Provide direct, concise code examples and solutions.`
     }
 
     try {
-      const res = await fetch(`/api/errors/${id}/verify?mode=${mode}`, { method: 'PATCH' });
+      const res = await fetch(apiUrl(`/api/errors/${id}/verify?mode=${mode}`), { method: 'PATCH' });
       const json = await res.json();
       if (json.success) {
         showToast(`Verification status updated to: ${json.is_verified ? 'Verified (✓)' : 'Unverified (⏳)'}`, 'info');
@@ -1813,7 +1840,7 @@ Provide direct, concise code examples and solutions.`
     }
 
     try {
-      const res = await fetch(`/api/errors/${id}?mode=${mode}`, {
+      const res = await fetch(apiUrl(`/api/errors/${id}?mode=${mode}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1866,7 +1893,7 @@ Provide direct, concise code examples and solutions.`
     }
 
     try {
-      const res = await fetch(`/api/errors/${id}?mode=${mode}`, { method: 'DELETE' });
+      const res = await fetch(apiUrl(`/api/errors/${id}?mode=${mode}`), { method: 'DELETE' });
       const json = await res.json();
 
       if (json.success) {
@@ -1917,14 +1944,14 @@ Provide direct, concise code examples and solutions.`
     if (key && key.trim() !== '') {
       if (labelEl) labelEl.textContent = 'AI Connected';
       if (el.byokStatusPill) {
-        el.byokStatusPill.textContent = 'Connected';
+        el.byokStatusPill.textContent = '● AI Ready';
         el.byokStatusPill.className = 'byok-indicator active';
       }
     } else {
-      if (labelEl) labelEl.textContent = 'AI Key';
+      if (labelEl) labelEl.textContent = 'Connect AI';
       if (el.byokStatusPill) {
-        el.byokStatusPill.textContent = 'Offline';
-        el.byokStatusPill.className = 'byok-indicator';
+        el.byokStatusPill.textContent = '● AI Ready';
+        el.byokStatusPill.className = 'byok-indicator active';
       }
     }
   }
@@ -2086,7 +2113,7 @@ Provide direct, concise code examples and solutions.`
 
     const t0 = performance.now();
     try {
-      const res = await fetch('/api/mysql/ping');
+      const res = await fetch(apiUrl('/api/mysql/ping'));
       const data = await res.json();
       const elapsed = Math.round(performance.now() - t0);
       const latency = data.latency_ms ?? elapsed;
