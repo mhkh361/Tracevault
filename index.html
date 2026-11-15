@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=fix10">
+  <link rel="stylesheet" href="./style.css?v=fullpage_v11">
 </head>
 <body>
   <div class="layout-container">
@@ -100,6 +100,134 @@
           <strong class="metric-number"><span id="stat-max">0</span> <span class="slash">/</span> <span id="stat-min">0</span></strong>
           <span class="metric-unit">max vs min</span>
         </div>
+      </div>
+    </section>
+
+        <!-- =================================================================== -->
+    <!-- FULL-DISPLAY SCROLLABLE VIEW (Alt+L): AI CODE FIXER & LARGE CHAT    -->
+    <!-- =================================================================== -->
+    <section id="live-fixer-workspace" class="fixer-fullpage-view" hidden>
+      <!-- Top Control Bar -->
+      <div class="fixer-top-bar">
+        <div class="fixer-title-left">
+          <span class="live-pulse-dot"></span>
+          <h2 class="fixer-title">AI Code Bug Fixer &amp; Interactive Diagnostic Chat</h2>
+          <code class="metric-fn">Shortcut: Alt + L</code>
+        </div>
+
+        <div class="sample-bar">
+          <span class="sample-label">Load Sample Bug:</span>
+          <button type="button" class="chip-btn" data-preset="cors">1. Express CORS</button>
+          <button type="button" class="chip-btn" data-preset="react">2. React Loop</button>
+          <button type="button" class="chip-btn" data-preset="mysql">3. MySQL FK Error</button>
+          <button type="button" class="chip-btn" data-preset="async">4. Headers Sent</button>
+        </div>
+
+        <div class="fixer-top-right">
+          <button type="button" id="modal-api-key-btn" class="api-key-btn">
+            <span id="modal-key-dot" class="key-dot"></span>
+            <span id="modal-key-label">🔑 API Key</span>
+          </button>
+          <button type="button" id="close-fixer-modal-btn" class="btn-secondary">
+            ← Back to Inventory Table
+          </button>
+        </div>
+      </div>
+
+      <!-- PART A: Side-by-Side Code Input & Patched Code Output -->
+      <div class="fixer-split-top">
+        <!-- Left: Paste Broken Code -->
+        <div class="fixer-card">
+          <div class="pane-header">
+            <span class="pane-step-title">1. Paste Broken Code or Stack Trace</span>
+            <div class="lang-select-group">
+              <select id="fixer-domain" title="Domain Category"></select>
+              <select id="fixer-lang-select" title="Language / Tech Stack">
+                <option value="auto" selected>✨ Auto-Detect Language</option>
+                <option value="Node.js / Express">JavaScript / Node.js</option>
+                <option value="React / Next.js">React / Next.js</option>
+                <option value="MySQL / SQL">MySQL / SQL Query</option>
+                <option value="Python">Python</option>
+                <option value="PHP">PHP</option>
+                <option value="C / C++">C / C++</option>
+                <option value="Java">Java</option>
+              </select>
+            </div>
+          </div>
+
+          <textarea id="fixer-code-input" class="code-editor-large" rows="12" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="// Paste your broken code or terminal error message here...&#10;// Then click '⚡ Analyze & Fix Bug with AI' below!"></textarea>
+
+          <div class="pane-footer">
+            <button type="button" id="clear-fixer-btn" class="btn-secondary">Clear Code</button>
+            <button type="button" id="run-diagnosis-btn" class="btn-primary btn-analyze">
+              ⚡ Analyze &amp; Fix Bug with AI
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Diagnosed Root Cause & Patched Code -->
+        <div class="fixer-card">
+          <div class="pane-header">
+            <span class="pane-step-title">2. Diagnosed Root Cause &amp; Verified Patch</span>
+            <button type="button" id="commit-diagnosis-btn" class="btn-primary btn-save-db">
+              💾 Save Fix to Database Table
+            </button>
+          </div>
+
+          <div class="solution-body-large">
+            <div class="sol-row-top">
+              <div class="sol-field">
+                <label for="fixer-out-sig">Detected Error Signature *</label>
+                <input type="text" id="fixer-out-sig" spellcheck="false" placeholder="Detected error title will appear here...">
+              </div>
+              <div class="sol-field">
+                <label for="fixer-stack">Detected Language / Stack *</label>
+                <input type="text" id="fixer-stack" spellcheck="false" placeholder="Auto-detected stack">
+              </div>
+            </div>
+
+            <div class="sol-field">
+              <label for="fixer-out-cause">Why This Bug Happened (Root Cause Analysis) *</label>
+              <textarea id="fixer-out-cause" rows="3" spellcheck="false" placeholder="Detailed root cause explanation will appear here..."></textarea>
+            </div>
+
+            <div class="sol-field">
+              <label for="fixer-out-fix">Verified Fixed Code (Patched Solution) *</label>
+              <textarea id="fixer-out-fix" class="fixed-code-large" rows="8" spellcheck="false" placeholder="// Complete patched code will appear here..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PART B: FULL-WIDTH, EXPANSIVE GEMINI-STYLE AI CHAT WORKSPACE -->
+      <div class="chat-workspace-card">
+        <div class="chat-workspace-header">
+          <div class="chat-header-left">
+            <span class="live-pulse-dot"></span>
+            <h3>💬 Chat with AI Diagnostic Assistant</h3>
+            <span class="chat-subtitle">Ask how to fix the code, request line-by-line explanations, or discuss SQL/project architecture</span>
+          </div>
+          <div class="chat-header-right">
+            <code id="chat-provider-pill" class="metric-fn">AI Ready</code>
+            <button type="button" id="clear-chat-history-btn" class="btn-secondary btn-xs">Clear Chat</button>
+          </div>
+        </div>
+
+        <div class="quick-question-bar">
+          <span class="sample-label">Quick Questions:</span>
+          <button type="button" class="chip-btn quick-ask-btn" data-q="How to fix this bug step by step?">How to fix this bug?</button>
+          <button type="button" class="chip-btn quick-ask-btn" data-q="Explain why this error happened line by line.">Explain root cause line by line</button>
+          <button type="button" class="chip-btn quick-ask-btn" data-q="How can I optimize this code and prevent future crashes?">How to optimize &amp; prevent?</button>
+        </div>
+
+        <div id="chat-messages" class="chat-stream-large">
+          <div class="chat-msg is-ai"><strong>AI Assistant:</strong> Paste any broken code above and click <strong>⚡ Analyze &amp; Fix Bug with AI</strong>, or type any question below (like <em>"how to fix it"</em> or <em>"explain line by line"</em>) to get a complete explanation!</div>
+        </div>
+
+        <form id="chat-form" class="chat-composer-bar" novalidate>
+          <textarea id="chat-input" rows="2" spellcheck="false" placeholder="Ask anything about your code or bug (e.g., 'how to fix it', 'explain line by line')... Press Enter to send, Shift+Enter for new line"></textarea>
+          <button type="submit" id="chat-send-btn" class="btn-primary chat-send-large">Send Message</button>
+        </form>
       </div>
     </section>
 
@@ -225,155 +353,50 @@
     </main>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- Alt + L POPUP MODAL: AI CODE BUG FIXER & LIVE CHAT ASSISTANT        -->
-  <!-- (Fits 100% on laptop screen with visible API Key & Chat buttons)    -->
-  <!-- =================================================================== -->
-  <div id="live-fixer-workspace" class="fixer-modal-backdrop" role="dialog" aria-modal="true" hidden>
-    <div class="fixer-modal-window">
-      <!-- Modal Top Header -->
-      <div class="fixer-top-bar">
-        <div class="fixer-title-left">
-          <span class="live-pulse-dot"></span>
-          <h2 class="fixer-title">AI Code Bug Fixer &amp; Diagnostic Chat</h2>
-          <code class="metric-fn">Alt + L</code>
-        </div>
-
-        <!-- Sample Presets -->
-        <div class="sample-bar">
-          <span class="sample-label">Try Sample Bug:</span>
-          <button type="button" class="chip-btn" data-preset="cors">1. Express CORS</button>
-          <button type="button" class="chip-btn" data-preset="react">2. React Loop</button>
-          <button type="button" class="chip-btn" data-preset="mysql">3. MySQL FK Error</button>
-          <button type="button" class="chip-btn" data-preset="async">4. Headers Sent</button>
-        </div>
-
-        <!-- Right Actions inside Modal Header: API Key Button + Close Button -->
-        <div class="fixer-top-right">
-          <button type="button" id="modal-api-key-btn" class="api-key-btn">
-            <span id="modal-key-dot" class="key-dot"></span>
-            <span id="modal-key-label">🔑 API Key</span>
-          </button>
-          <button type="button" id="close-fixer-modal-btn" class="btn-close-popup">
-            ✕ Close <kbd>Esc</kbd>
-          </button>
-        </div>
-      </div>
-
-      <!-- Two-Column Body inside Modal (Strictly fits screen height) -->
-      <div class="fixer-grid-2">
-        <!-- LEFT PANE: Paste Broken Code + Auto Language Selector + Big Action Button -->
-        <div class="fixer-pane">
-          <div class="pane-header">
-            <span class="pane-step-title">Step 1: Paste Broken Code or Error Trace</span>
-            <div class="lang-select-group">
-              <select id="fixer-domain" title="Domain Category"></select>
-              <select id="fixer-lang-select" title="Language / Tech Stack">
-                <option value="auto" selected>✨ Auto-Detect Language</option>
-                <option value="Node.js / Express">JavaScript / Node.js</option>
-                <option value="React / Next.js">React / Next.js</option>
-                <option value="MySQL / SQL">MySQL / SQL Query</option>
-                <option value="Python / Backend">Python</option>
-                <option value="PHP / Laravel">PHP</option>
-                <option value="C / C++">C / C++</option>
-                <option value="Java / Spring">Java</option>
-              </select>
-            </div>
-          </div>
-
-          <textarea id="fixer-code-input" class="code-editor-box" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="// Paste your broken code or terminal error message here...&#10;// Then click '⚡ Analyze & Fix Bug with AI' below!"></textarea>
-
-          <div class="pane-footer">
-            <button type="button" id="clear-fixer-btn" class="btn-secondary">Clear</button>
-            <button type="button" id="run-diagnosis-btn" class="btn-primary btn-analyze">
-              ⚡ Analyze &amp; Fix Bug with AI
-            </button>
-          </div>
-        </div>
-
-        <!-- RIGHT PANE: AI Diagnosis Result + Live AI Chat + 1-Click Save to MySQL -->
-        <div class="fixer-pane">
-          <div class="pane-header">
-            <span class="pane-step-title">Step 2: AI Solution &amp; Live Chat Assistant</span>
-            <button type="button" id="commit-diagnosis-btn" class="btn-primary btn-save-db" title="Save this bug and fix into the MySQL table">
-              💾 Save Fix to Database Table
-            </button>
-          </div>
-
-          <!-- AI Diagnosis Summary Card (Auto-filled by AI or Editable) -->
-          <div class="ai-solution-card">
-            <div class="sol-row-top">
-              <div class="sol-field">
-                <label for="fixer-out-sig">Detected Error Title</label>
-                <input type="text" id="fixer-out-sig" spellcheck="false" placeholder="Click 'Analyze & Fix Bug' to generate...">
-              </div>
-              <div class="sol-field sol-field-sm">
-                <label for="fixer-stack">Detected Language</label>
-                <input type="text" id="fixer-stack" spellcheck="false" placeholder="Auto-detected">
-              </div>
-            </div>
-
-            <div class="sol-field">
-              <label for="fixer-out-cause">Why This Bug Happened (Root Cause)</label>
-              <input type="text" id="fixer-out-cause" spellcheck="false" placeholder="AI root cause explanation will appear here...">
-            </div>
-
-            <div class="sol-field">
-              <label for="fixer-out-fix">Verified Fixed Code (Ready to Copy or Save)</label>
-              <textarea id="fixer-out-fix" class="fixed-code-output" rows="4" spellcheck="false" placeholder="// AI patched solution code will appear here..."></textarea>
-            </div>
-          </div>
-
-          <!-- Interactive Live AI Chat Box -->
-          <div class="inline-chat-section">
-            <div class="inline-chat-header">
-              <span>💬 Chat with AI Assistant (Ask anything about this code or project)</span>
-              <span id="chat-provider-pill" class="metric-fn">Built-in AI Ready</span>
-            </div>
-
-            <div id="chat-messages" class="inline-chat-messages">
-              <div class="chat-msg is-ai"><strong>AI Assistant:</strong> Paste broken code on the left and click <b>⚡ Analyze &amp; Fix Bug with AI</b>, or type any question below to chat with me! (Click <b>🔑 API Key</b> at the top right to connect your own Gemini/Groq/OpenAI key).
-              </div>
-            </div>
-
-            <form id="chat-form" class="inline-chat-form" novalidate>
-              <input type="text" id="chat-input" spellcheck="false" autocomplete="off" placeholder="Ask AI a question (e.g., 'Explain this fix line by line' or 'How to optimize this query?')...">
-              <button type="submit" id="chat-send-btn" class="btn-primary">Send</button>
-            </form>
-          </div>
-        </div>
-      </div>
+  
     </div>
   </div>
 
   <!-- =================================================================== -->
   <!-- UNIVERSAL API KEY CONFIGURATION POPUP MODAL                         -->
   <!-- =================================================================== -->
-  <dialog id="api-key-modal" class="clean-modal">
+    <dialog id="api-key-modal" class="clean-modal modal-wide">
     <div class="modal-top">
-      <h2>🔑 Connect Universal AI API Key</h2>
+      <h2>🔑 Connect AI API Key (Gemini / Groq / OpenRouter / OpenAI)</h2>
       <code id="detected-provider-pill" class="metric-fn">Auto-Detect</code>
     </div>
 
     <p class="modal-body-text">
-      Paste your API key below. TraceVault automatically detects <strong>Google Gemini</strong> (<code>AIza...</code>), <strong>Groq</strong> (<code>gsk_...</code>), <strong>OpenRouter</strong> (<code>sk-or-...</code>), or <strong>OpenAI</strong> (<code>sk-...</code>). Your key is saved only in your browser.
+      Select your provider (or leave on Auto-Detect) and paste your API key below. Your key is stored only in your browser's <code>localStorage</code>.
     </p>
 
     <form id="api-key-form" novalidate>
-      <div class="field-block">
-        <label for="api-key-input">Paste API Key *</label>
-        <input type="password" id="api-key-input" spellcheck="false" autocomplete="off" placeholder="Paste AIza..., gsk_..., sk-or-..., or sk-... key here">
+      <div class="field-row-2">
+        <div class="field-block">
+          <label for="api-provider-select">AI Provider *</label>
+          <select id="api-provider-select">
+            <option value="auto" selected>✨ Auto-Detect from Key</option>
+            <option value="gemini">Google Gemini (AIza...)</option>
+            <option value="groq">Groq Cloud (gsk_...)</option>
+            <option value="openrouter">OpenRouter (sk-or-...)</option>
+            <option value="openai">OpenAI (sk-...)</option>
+          </select>
+        </div>
+        <div class="field-block">
+          <label for="api-key-input">API Key *</label>
+          <input type="text" id="api-key-input" spellcheck="false" autocomplete="off" placeholder="Paste your API key here...">
+        </div>
       </div>
 
       <div id="api-key-feedback" class="key-status-box">
-        Current Mode: Built-in Diagnostic Engine (Paste an API key above for live LLM chat &amp; code fixing).
+        Status: Ready.
       </div>
 
       <div class="modal-foot split-foot">
         <button type="button" id="remove-api-key-btn" class="btn-danger">Remove Key</button>
         <div class="row-actions">
           <button type="button" id="close-api-key-btn" class="btn-secondary">Close</button>
-          <button type="submit" class="btn-primary">Save &amp; Activate Key</button>
+          <button type="submit" class="btn-primary">Save &amp; Connect Key</button>
         </div>
       </div>
     </form>
@@ -448,6 +471,6 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=fix10" defer></script>
+  <script src="./app.js?v=fullpage_v11" defer></script>
 </body>
 </html>
