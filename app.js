@@ -20,42 +20,42 @@ const DEFAULT_ERRORS = [
   { error_id: 12, domain_id: 4, domain_name: 'Fullstack', tech_stack: 'WebSockets / TLS', error_signature: 'Mixed Content: The page at HTTPS was loaded over HTTPS, but requested an insecure ws:// endpoint', root_cause: 'Hardcoded insecure ws:// or http:// protocol used inside an HTTPS production origin.', fix_requirements: 'Upgrade connections to wss:// and https:// when window.location.protocol is https:.', times_hit: 2, is_verified: 1 }
 ];
 
-// Live Code Presets for Alt+L Demonstration
 const CODE_PRESETS = {
   cors: {
     domain_id: 1,
     tech_stack: 'Express / Fetch CORS',
-    code: `// Broken Frontend + Backend Request\nfetch('http://localhost:4000/api/orders', {\n  method: 'POST',\n  credentials: 'include'\n});\n// Console Error: Access to fetch at 'http://localhost:4000/api/orders' from origin 'http://localhost:3000' has been blocked by CORS policy`,
+    code: `fetch('http://localhost:4000/api/orders', {\n  method: 'POST',\n  credentials: 'include'\n});\n// Error: Access to fetch at 'http://localhost:4000/api/orders' from origin 'http://localhost:3000' has been blocked by CORS policy`,
     signature: 'Access to fetch at origin blocked by CORS policy (credentials mode)',
     cause: 'Backend server does not include Access-Control-Allow-Origin and Access-Control-Allow-Credentials headers.',
     fix: `const cors = require('cors');\napp.use(cors({ origin: 'http://localhost:3000', credentials: true }));`
   },
   react: {
     domain_id: 1,
-    tech_stack: 'React 18 / State Hook',
-    code: `function CounterView({ items }) {\n  const [total, setTotal] = useState(0);\n  // BUG: Calling state setter directly during render\n  setTotal(items.length);\n  return <div>{total}</div>;\n}`,
+    tech_stack: 'React 18 / Hooks',
+    code: `function CounterView({ items }) {\n  const [total, setTotal] = useState(0);\n  setTotal(items.length);\n  return <div>{total}</div>;\n}`,
     signature: 'Too many re-renders. React limits the number of renders to prevent an infinite loop',
-    cause: 'setTotal(items.length) is called unconditionally inside the component render body, triggering an infinite render loop.',
+    cause: 'setTotal(items.length) is called unconditionally inside the component render body.',
     fix: `useEffect(() => {\n  setTotal(items.length);\n}, [items.length]);`
   },
   mysql: {
     domain_id: 3,
     tech_stack: 'MySQL 8.0 / Foreign Key',
-    code: `INSERT INTO error_logs (domain_id, tech_stack, error_signature)\nVALUES (99, 'MySQL 8.0', 'Foreign Key Test');\n-- Error 1452 (23000): Cannot add or update a child row: a foreign key constraint fails`,
+    code: `INSERT INTO error_logs (domain_id, tech_stack, error_signature)\nVALUES (99, 'MySQL 8.0', 'Foreign Key Test');\n-- Error 1452: Cannot add or update a child row: a foreign key constraint fails`,
     signature: 'ER_NO_REFERENCED_ROW_2: Foreign key constraint fails on domain_id',
     cause: 'Attempted to insert child record with domain_id = 99 which does not exist in parent table domains.',
-    fix: `INSERT INTO domains (domain_id, domain_name, description) VALUES (5, 'Cloud', 'Cloud infra');\nINSERT INTO error_logs (domain_id, ...) VALUES (5, ...);`
+    fix: `INSERT IGNORE INTO domains (domain_id, domain_name, description) VALUES (1, 'Frontend', 'UI layer');\nINSERT INTO error_logs (domain_id, ...) VALUES (1, ...);`
   },
   async: {
     domain_id: 2,
-    tech_stack: 'Node.js / Express Async',
-    code: `app.post('/api/login', async (req, res) => {\n  if (!req.body.email) {\n    res.status(400).json({ error: 'Email required' }); // Missing return!\n  }\n  res.json({ status: 'ok' });\n});`,
+    tech_stack: 'Node.js / Express',
+    code: `app.post('/api/login', async (req, res) => {\n  if (!req.body.email) {\n    res.status(400).json({ error: 'Email required' });\n  }\n  res.json({ status: 'ok' });\n});`,
     signature: 'Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client',
-    cause: 'Missing return keyword before res.status(400).json(), causing execution to continue to the second res.json() call.',
+    cause: 'Missing return keyword before res.status(400).json(), causing execution to continue to res.json().',
     fix: `if (!req.body.email) {\n  return res.status(400).json({ error: 'Email required' });\n}\nreturn res.json({ status: 'ok' });`
   }
 };
 
+const AI_KEY_STORAGE = 'tv_universal_api_key_v1';
 let useLocalFallback = false;
 let apiBase = '';
 let domainsState = [];
@@ -74,19 +74,40 @@ const statMinEl = document.getElementById('stat-min');
 
 const tabLabView = document.getElementById('tab-lab-view');
 const tabLiveFixer = document.getElementById('tab-live-fixer');
-const labWorkspace = document.getElementById('lab-inventory-workspace');
 const fixerWorkspace = document.getElementById('live-fixer-workspace');
+const closeFixerModalBtn = document.getElementById('close-fixer-modal-btn');
 
 const fixerDomainSelect = document.getElementById('fixer-domain');
+const fixerLangSelect = document.getElementById('fixer-lang-select');
 const fixerStackInput = document.getElementById('fixer-stack');
 const fixerCodeInput = document.getElementById('fixer-code-input');
 const fixerOutSig = document.getElementById('fixer-out-sig');
 const fixerOutCause = document.getElementById('fixer-out-cause');
 const fixerOutFix = document.getElementById('fixer-out-fix');
+const clearFixerBtn = document.getElementById('clear-fixer-btn');
 const runDiagnosisBtn = document.getElementById('run-diagnosis-btn');
 const commitDiagnosisBtn = document.getElementById('commit-diagnosis-btn');
-const closeFixerModalBtn = document.getElementById('close-fixer-modal-btn');
 
+const chatMessagesBox = document.getElementById('chat-messages');
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+const chatProviderPill = document.getElementById('chat-provider-pill');
+
+const openApiKeyBtn = document.getElementById('open-api-key-btn');
+const modalApiKeyBtn = document.getElementById('modal-api-key-btn');
+const navKeyDot = document.getElementById('nav-key-dot');
+const navKeyLabel = document.getElementById('nav-key-label');
+const modalKeyDot = document.getElementById('modal-key-dot');
+const modalKeyLabel = document.getElementById('modal-key-label');
+
+const apiKeyModal = document.getElementById('api-key-modal');
+const apiKeyForm = document.getElementById('api-key-form');
+const apiKeyInput = document.getElementById('api-key-input');
+const detectedProviderPill = document.getElementById('detected-provider-pill');
+const apiKeyFeedback = document.getElementById('api-key-feedback');
+const removeApiKeyBtn = document.getElementById('remove-api-key-btn');
+const closeApiKeyBtn = document.getElementById('close-api-key-btn');
 
 const addErrorForm = document.getElementById('add-error-form');
 const addDomainSelect = document.getElementById('add-domain');
@@ -122,13 +143,135 @@ function showBanner(msg, tone = 'success') {
   }, 4000);
 }
 
+// ===================================================================
+// UNIVERSAL API KEY AUTO-ROUTER
+// ===================================================================
+function detectProviderFromKey(rawKey) {
+  const key = String(rawKey || '').trim();
+  if (!key) return null;
+  if (key.startsWith('AIza')) {
+    return { id: 'gemini', name: 'Google Gemini', model: 'gemini-2.5-flash', key };
+  }
+  if (key.startsWith('gsk_')) {
+    return { id: 'groq', name: 'Groq Llama-3.3', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile', key };
+  }
+  if (key.startsWith('sk-or-')) {
+    return { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: 'openai/gpt-4o-mini', key };
+  }
+  if (key.startsWith('sk-')) {
+    return { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
+  }
+  return { id: 'custom', name: 'Custom AI API', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
+}
+
+function getSavedProvider() {
+  return detectProviderFromKey(localStorage.getItem(AI_KEY_STORAGE) || '');
+}
+
+function refreshAiKeyUI() {
+  const p = getSavedProvider();
+  if (p) {
+    navKeyDot.classList.add('is-active');
+    modalKeyDot.classList.add('is-active');
+    navKeyLabel.textContent = `🔑 AI: ${p.name}`;
+    modalKeyLabel.textContent = `🔑 ${p.name} Active`;
+    chatProviderPill.textContent = `${p.name} Connected`;
+    detectedProviderPill.textContent = p.name;
+    apiKeyFeedback.textContent = `Active: ${p.name} (${p.model}) connected and ready.`;
+  } else {
+    navKeyDot.classList.remove('is-active');
+    modalKeyDot.classList.remove('is-active');
+    navKeyLabel.textContent = '🔑 Connect API Key';
+    modalKeyLabel.textContent = '🔑 Set API Key';
+    chatProviderPill.textContent = 'Built-in AI Ready';
+    detectedProviderPill.textContent = 'Auto-Detect';
+    apiKeyFeedback.textContent = 'Current Mode: Built-in Diagnostic Engine (Paste an API key above for live LLM calls).';
+  }
+}
+
+async function callUniversalAI(systemPrompt, userPrompt) {
+  const p = getSavedProvider();
+  if (!p) throw new Error('NO_API_KEY');
+
+  if (p.id === 'gemini') {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${p.model}:generateContent?key=${encodeURIComponent(p.key)}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: { temperature: 0.2 }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Gemini API request failed.');
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  const res = await fetch(p.endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${p.key}`
+    },
+    body: JSON.stringify({
+      model: p.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.2
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || `${p.name} API error.`);
+  return data.choices?.[0]?.message?.content || '';
+}
+
+function openKeyDialog() {
+  apiKeyInput.value = localStorage.getItem(AI_KEY_STORAGE) || '';
+  refreshAiKeyUI();
+  apiKeyModal.showModal();
+}
+
+openApiKeyBtn.addEventListener('click', openKeyDialog);
+modalApiKeyBtn.addEventListener('click', openKeyDialog);
+closeApiKeyBtn.addEventListener('click', () => apiKeyModal.close());
+
+apiKeyInput.addEventListener('input', () => {
+  const p = detectProviderFromKey(apiKeyInput.value);
+  detectedProviderPill.textContent = p ? p.name : 'Auto-Detect';
+});
+
+removeApiKeyBtn.addEventListener('click', () => {
+  localStorage.removeItem(AI_KEY_STORAGE);
+  apiKeyInput.value = '';
+  refreshAiKeyUI();
+  apiKeyModal.close();
+  appendChat('ai', 'API key removed. Switched to built-in diagnostic engine.');
+});
+
+apiKeyForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const raw = apiKeyInput.value.trim();
+  if (!raw) return;
+  const p = detectProviderFromKey(raw);
+  localStorage.setItem(AI_KEY_STORAGE, raw);
+  refreshAiKeyUI();
+  apiKeyModal.close();
+  appendChat('ai', `Connected ${p.name} (${p.model})! You can now analyze code or chat with me live.`);
+  showBanner(`Connected ${p.name} API key.`);
+});
+
+// ===================================================================
+// WORKSPACE MODE SWITCHING (DEFAULT LAB VIEW vs Alt+L POPUP)
+// ===================================================================
 function setWorkspaceMode(mode) {
   const isFixer = mode === 'fixer';
   fixerWorkspace.hidden = !isFixer;
   tabLiveFixer.classList.toggle('is-active', isFixer);
   tabLabView.classList.toggle('is-active', !isFixer);
-  tabLiveFixer.setAttribute('aria-selected', String(isFixer));
-  tabLabView.setAttribute('aria-selected', String(!isFixer));
   if (isFixer) {
     setTimeout(() => fixerCodeInput.focus(), 40);
   }
@@ -136,10 +279,7 @@ function setWorkspaceMode(mode) {
 
 tabLabView.addEventListener('click', () => setWorkspaceMode('lab'));
 tabLiveFixer.addEventListener('click', () => setWorkspaceMode('fixer'));
-
-if (closeFixerModalBtn) {
-  closeFixerModalBtn.addEventListener('click', () => setWorkspaceMode('lab'));
-}
+closeFixerModalBtn.addEventListener('click', () => setWorkspaceMode('lab'));
 
 fixerWorkspace.addEventListener('click', (e) => {
   if (e.target === fixerWorkspace) setWorkspaceMode('lab');
@@ -149,7 +289,7 @@ document.addEventListener('keydown', (e) => {
   if (e.altKey && e.key.toLowerCase() === 'l') {
     e.preventDefault();
     setWorkspaceMode(fixerWorkspace.hidden ? 'fixer' : 'lab');
-  } else if (e.key === 'Escape' && !fixerWorkspace.hidden) {
+  } else if (e.key === 'Escape' && !fixerWorkspace.hidden && !apiKeyModal.open) {
     e.preventDefault();
     setWorkspaceMode('lab');
   } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -159,7 +299,18 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Live Code Bug Fixer Presets & Heuristic Analyzer
+// ===================================================================
+// LIVE CODE BUG FIXER + LANGUAGE AUTO-DETECT + AI CHAT
+// ===================================================================
+function appendChat(role, text) {
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role === 'user' ? 'is-user' : 'is-ai'}`;
+  div.textContent = role === 'user' ? `You: ${text}` : `AI: ${text}`;
+  chatMessagesBox.appendChild(div);
+  chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+  return div;
+}
+
 document.querySelectorAll('.chip-btn[data-preset]').forEach((btn) => {
   btn.addEventListener('click', () => {
     const p = CODE_PRESETS[btn.dataset.preset];
@@ -170,16 +321,19 @@ document.querySelectorAll('.chip-btn[data-preset]').forEach((btn) => {
     fixerOutSig.value = p.signature;
     fixerOutCause.value = p.cause;
     fixerOutFix.value = p.fix;
+    appendChat('ai', `Loaded sample "${p.signature}". Root cause and fixed code are ready above—click "💾 Save Fix to Database Table" or ask me a follow-up question!`);
   });
 });
 
-runDiagnosisBtn.addEventListener('click', () => {
-  const raw = fixerCodeInput.value.trim();
-  if (!raw) {
-    showBanner('Paste a broken code snippet or error trace first.', 'error');
-    return;
-  }
+clearFixerBtn.addEventListener('click', () => {
+  fixerCodeInput.value = '';
+  fixerOutSig.value = '';
+  fixerOutCause.value = '';
+  fixerOutFix.value = '';
+  fixerStackInput.value = '';
+});
 
+function runLocalHeuristicDiagnosis(raw) {
   const lines = raw.split('\n');
   const errorLine = lines.find((l) => /error[:\s]|exception|er_[a-z0-9_]+|lock wait timeout|foreign key|headers_sent|cors|re-renders|hydration|eaddrinuse|econnrefused/i.test(l));
   const codeLines = lines.filter((l) => {
@@ -187,73 +341,130 @@ runDiagnosisBtn.addEventListener('click', () => {
     return t !== '' && !t.startsWith('//') && !t.startsWith('--');
   });
 
-  let detectedSig = errorLine
+  let sig = errorLine
     ? errorLine.replace(/^\s*(\/\/|--|\/\*+|\*+)\s*/, '').replace(/\*+\/\s*$/, '').trim()
     : (codeLines[0] || lines[0]).replace(/^\s*(\/\/|--)\s*/, '').trim();
 
-  let detectedDomain = Number(fixerDomainSelect.value || 1);
-  let detectedStack = fixerStackInput.value.trim();
-  let detectedCause = '';
-  let patchedCode = '';
+  let domainId = Number(fixerDomainSelect.value || 1);
+  let stack = fixerLangSelect.value !== 'auto' ? fixerLangSelect.value : '';
+  let cause = '';
+  let fix = '';
 
   if (/beginTransaction|getConnection|ER_LOCK_WAIT_TIMEOUT|lock wait timeout/i.test(raw)) {
-    detectedDomain = 3;
-    detectedStack = 'Node.js / MySQL Transaction Pool';
-    detectedCause = 'Database transaction lacks try/catch rollback handling and fails to release the pooled connection in a finally block, causing lock wait timeouts and connection leaks.';
-    patchedCode = `app.post('/api/checkout', async (req, res) => {\n  const conn = await pool.getConnection();\n  try {\n    await conn.beginTransaction();\n    const [order] = await conn.execute('INSERT INTO orders (user_id) VALUES (?)', [req.body.userId]);\n    await conn.commit();\n    return res.json({ success: true, orderId: order.insertId });\n  } catch (err) {\n    await conn.rollback();\n    return res.status(500).json({ error: 'Transaction failed', details: err.message });\n  } finally {\n    conn.release(); // Always release connection back to pool\n  }\n});`;
+    domainId = 3;
+    stack = stack || 'Node.js / MySQL Transaction';
+    cause = 'Database transaction lacks try/catch rollback handling and fails to release the pooled connection in a finally block.';
+    fix = `app.post('/api/checkout', async (req, res) => {\n  const conn = await pool.getConnection();\n  try {\n    await conn.beginTransaction();\n    const [order] = await conn.execute('INSERT INTO orders (user_id) VALUES (?)', [req.body.userId]);\n    await conn.commit();\n    return res.json({ success: true, orderId: order.insertId });\n  } catch (err) {\n    await conn.rollback();\n    return res.status(500).json({ error: err.message });\n  } finally {\n    conn.release();\n  }\n});`;
   } else if (/cors|Access-Control-Allow-Origin/i.test(raw)) {
-    detectedDomain = 1;
-    detectedStack = 'Express / Fetch CORS';
-    detectedCause = 'Cross-origin browser request blocked because the backend server omitted Access-Control-Allow-Origin and credentials headers.';
-    patchedCode = `const cors = require('cors');\napp.use(cors({\n  origin: 'http://localhost:3000',\n  methods: ['GET', 'POST', 'PUT', 'DELETE'],\n  credentials: true\n}));`;
+    domainId = 1;
+    stack = stack || 'Express / Fetch CORS';
+    cause = 'Cross-origin request blocked because backend omitted Access-Control-Allow-Origin headers.';
+    fix = `const cors = require('cors');\napp.use(cors({ origin: 'http://localhost:3000', credentials: true }));`;
   } else if (/useState|re-renders|useEffect/i.test(raw)) {
-    detectedDomain = 1;
-    detectedStack = 'React 18 / Hooks';
-    detectedCause = 'State setter is invoked unconditionally during component render, causing an infinite re-render loop.';
-    patchedCode = `useEffect(() => {\n  ${codeLines.join('\n  ')}\n}, [dependencies]);`;
+    domainId = 1;
+    stack = stack || 'React 18 / Hooks';
+    cause = 'State setter invoked directly inside component render body, causing an infinite loop.';
+    fix = `useEffect(() => {\n  ${codeLines.join('\n  ')}\n}, [dependencies]);`;
   } else if (/foreign key|ER_NO_REFERENCED_ROW|1452/i.test(raw)) {
-    detectedDomain = 3;
-    detectedStack = 'MySQL 8.0 / InnoDB';
-    detectedCause = 'Child row INSERT/UPDATE references a domain_id that does not exist in the parent domains table.';
-    patchedCode = `-- 1. Ensure parent domain exists first:\nINSERT IGNORE INTO domains (domain_id, domain_name, description) VALUES (1, 'Frontend', 'UI layer');\n-- 2. Execute child insert with valid FK:\n${codeLines.join('\n')}`;
+    domainId = 3;
+    stack = stack || 'MySQL 8.0 / InnoDB';
+    cause = 'Child row references a domain_id that does not exist in parent table domains.';
+    fix = `INSERT IGNORE INTO domains (domain_id, domain_name, description) VALUES (1, 'Frontend', 'UI layer');\n${codeLines.join('\n')}`;
   } else if (/HEADERS_SENT|headers after they are sent/i.test(raw)) {
-    detectedDomain = 2;
-    detectedStack = 'Node.js / Express';
-    detectedCause = 'Multiple res.json() / res.send() calls executed in one request lifecycle due to a missing return statement.';
-    patchedCode = codeLines
-      .map((l) => (l.includes('res.status(') && !l.trim().startsWith('return ') ? l.replace('res.status(', 'return res.status(') : l))
-      .join('\n');
+    domainId = 2;
+    stack = stack || 'Node.js / Express';
+    cause = 'Multiple res.json() calls executed in one route handler due to missing return statement.';
+    fix = codeLines.map((l) => (l.includes('res.status(') && !l.trim().startsWith('return ') ? l.replace('res.status(', 'return res.status(') : l)).join('\n');
   } else {
-    if (/SELECT|INSERT|UPDATE|DELETE|mysql|pool\./i.test(raw)) {
-      detectedDomain = 3;
-      detectedStack = detectedStack || 'MySQL / Node.js';
-    } else if (/app\.(get|post|put|delete)|req,\s*res|express/i.test(raw)) {
-      detectedDomain = 2;
-      detectedStack = detectedStack || 'Node.js / Express';
-    } else if (/jwt|token|auth|prisma/i.test(raw)) {
-      detectedDomain = 4;
-      detectedStack = detectedStack || 'Fullstack / Auth';
-    } else {
-      detectedStack = detectedStack || 'JavaScript / Runtime';
+    if (!stack) {
+      if (/SELECT|INSERT|UPDATE|DELETE|CREATE TABLE/i.test(raw)) { domainId = 3; stack = 'MySQL / SQL'; }
+      else if (/def |import |print\(/i.test(raw)) { domainId = 2; stack = 'Python'; }
+      else if (/#include|std::|printf\(/i.test(raw)) { domainId = 2; stack = 'C / C++'; }
+      else if (/app\.(get|post|put|delete)|req,\s*res/i.test(raw)) { domainId = 2; stack = 'Node.js / Express'; }
+      else { stack = 'JavaScript / Runtime'; }
     }
-    detectedCause = `Unhandled exception in ${detectedStack} execution block without defensive try/catch error boundary.`;
-    const indentedBody = (codeLines.length ? codeLines : lines).map((l) => `  ${l}`).join('\n');
-    patchedCode = `try {\n${indentedBody}\n} catch (err) {\n  console.error('[Handled Exception]:', err.message);\n  return res?.status ? res.status(500).json({ error: err.message }) : null;\n}`;
+    cause = `Unhandled runtime exception in ${stack} block without defensive error boundary.`;
+    const body = (codeLines.length ? codeLines : lines).map((l) => `  ${l}`).join('\n');
+    fix = `try {\n${body}\n} catch (err) {\n  console.error('Handled error:', err.message);\n}`;
   }
 
-  fixerDomainSelect.value = String(detectedDomain);
-  fixerStackInput.value = detectedStack;
-  fixerOutSig.value = detectedSig.slice(0, 250);
-  fixerOutCause.value = detectedCause;
-  fixerOutFix.value = patchedCode;
+  return { domainId, stack, sig: sig.slice(0, 240), cause, fix };
+}
 
-  showBanner('Live diagnosis complete. Verified multi-line fix generated.');
+runDiagnosisBtn.addEventListener('click', async () => {
+  const raw = fixerCodeInput.value.trim();
+  if (!raw) {
+    showBanner('Please paste broken code or click a sample button first.', 'error');
+    return;
+  }
+
+  runDiagnosisBtn.disabled = true;
+  runDiagnosisBtn.textContent = '⏳ Analyzing Code...';
+
+  // First fill instant heuristic result so fields are never empty
+  const heur = runLocalHeuristicDiagnosis(raw);
+  fixerDomainSelect.value = String(heur.domainId);
+  fixerStackInput.value = heur.stack;
+  fixerOutSig.value = heur.sig;
+  fixerOutCause.value = heur.cause;
+  fixerOutFix.value = heur.fix;
+
+  const provider = getSavedProvider();
+  if (provider) {
+    try {
+      const sys = `You are TraceVault AI Bug Fixer. Analyze the user's broken code or stack trace and respond in valid JSON with exact keys: {"error_signature": "...", "tech_stack": "...", "domain_id": 1|2|3|4, "root_cause": "...", "fixed_code": "...", "chat_summary": "..."} where domain_id is 1 (Frontend), 2 (Backend), 3 (Database), or 4 (Fullstack).`;
+      const reply = await callUniversalAI(sys, raw);
+      const cleanJson = reply.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
+      if (parsed.error_signature) fixerOutSig.value = parsed.error_signature;
+      if (parsed.tech_stack) fixerStackInput.value = parsed.tech_stack;
+      if (parsed.domain_id) fixerDomainSelect.value = String(parsed.domain_id);
+      if (parsed.root_cause) fixerOutCause.value = parsed.root_cause;
+      if (parsed.fixed_code) fixerOutFix.value = parsed.fixed_code;
+      appendChat('ai', parsed.chat_summary || `Analyzed with ${provider.name}! Root cause: ${fixerOutCause.value}`);
+    } catch (_err) {
+      appendChat('ai', `Diagnosed "${heur.sig}" (${heur.stack}). Root Cause: ${heur.cause}`);
+    }
+  } else {
+    appendChat('ai', `Diagnosed "${heur.sig}" (${heur.stack}).\n• Root Cause: ${heur.cause}\n• Fixed code has been generated in the box above. Click "💾 Save Fix to Database Table" to store it!`);
+  }
+
+  runDiagnosisBtn.disabled = false;
+  runDiagnosisBtn.textContent = '⚡ Analyze & Fix Bug with AI';
+});
+
+chatForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const q = chatInput.value.trim();
+  if (!q) return;
+  appendChat('user', q);
+  chatInput.value = '';
+  chatSendBtn.disabled = true;
+
+  const waitingMsg = appendChat('ai', 'Thinking...');
+  const currentCode = fixerCodeInput.value.trim();
+  const currentSig = fixerOutSig.value.trim();
+  const sys = `You are TraceVault AI Assistant. Answer concisely with clear code or SQL examples.\nCurrent Code Context: ${currentCode || 'None'}\nCurrent Error Signature: ${currentSig || 'General Project Question'}`;
+
+  try {
+    const ans = await callUniversalAI(sys, q);
+    waitingMsg.textContent = `AI: ${ans.trim()}`;
+  } catch (_err) {
+    if (currentSig) {
+      waitingMsg.textContent = `AI: For "${currentSig}", the root cause is: ${fixerOutCause.value}. Use the patched code shown above to resolve it. (Tip: Click "🔑 API Key" at the top right of this window and paste a Gemini/Groq/OpenAI key for live custom chat!)`;
+    } else {
+      waitingMsg.textContent = `AI: Please click "🔑 API Key" at the top right of this popup and paste a free Gemini (AIza...) or Groq (gsk_...) key to chat freely on any topic, or paste broken code on the left and click "⚡ Analyze & Fix Bug with AI"!`;
+    }
+  } finally {
+    chatSendBtn.disabled = false;
+    chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+  }
 });
 
 commitDiagnosisBtn.addEventListener('click', async () => {
   const payload = {
     domain_id: Number(fixerDomainSelect.value || 1),
-    tech_stack: fixerStackInput.value.trim() || 'Node.js / Runtime',
+    tech_stack: fixerStackInput.value.trim() || 'JavaScript / Node.js',
     error_signature: fixerOutSig.value.trim(),
     root_cause: fixerOutCause.value.trim(),
     fix_requirements: fixerOutFix.value.trim(),
@@ -261,13 +472,16 @@ commitDiagnosisBtn.addEventListener('click', async () => {
     is_verified: 1
   };
   if (!payload.error_signature || !payload.root_cause || !payload.fix_requirements) {
-    showBanner('Please run diagnosis or fill in Signature, Cause, and Fix before committing.', 'error');
+    showBanner('Click "⚡ Analyze & Fix Bug with AI" first so the solution fields are filled.', 'error');
     return;
   }
   await saveBugRecord(payload);
   setWorkspaceMode('lab');
 });
 
+// ===================================================================
+// DATABASE INVENTORY & CRUD OPERATIONS
+// ===================================================================
 function getLocalVault() {
   try {
     const rawDomains = localStorage.getItem('tv_domains_v1');
@@ -339,7 +553,22 @@ function populateDomainDropdowns(domains) {
 }
 
 function renderDomainSidebar(domains) {
-  domainCountPill.textContent = `${domains.length} rows`; domainListEl.innerHTML = '';  domains.forEach((d) => { const li = document.createElement('li'); li.className = 'domain-row-item';  const left = document.createElement('div'); left.className = 'domain-row-meta';  const nameSpan = document.createElement('span'); nameSpan.textContent = d.domain_name;  const countSpan = document.createElement('span'); countSpan.className = 'domain-row-count'; countSpan.textContent = `(${d.bug_count || 0})`;
+  domainCountPill.textContent = `${domains.length} rows`;
+  domainListEl.innerHTML = '';
+
+  domains.forEach((d) => {
+    const li = document.createElement('li');
+    li.className = 'domain-row-item';
+
+    const left = document.createElement('div');
+    left.className = 'domain-row-meta';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = d.domain_name;
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'domain-row-count';
+    countSpan.textContent = `(${d.bug_count || 0})`;
 
     left.append(nameSpan, countSpan);
 
@@ -354,10 +583,40 @@ function renderDomainSidebar(domains) {
   });
 }
 
+function openRecordInAiFixer(err) {
+  setWorkspaceMode('fixer');
+  fixerDomainSelect.value = String(err.domain_id);
+  fixerStackInput.value = err.tech_stack || '';
+  fixerCodeInput.value = `// Bug Record #${err.error_id}: ${err.error_signature}\n// Tech Stack: ${err.tech_stack}\n\n${err.fix_requirements || ''}`;
+  fixerOutSig.value = err.error_signature || '';
+  fixerOutCause.value = err.root_cause || '';
+  fixerOutFix.value = err.fix_requirements || '';
+  appendChat('ai', `Bound to Record #${err.error_id} ("${err.error_signature}"). Ask me anything about this bug below!`);
+}
+
 function renderErrorsTable(errors) {
   errorsMap.clear();
   errorsTbody.innerHTML = '';
-  recordsCaption.textContent = `Saved Error Records (${errors.length} ${errors.length === 1 ? 'item' : 'items'})`;  if (errors.length === 0) { const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 8; td.className = 'empty-row'; td.textContent = 'No matching bug records found.'; tr.appendChild(td); errorsTbody.appendChild(tr); return; }  errors.forEach((err) => { errorsMap.set(Number(err.error_id), err); const tr = document.createElement('tr');  const tdId = document.createElement('td'); tdId.className = 'mono-id'; tdId.textContent = `#${err.error_id}`;
+  recordsCaption.textContent = `Saved Error Records (${errors.length} ${errors.length === 1 ? 'item' : 'items'})`;
+
+  if (errors.length === 0) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 8;
+    td.className = 'empty-row';
+    td.textContent = 'No matching bug records found.';
+    tr.appendChild(td);
+    errorsTbody.appendChild(tr);
+    return;
+  }
+
+  errors.forEach((err) => {
+    errorsMap.set(Number(err.error_id), err);
+    const tr = document.createElement('tr');
+
+    const tdId = document.createElement('td');
+    tdId.className = 'mono-id';
+    tdId.textContent = `#${err.error_id}`;
 
     const tdSig = document.createElement('td');
     const sigTitle = document.createElement('div');
@@ -389,13 +648,102 @@ function renderErrorsTable(errors) {
     tdStatus.className = 't-center';
     const statusPill = document.createElement('span');
     const verified = Number(err.is_verified ?? 1) === 1;
-    statusPill.className = `state-tag ${verified ? 'state-verified' : 'state-pending'}`; statusPill.textContent = verified ? 'Verified' : 'Pending'; tdStatus.appendChild(statusPill);  const tdActions = document.createElement('td'); tdActions.className = 't-right'; const actionWrap = document.createElement('div'); actionWrap.className = 'row-actions';  const editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'btn-secondary btn-xs'; editBtn.textContent = 'Edit'; editBtn.addEventListener('click', () => openEditModal(err.error_id));  const delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.className = 'btn-danger btn-xs'; delBtn.textContent = 'Delete'; delBtn.addEventListener('click', () => promptDeleteError(err));
+    statusPill.className = `state-tag ${verified ? 'state-verified' : 'state-pending'}`;
+    statusPill.textContent = verified ? 'Verified' : 'Pending';
+    tdStatus.appendChild(statusPill);
+
+    const tdActions = document.createElement('td');
+    tdActions.className = 't-right';
+    const actionWrap = document.createElement('div');
+    actionWrap.className = 'row-actions';
+
     const askAiBtn = document.createElement('button');
     askAiBtn.type = 'button';
     askAiBtn.className = 'btn-secondary btn-xs';
-    askAiBtn.textContent = 'Ask AI';
-    askAiBtn.addEventListener('click', () => openAiChatWithContext(err));
-    actionWrap.append(askAiBtn, editBtn, delBtn); tdActions.appendChild(actionWrap);  tr.append(tdId, tdSig, tdDom, tdStack, tdFix, tdHits, tdStatus, tdActions); errorsTbody.appendChild(tr); }); }  function updateSummaryCards(stats) { statCountEl.textContent = String(stats.total_bugs ?? 0); statSumEl.textContent = String(stats.total_hits ?? 0); statAvgEl.textContent = Number(stats.avg_hits ?? 0).toFixed(1); statMaxEl.textContent = String(stats.max_hits ?? 0); statMinEl.textContent = String(stats.min_hits ?? 0); }  async function refreshWorkspace() { const search = searchInput.value.trim(); const domain_id = domainFilterSelect.value || 'all';  if (useLocalFallback) { const { domains, errors } = getLocalVault(); const enrichedDomains = domains.map((d) => ({ ...d, bug_count: errors.filter((e) => Number(e.domain_id) === Number(d.domain_id)).length })); domainsState = enrichedDomains; populateDomainDropdowns(enrichedDomains); renderDomainSidebar(enrichedDomains);  let filtered = errors.map((e) => { const dom = domains.find((d) => Number(d.domain_id) === Number(e.domain_id)); return { ...e, domain_name: dom ? dom.domain_name : 'General' }; });  if (domain_id !== 'all') { filtered = filtered.filter((e) => Number(e.domain_id) === Number(domain_id)); } if (search) { const q = search.toLowerCase(); const numId = Number(q.replace(/^#/, '')); filtered = filtered.filter((e) => (Number.isInteger(numId) && numId > 0 && Number(e.error_id) === numId) || String(e.error_signature).toLowerCase().includes(q) || String(e.tech_stack).toLowerCase().includes(q) || String(e.root_cause).toLowerCase().includes(q) || String(e.fix_requirements).toLowerCase().includes(q) || String(e.domain_name).toLowerCase().includes(q) ); }  const total_bugs = filtered.length; const total_hits = filtered.reduce((acc, r) => acc + Number(r.times_hit || 1), 0); const avg_hits = total_bugs ? (total_hits / total_bugs).toFixed(1) : 0; const max_hits = total_bugs ? Math.max(...filtered.map((r) => Number(r.times_hit || 1))) : 0; const min_hits = total_bugs ? Math.min(...filtered.map((r) => Number(r.times_hit || 1))) : 0;  updateSummaryCards({ total_bugs, total_hits, avg_hits, max_hits, min_hits }); renderErrorsTable(filtered); return; }  try { const qs = new URLSearchParams(); if (domain_id && domain_id !== 'all') qs.set('domain_id', domain_id); if (search) qs.set('search', search);  const [domRes, errRes, statRes] = await Promise.all([ fetch(`${apiBase}/api/domains`),
+    askAiBtn.textContent = '💬 Ask AI';
+    askAiBtn.addEventListener('click', () => openRecordInAiFixer(err));
+
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'btn-secondary btn-xs';
+    editBtn.textContent = 'Edit';
+    editBtn.addEventListener('click', () => openEditModal(err.error_id));
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn-danger btn-xs';
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', () => promptDeleteError(err));
+
+    actionWrap.append(askAiBtn, editBtn, delBtn);
+    tdActions.appendChild(actionWrap);
+
+    tr.append(tdId, tdSig, tdDom, tdStack, tdFix, tdHits, tdStatus, tdActions);
+    errorsTbody.appendChild(tr);
+  });
+}
+
+function updateSummaryCards(stats) {
+  statCountEl.textContent = String(stats.total_bugs ?? 0);
+  statSumEl.textContent = String(stats.total_hits ?? 0);
+  statAvgEl.textContent = Number(stats.avg_hits ?? 0).toFixed(1);
+  statMaxEl.textContent = String(stats.max_hits ?? 0);
+  statMinEl.textContent = String(stats.min_hits ?? 0);
+}
+
+async function refreshWorkspace() {
+  const search = searchInput.value.trim();
+  const domain_id = domainFilterSelect.value || 'all';
+
+  if (useLocalFallback) {
+    const { domains, errors } = getLocalVault();
+    const enrichedDomains = domains.map((d) => ({
+      ...d,
+      bug_count: errors.filter((e) => Number(e.domain_id) === Number(d.domain_id)).length
+    }));
+    domainsState = enrichedDomains;
+    populateDomainDropdowns(enrichedDomains);
+    renderDomainSidebar(enrichedDomains);
+
+    let filtered = errors.map((e) => {
+      const dom = domains.find((d) => Number(d.domain_id) === Number(e.domain_id));
+      return { ...e, domain_name: dom ? dom.domain_name : 'General' };
+    });
+
+    if (domain_id !== 'all') {
+      filtered = filtered.filter((e) => Number(e.domain_id) === Number(domain_id));
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      const numId = Number(q.replace(/^#/, ''));
+      filtered = filtered.filter((e) =>
+        (Number.isInteger(numId) && numId > 0 && Number(e.error_id) === numId) ||
+        String(e.error_signature).toLowerCase().includes(q) ||
+        String(e.tech_stack).toLowerCase().includes(q) ||
+        String(e.root_cause).toLowerCase().includes(q) ||
+        String(e.fix_requirements).toLowerCase().includes(q) ||
+        String(e.domain_name).toLowerCase().includes(q)
+      );
+    }
+
+    const total_bugs = filtered.length;
+    const total_hits = filtered.reduce((acc, r) => acc + Number(r.times_hit || 1), 0);
+    const avg_hits = total_bugs ? (total_hits / total_bugs).toFixed(1) : 0;
+    const max_hits = total_bugs ? Math.max(...filtered.map((r) => Number(r.times_hit || 1))) : 0;
+    const min_hits = total_bugs ? Math.min(...filtered.map((r) => Number(r.times_hit || 1))) : 0;
+
+    updateSummaryCards({ total_bugs, total_hits, avg_hits, max_hits, min_hits });
+    renderErrorsTable(filtered);
+    return;
+  }
+
+  try {
+    const qs = new URLSearchParams();
+    if (domain_id && domain_id !== 'all') qs.set('domain_id', domain_id);
+    if (search) qs.set('search', search);
+
+    const [domRes, errRes, statRes] = await Promise.all([
+      fetch(`${apiBase}/api/domains`),
       fetch(`${apiBase}/api/errors?${qs.toString()}`),
       fetch(`${apiBase}/api/stats?${qs.toString()}`)
     ]);
@@ -432,7 +780,14 @@ async function saveBugRecord(payload) {
   }
 
   try {
-    const res = await fetch(`${apiBase}/api/errors`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if (!res.ok || !data.success) throw new Error(data.error || 'Could not save bug record.'); showBanner(`Saved "${payload.error_signature}" to MySQL database.`);
+    const res = await fetch(`${apiBase}/api/errors`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Could not save bug record.');
+    showBanner(`Saved "${payload.error_signature}" to MySQL database.`);
     await refreshWorkspace();
   } catch (err) {
     showBanner(err.message, 'error');
@@ -472,7 +827,13 @@ addDomainForm.addEventListener('submit', async (e) => {
     domains.push({ domain_id: nextId, domain_name, description: 'Custom category' });
     saveLocalVault(domains, errors);
     addDomainForm.reset();
-    showBanner(`Added domain "${domain_name}".`); await refreshWorkspace(); return; }  try { const res = await fetch(`${apiBase}/api/domains`, {
+    showBanner(`Added domain "${domain_name}".`);
+    await refreshWorkspace();
+    return;
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/domains`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ domain_name })
@@ -550,7 +911,7 @@ editErrorForm.addEventListener('submit', async (e) => {
 function promptDeleteError(err) {
   pendingDeleteTarget = { type: 'error', id: Number(err.error_id) };
   deleteDialogTitle.textContent = 'Delete Bug Record?';
-  deleteDialogMessage.textContent = `Permanently delete "#${err.error_id}${err.error_signature}" from the database?`;
+  deleteDialogMessage.textContent = `Permanently delete "#${err.error_id} ${err.error_signature}" from the database?`;
   deleteConfirmBtn.hidden = false;
   deleteDialog.showModal();
 }
@@ -615,289 +976,5 @@ searchInput.addEventListener('input', () => {
 domainFilterSelect.addEventListener('change', refreshWorkspace);
 filterForm.addEventListener('reset', () => setTimeout(refreshWorkspace, 0));
 
+refreshAiKeyUI();
 detectBackendMode().then(refreshWorkspace);
-// ===================================================================
-// UNIVERSAL API KEY AUTO-ROUTER & LIVE AI CHAT / DIAGNOSIS ENGINE
-// ===================================================================
-const AI_KEY_STORAGE = 'tv_universal_api_key_v1';
-let activeChatContext = null;
-let chatHistory = [];
-
-const openAiChatBtn = document.getElementById('open-ai-chat-btn');
-const openApiKeyBtn = document.getElementById('open-api-key-btn');
-const aiKeyDot = document.getElementById('ai-key-dot');
-const aiKeyStatusText = document.getElementById('ai-key-status-text');
-
-const aiChatModal = document.getElementById('ai-chat-modal');
-const chatProviderBadge = document.getElementById('chat-provider-badge');
-const chatContextText = document.getElementById('chat-context-text');
-const chatUnbindBtn = document.getElementById('chat-unbind-btn');
-const chatClearBtn = document.getElementById('chat-clear-btn');
-const chatCloseBtn = document.getElementById('chat-close-btn');
-const chatMessagesBox = document.getElementById('chat-messages');
-const chatForm = document.getElementById('chat-form');
-const chatInput = document.getElementById('chat-input');
-const chatSendBtn = document.getElementById('chat-send-btn');
-
-const apiKeyModal = document.getElementById('api-key-modal');
-const apiKeyForm = document.getElementById('api-key-form');
-const apiKeyInput = document.getElementById('api-key-input');
-const detectedProviderPill = document.getElementById('detected-provider-pill');
-const apiKeyFeedback = document.getElementById('api-key-feedback');
-const removeApiKeyBtn = document.getElementById('remove-api-key-btn');
-const closeApiKeyBtn = document.getElementById('close-api-key-btn');
-
-function detectProviderFromKey(rawKey) {
-  const key = String(rawKey || '').trim();
-  if (!key) return null;
-  if (key.startsWith('AIza')) {
-    return { id: 'gemini', name: 'Google Gemini', model: 'gemini-2.5-flash', key };
-  }
-  if (key.startsWith('gsk_')) {
-    return { id: 'groq', name: 'Groq Llama-3.3', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile', key };
-  }
-  if (key.startsWith('sk-or-')) {
-    return { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: 'openai/gpt-4o-mini', key };
-  }
-  if (key.startsWith('sk-')) {
-    return { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
-  }
-  return { id: 'openai-compatible', name: 'Custom AI API', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
-}
-
-function getSavedProvider() {
-  const saved = localStorage.getItem(AI_KEY_STORAGE) || '';
-  return detectProviderFromKey(saved);
-}
-
-function refreshAiKeyBadge() {
-  const provider = getSavedProvider();
-  if (provider && aiKeyDot && aiKeyStatusText) {
-    aiKeyDot.classList.add('is-active');
-    aiKeyStatusText.textContent = `AI: ${provider.name}`;
-    if (chatProviderBadge) chatProviderBadge.textContent = `${provider.name} Live`;
-    if (detectedProviderPill) detectedProviderPill.textContent = provider.name;
-    if (apiKeyFeedback) apiKeyFeedback.textContent = `Connected: ${provider.name} (${provider.model}) active in browser.`;
-  } else if (aiKeyDot && aiKeyStatusText) {
-    aiKeyDot.classList.remove('is-active');
-    aiKeyStatusText.textContent = 'API Key';
-    if (chatProviderBadge) chatProviderBadge.textContent = 'Built-in Engine';
-    if (detectedProviderPill) detectedProviderPill.textContent = 'No Key Set';
-    if (apiKeyFeedback) apiKeyFeedback.textContent = 'Status: Using built-in diagnostic engine (Paste an API key for live LLM calls).';
-  }
-}
-
-async function callUniversalAI(systemPrompt, userPrompt, jsonMode = false) {
-  const provider = getSavedProvider();
-  if (!provider) {
-    throw new Error('NO_API_KEY');
-  }
-
-  if (provider.id === 'gemini') {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${provider.model}:generateContent?key=${encodeURIComponent(provider.key)}`;
-    const body = {
-      systemInstruction: { parts: [{ text: systemPrompt }] },
-      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-      generationConfig: jsonMode ? { responseMimeType: 'application/json', temperature: 0.2 } : { temperature: 0.3 }
-    };
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Gemini API request failed.');
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  }
-
-  // OpenAI / Groq / OpenRouter compatible chat completions
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${provider.key}`
-  };
-  const payload = {
-    model: provider.model,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
-    ],
-    temperature: 0.2
-  };
-  if (jsonMode && provider.id !== 'openrouter') {
-    payload.response_format = { type: 'json_object' };
-  }
-
-  const res = await fetch(provider.endpoint, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error?.message || `${provider.name} API error.`);
-  return data.choices?.[0]?.message?.content || '';
-}
-
-// Wire up API Key Modal
-if (openApiKeyBtn) {
-  openApiKeyBtn.addEventListener('click', () => {
-    apiKeyInput.value = localStorage.getItem(AI_KEY_STORAGE) || '';
-    refreshAiKeyBadge();
-    apiKeyModal.showModal();
-  });
-}
-
-if (apiKeyInput) {
-  apiKeyInput.addEventListener('input', () => {
-    const p = detectProviderFromKey(apiKeyInput.value);
-    detectedProviderPill.textContent = p ? p.name : 'Auto-Detect';
-  });
-}
-
-if (closeApiKeyBtn) {
-  closeApiKeyBtn.addEventListener('click', () => apiKeyModal.close());
-}
-
-if (removeApiKeyBtn) {
-  removeApiKeyBtn.addEventListener('click', () => {
-    localStorage.removeItem(AI_KEY_STORAGE);
-    apiKeyInput.value = '';
-    refreshAiKeyBadge();
-    apiKeyModal.close();
-    showBanner('Removed saved API key. Switched to built-in engine.');
-  });
-}
-
-if (apiKeyForm) {
-  apiKeyForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const raw = apiKeyInput.value.trim();
-    if (!raw) {
-      showBanner('Please paste a valid API key.', 'error');
-      return;
-    }
-    const provider = detectProviderFromKey(raw);
-    localStorage.setItem(AI_KEY_STORAGE, raw);
-    refreshAiKeyBadge();
-    apiKeyModal.close();
-    showBanner(`Connected ${provider ? provider.name : 'API'} key successfully.`);
-  });
-}
-
-// Wire up Top Popup AI Chat Modal
-function openAiChatWithContext(record = null) {
-  if (record) {
-    activeChatContext = record;
-    if (chatContextText) {
-      chatContextText.textContent = `#${record.error_id} [${record.domain_name || 'Bug'}] ${record.error_signature} (${record.tech_stack})`;
-    }
-    if (chatUnbindBtn) chatUnbindBtn.hidden = false;
-  }
-  refreshAiKeyBadge();
-  if (aiChatModal) {
-    aiChatModal.showModal();
-    setTimeout(() => chatInput?.focus(), 40);
-  }
-}
-
-if (openAiChatBtn) {
-  openAiChatBtn.addEventListener('click', () => openAiChatWithContext(null));
-}
-
-if (chatCloseBtn) {
-  chatCloseBtn.addEventListener('click', () => aiChatModal.close());
-}
-
-if (chatUnbindBtn) {
-  chatUnbindBtn.addEventListener('click', () => {
-    activeChatContext = null;
-    chatContextText.textContent = 'General Project & Code Debugging Assistant';
-    chatUnbindBtn.hidden = true;
-  });
-}
-
-if (chatClearBtn) {
-  chatClearBtn.addEventListener('click', () => {
-    chatHistory = [];
-    chatMessagesBox.innerHTML = `
-      <div class="chat-bubble is-ai">
-        <div class="bubble-role">TraceVault AI</div>
-        <div class="bubble-content">Chat history cleared. Ask any question about your code, SQL schema, or bug records.</div>
-      </div>
-    `;
-  });
-}
-
-function appendChatBubble(role, text) {
-  const div = document.createElement('div');
-  div.className = `chat-bubble ${role === 'user' ? 'is-user' : 'is-ai'}`;
-  const roleEl = document.createElement('div');
-  roleEl.className = 'bubble-role';
-  roleEl.textContent = role === 'user' ? 'You' : 'TraceVault AI';
-  const contentEl = document.createElement('div');
-  contentEl.className = 'bubble-content';
-  contentEl.textContent = text;
-  div.append(roleEl, contentEl);
-  chatMessagesBox.appendChild(div);
-  chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
-  return contentEl;
-}
-
-async function handleChatSubmit(promptText) {
-  const question = String(promptText || '').trim();
-  if (!question) return;
-
-  appendChatBubble('user', question);
-  chatInput.value = '';
-  chatSendBtn.disabled = true;
-  const thinkingEl = appendChatBubble('ai', 'Analyzing...');
-
-  const contextBlock = activeChatContext
-    ? `Active Bug Record Context:\n- ID: #${activeChatContext.error_id}\n- Domain: ${activeChatContext.domain_name}\n- Tech Stack: ${activeChatContext.tech_stack}\n- Error Signature: ${activeChatContext.error_signature}\n- Root Cause: ${activeChatContext.root_cause}\n- Current Fix: ${activeChatContext.fix_requirements || activeChatContext.fixed_code || 'None'}`
-    : `Project Context: TraceVault Software Bug & Error Inventory System (Node.js, Express, MySQL 3306 with domains and error_logs tables, currently tracking ${errorsMap.size} bug records).`;
-
-  const systemPrompt = `You are TraceVault AI, a senior full-stack and MySQL database debugging assistant. Be concise, practical, and provide clean code examples.\n${contextBlock}`;
-
-  try {
-    const reply = await callUniversalAI(systemPrompt, question, false);
-    thinkingEl.textContent = reply.trim() || 'No response received.';
-  } catch (err) {
-    if (activeChatContext) {
-      thinkingEl.textContent =
-        `[Diagnostic Analysis for #${activeChatContext.error_id} — ${activeChatContext.tech_stack}]\n\n` +
-        `• Error Signature: ${activeChatContext.error_signature}\n` +
-        `• Root Cause: ${activeChatContext.root_cause}\n` +
-        `• Recommended Fix:\n${activeChatContext.fix_requirements || activeChatContext.fixed_code || 'None'}\n\n` +
-        `(Tip: Click "API Key" in the top navbar and paste a Groq/Gemini/OpenAI key for live custom LLM generation.)`;
-    } else {
-      thinkingEl.textContent =
-        `[TraceVault Diagnostic Assistant]\n` +
-        `To get live custom AI responses for "${question.slice(0, 60)}...", click "API Key" in the top bar and paste your API key (Groq gsk_, Gemini AIza, OpenRouter sk-or-, or OpenAI sk-). Or click "Ask AI" on any table row to inspect its root cause and verified fix.`;
-    }
-  } finally {
-    chatSendBtn.disabled = false;
-    chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
-  }
-}
-
-if (chatForm) {
-  chatForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    handleChatSubmit(chatInput.value);
-  });
-}
-
-if (chatInput) {
-  chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleChatSubmit(chatInput.value);
-    }
-  });
-}
-
-document.querySelectorAll('.chat-prompt-chip').forEach((btn) => {
-  btn.addEventListener('click', () => handleChatSubmit(btn.dataset.prompt));
-});
-
-// Initialize AI Key status on boot
-refreshAiKeyBadge();
