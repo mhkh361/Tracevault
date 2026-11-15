@@ -81,7 +81,9 @@ app.use(express.json());
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 600, // 600 requests per 15 min allows continuous live search and multi-user testing
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { success: false, error: 'Too many requests, please try again later.' }
 });
 app.use('/api/', apiLimiter);
@@ -184,11 +186,11 @@ app.get('/api/stats', async (req, res) => {
       const likeTerm = `%${q}%`;
       const numericId = Number(q.replace(/^#/, ''));
       if (Number.isInteger(numericId) && numericId > 0) {
-        whereClause += ' AND (e.error_id = ? OR e.error_signature LIKE ? OR e.tech_stack LIKE ? OR e.root_cause LIKE ? OR e.fix_requirements LIKE ?)';
-        params.push(numericId, likeTerm, likeTerm, likeTerm, likeTerm);
+        whereClause += ' AND (e.error_id = ? OR e.error_signature LIKE ? OR e.tech_stack LIKE ? OR e.root_cause LIKE ? OR e.fix_requirements LIKE ? OR d.domain_name LIKE ?)';
+        params.push(numericId, likeTerm, likeTerm, likeTerm, likeTerm, likeTerm);
       } else {
-        whereClause += ' AND (e.error_signature LIKE ? OR e.tech_stack LIKE ? OR e.root_cause LIKE ? OR e.fix_requirements LIKE ?)';
-        params.push(likeTerm, likeTerm, likeTerm, likeTerm);
+        whereClause += ' AND (e.error_signature LIKE ? OR e.tech_stack LIKE ? OR e.root_cause LIKE ? OR e.fix_requirements LIKE ? OR d.domain_name LIKE ?)';
+        params.push(likeTerm, likeTerm, likeTerm, likeTerm, likeTerm);
       }
     }
 
@@ -201,6 +203,7 @@ app.get('/api/stats', async (req, res) => {
         COALESCE(MIN(e.times_hit), 0) AS min_hits,
         COALESCE(SUM(CASE WHEN e.is_verified = 1 THEN 1 ELSE 0 END), 0) AS verified_count
       FROM error_logs e
+      LEFT JOIN domains d ON e.domain_id = d.domain_id
       ${whereClause}
     `;
     const [aggRows] = await pool.execute(aggSql, params);
@@ -323,6 +326,9 @@ app.post('/api/errors', async (req, res) => {
     });
   } catch (err) {
     console.error('[POST /api/errors Error]:', err.message);
+    if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(400).json({ success: false, error: 'Referenced domain_id does not exist.' });
+    }
     return res.status(500).json({ success: false, error: err.message });
   }
 });
@@ -398,6 +404,9 @@ app.put('/api/errors/:id', async (req, res) => {
     });
   } catch (err) {
     console.error('[PUT /api/errors/:id Error]:', err.message);
+    if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+      return res.status(400).json({ success: false, error: 'Referenced domain_id does not exist.' });
+    }
     return res.status(500).json({ success: false, error: err.message });
   }
 });
