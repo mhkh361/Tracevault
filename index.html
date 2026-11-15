@@ -1,1015 +1,275 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TraceVault | Developer Error Knowledge Base &amp; Diagnostic Workbench</title>
-  <meta name="description" content="High-performance developer error knowledge base and self-learning diagnostic assistant.">
+  <title>TraceVault — Software Bug & Error Inventory Management System</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=human_v2">
-  <link rel="stylesheet" href="style.css?v=human_v2">
+  <link rel="stylesheet" href="./style.css?v=clean_dbms_v1">
 </head>
 <body>
-
-  <!-- Subtle Atmospheric Top Illumination -->
-  <div class="top-spotlight" aria-hidden="true"></div>
-
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="toast-container" aria-live="polite"></div>
-
-  <!-- Main Application Wrapper -->
-  <div class="app-layout">
-    
-    <!-- TOP COMMAND HEADER (56px) -->
-    <header class="app-header">
-      <div class="header-left">
-        <a href="./" class="brand-logo" title="TraceVault Developer Workbench">
-          <img src="favicon.svg?v=human_v2" class="brand-icon" alt="TraceVault Logo" width="28" height="28" />
-          <div class="brand-titles">
-            <div class="brand-main">
-              <span class="brand-title">TraceVault</span>
-              <span class="brand-badge">v2.0</span>
-            </div>
-            <span class="brand-subtitle">Developer Workbench</span>
-          </div>
-        </a>
-      </div>
-
-      <div class="header-center">
-        <div class="quick-search-box" id="quick-search-trigger">
-          <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="9" r="6"/>
-            <line x1="13.5" y1="13.5" x2="18" y2="18"/>
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="topbar">
+      <div class="brand-group">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,2 29,9.5 29,22.5 16,30 3,22.5 3,9.5" fill="#0d1520" stroke="#10b981" stroke-width="2"/>
+            <polygon points="16,2 29,9.5 16,17 3,9.5" fill="rgba(16,185,129,0.22)"/>
+            <polyline points="3,9.5 16,17 29,9.5" stroke="#34d399" stroke-width="1.5" fill="none"/>
+            <line x1="16" y1="17" x2="16" y2="30" stroke="#34d399" stroke-width="1.5"/>
           </svg>
-          <input type="text" id="global-search-input" placeholder="Search errors, stack traces, or causes..." autocomplete="off">
-          <kbd class="shortcut-pill">Ctrl+K</kbd>
+        </div>
+        <div>
+          <div class="brand-title-row">
+            <h1>TraceVault</h1>
+            <span class="topic-pill">Bug &amp; Error Inventory System</span>
+          </div>
+          <p class="brand-subtitle">Relational MySQL Error Knowledge Base &amp; Issue Tracker</p>
         </div>
       </div>
 
-      <div class="header-right">
-        <!-- Live Database Status & Sync Trigger (Always Green) -->
-        <button class="status-btn connected" id="mysql-status-trigger" title="Database Connection Status &amp; Sync Inspector">
-          <span class="status-dot" id="mysql-status-dot"></span>
-          <span id="mysql-status-text">● Cloud Vault Active</span>
-        </button>
-
-        <!-- Export Dropdown -->
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-btn" id="export-dropdown-btn">
-            <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 14v2a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2"/>
-              <polyline points="7 9 10 12 13 9"/>
-              <line x1="10" y1="12" x2="10" y2="2"/>
-            </svg>
-            Export
-          </button>
-          <div class="dropdown-content" id="export-menu">
-            <button class="dropdown-item" id="export-json-btn">
-              <svg class="item-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/><polyline points="10 8 10 12 14 12"/></svg>
-              Export JSON
-            </button>
-            <button class="dropdown-item" id="export-csv-btn">
-              <svg class="item-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="14" height="14" rx="2"/><line x1="3" y1="9" x2="17" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-              Export CSV
-            </button>
-          </div>
-        </div>
-
-        <!-- AI Engine Status & Key Modal Trigger -->
-        <button class="btn btn-secondary btn-ai-status" id="open-byok-modal-btn">
-          <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17.5 2.5l-2 2m-1.5 1.5l-2 2-2-2-1.5 1.5 2 2-1 1-1.5-1.5-2 2 1.5 1.5-3.5 3.5a5 5 0 1 1-2.5-2.5l3.5-3.5 1.5 1.5 2-2-1.5-1.5 1-1 2 2 1.5-1.5-2-2 1.5-1.5 2 2z"/>
-          </svg>
-          <span class="btn-label" id="byok-btn-label">🔑 AI Engine: Ready</span>
-          <span class="byok-indicator active" id="byok-status-pill">● Ready</span>
-        </button>
-
-        <!-- Theme Toggle -->
-        <button class="btn btn-icon theme-toggle-btn" id="theme-toggle-btn" title="Toggle theme">
-          <span id="theme-icon">🌓</span>
-        </button>
+      <div class="topbar-right">
+        <span id="db-status-badge" class="status-badge is-online">
+          <span class="status-dot"></span>
+          <span id="db-status-text">MySQL 3306 Connected</span>
+        </span>
       </div>
     </header>
 
-    <!-- SLIM HORIZONTAL TELEMETRY RIBBON (52px) -->
-    <section class="telemetry-ribbon" aria-label="System Telemetry">
-      <div class="telemetry-bar">
-        
-        <!-- Metric 1: Unique Issues -->
-        <div class="telemetry-cell">
-          <span class="telemetry-label">UNIQUE ISSUES</span>
-          <span class="telemetry-val font-mono" id="stat-unique"><strong id="kpi-total-errors">0</strong></span>
-          <span class="sql-pill">COUNT()</span>
-        </div>
+    <!-- Notification Toast Banner -->
+    <div id="status-banner" class="status-banner" hidden></div>
 
-        <!-- Metric 2: Total Occurrences -->
-        <div class="telemetry-cell">
-          <span class="telemetry-label">TOTAL OCCURRENCES</span>
-          <span class="telemetry-val font-mono highlight-emerald" id="stat-total"><strong id="kpi-total-hits">0</strong></span>
-          <span class="sql-pill pill-emerald">SUM()</span>
+    <!-- Section 1: SQL Aggregate Summary Cards -->
+    <section class="summary-grid" aria-label="Database Summary Statistics">
+      <article class="summary-card">
+        <div class="summary-top">
+          <span class="summary-label">Total Bug Records</span>
+          <span class="sql-tag">COUNT(*)</span>
         </div>
+        <p id="stat-count" class="summary-value">0</p>
+        <span class="summary-sub">Unique error signatures in vault</span>
+      </article>
 
-        <!-- Metric 3: Avg Frequency -->
-        <div class="telemetry-cell">
-          <span class="telemetry-label">AVG FREQUENCY</span>
-          <span class="telemetry-val font-mono" id="stat-avg"><strong id="kpi-avg-hits">0.0</strong></span>
-          <span class="sql-pill">AVG()</span>
+      <article class="summary-card">
+        <div class="summary-top">
+          <span class="summary-label">Total Occurrences</span>
+          <span class="sql-tag">SUM(times_hit)</span>
         </div>
+        <p id="stat-sum" class="summary-value text-emerald">0</p>
+        <span class="summary-sub">Cumulative incidents tracked</span>
+      </article>
 
-        <!-- Metric 4: Frequency Spread -->
-        <div class="telemetry-cell">
-          <span class="telemetry-label">SPREAD</span>
-          <div class="telemetry-val font-mono telemetry-spread-box" id="stat-spread">
-            <span id="stat-max"><small>MAX</small> <strong id="kpi-max-hits">0</strong></span>
-            <span class="split-divider">/</span>
-            <span id="stat-min"><small>MIN</small> <strong id="kpi-min-hits">0</strong></span>
-          </div>
-          <span class="sql-pill">MAX/MIN</span>
+      <article class="summary-card">
+        <div class="summary-top">
+          <span class="summary-label">Average Hits / Bug</span>
+          <span class="sql-tag">AVG(times_hit)</span>
         </div>
+        <p id="stat-avg" class="summary-value">0.0</p>
+        <span class="summary-sub">Mean recurrence frequency</span>
+      </article>
 
-        <!-- Metric 5: Peak Incident -->
-        <div class="telemetry-cell telemetry-cell-top">
-          <span class="telemetry-label">PEAK INCIDENT</span>
-          <div class="telemetry-top-content" id="stat-top-bug">
-            <span class="top-bug-title font-mono" id="kpi-top-bug-name">No incidents recorded</span>
-            <span class="top-bug-stack" id="kpi-top-bug-stack">-</span>
-            <span class="top-bug-hits font-mono highlight-emerald" id="kpi-top-bug-hits">0 hits</span>
-          </div>
-          <span class="sql-pill pill-accent">PEAK</span>
+      <article class="summary-card">
+        <div class="summary-top">
+          <span class="summary-label">Frequency Spread</span>
+          <span class="sql-tag">MAX / MIN</span>
         </div>
-
-      </div>
+        <p class="summary-value"><span id="stat-max">0</span> <span class="muted-slash">/</span> <span id="stat-min">0</span></p>
+        <span class="summary-sub">Highest vs. lowest hit count</span>
+      </article>
     </section>
 
-    <!-- MAIN WORKBENCH BODY -->
-    <main class="app-main">
-
-      <!-- SECTION: 2-COLUMN WORKBENCH (01 INGEST & 02 DIAGNOSE) -->
-      <section class="workbench-grid">
-
-        <!-- COLUMN 1: 01 / INGEST & ANALYZE TRACE -->
-        <div class="workbench-card ide-panel" id="panel-scanner-entry">
-          <div class="card-header">
-            <div class="header-step-tag">
-              <span class="step-num font-mono">01</span>
-              <h2 class="card-title">INGEST &amp; ANALYZE TRACE</h2>
-            </div>
-            <div class="tab-toggle-group">
-              <button class="tab-pill active" data-tab="tab-ai-scanner" id="btn-tab-scanner">Trace Analyzer</button>
-              <button class="tab-pill" data-tab="tab-manual-entry" id="btn-tab-manual">Manual Entry</button>
-            </div>
+    <!-- Main Single-Page Workspace -->
+    <main class="workspace-grid">
+      <!-- Left Column: Add Bug Record Form & Domain Management -->
+      <aside class="sidebar-column">
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Add New Bug Record</h2>
+            <span class="sql-tag">INSERT INTO</span>
           </div>
 
-          <div class="card-body">
-            
-            <!-- TAB 1: AI & HEURISTIC SCANNER -->
-            <div class="tab-pane active" id="tab-ai-scanner">
-              
-              <!-- 1-Click Interactive Sample Chips -->
-              <div class="sample-chips-wrapper">
-                <span class="sample-chips-label">Sample Presets:</span>
-                <div class="sample-chips-list">
-                  <button type="button" class="sample-chip" data-preset="cors_error" title="Load CORS Policy Error">
-                    <span class="chip-dot"></span>CORS Policy
-                  </button>
-                  <button type="button" class="sample-chip" data-preset="react_hydration" title="Load React Hydration Mismatch">
-                    <span class="chip-dot"></span>React Hydration
-                  </button>
-                  <button type="button" class="sample-chip" data-preset="mysql_1452" title="Load MySQL Foreign Key Error">
-                    <span class="chip-dot"></span>MySQL FK Constraint
-                  </button>
-                  <button type="button" class="sample-chip" data-preset="jwt_error" title="Load JWT Invalid Signature Error">
-                    <span class="chip-dot"></span>JWT Signature
-                  </button>
-                </div>
+          <form id="add-error-form" novalidate>
+            <div class="form-group">
+              <label for="add-signature">Error Signature / Message *</label>
+              <input type="text" id="add-signature" name="error_signature" required maxlength="255" placeholder="e.g., ER_NO_REFERENCED_ROW_2: Foreign key constraint fails">
+            </div>
 
-                <!-- Hidden select for programmatic and fallback sync -->
-                <select id="sample-error-select" class="sr-only" aria-hidden="true" tabindex="-1">
-                  <option value="">-- Choose sample --</option>
-                  <option value="cors_error">CORS Error</option>
-                  <option value="react_hydration">React Hydration</option>
-                  <option value="mysql_1452">MySQL FK</option>
-                  <option value="jwt_error">JWT Error</option>
-                  <option value="react_map">React Map</option>
-                  <option value="js_const">JS Const</option>
-                  <option value="node_eaddrinuse">Node EADDRINUSE</option>
-                  <option value="express_headers">Express Headers</option>
-                </select>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="add-domain">Domain Category (FK) *</label>
+                <select id="add-domain" name="domain_id" required></select>
               </div>
-
-              <!-- Main Scanner Form -->
-              <form id="ai-scanner-form" class="scanner-form">
-                
-                <!-- Code Editor Surface with Gutter -->
-                <div class="form-group">
-                  <div class="editor-header">
-                    <label for="scan-trace-textarea" class="editor-label">Stack Trace / Exception Dump <span class="required">*</span></label>
-                    <span class="editor-hint">Raw terminal output or error log</span>
-                  </div>
-                  <div class="ide-editor-wrapper">
-                    <div class="ide-gutter font-mono" aria-hidden="true">
-                      <span>01</span><span>02</span><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span>
-                    </div>
-                    <textarea id="scan-trace-textarea" class="ide-textarea font-mono" rows="6" placeholder="// Paste raw stack trace, uncaught exception, or SQL failure here..." required></textarea>
-                  </div>
-                </div>
-
-                <!-- Compact 2-Column Metadata Row (36px inputs) -->
-                <div class="form-row-metadata">
-                  <div class="form-group flex-1">
-                    <label for="scan-domain-select">Domain Category <span class="required">*</span></label>
-                    <select id="scan-domain-select" class="form-input form-input-sm" required>
-                      <option value="1">Frontend</option>
-                      <option value="2">Backend</option>
-                      <option value="3">Database</option>
-                      <option value="4">Fullstack</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group flex-1">
-                    <label for="scan-tech-input">Tech Stack / Runtime <span class="required">*</span></label>
-                    <input type="text" id="scan-tech-input" class="form-input form-input-sm" placeholder="e.g. React, Express, MySQL, Next.js" required>
-                  </div>
-                </div>
-
-                <!-- Form Action Buttons -->
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary" id="btn-scan-analyze">
-                    <span class="btn-spinner hidden" id="scan-spinner"></span>
-                    <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                      <polygon points="11 2 3 11 10 11 9 18 17 9 10 9 11 2"/>
-                    </svg>
-                    <span class="btn-text">Analyze &amp; Commit Trace</span>
-                    <kbd class="btn-kbd">Ctrl ↵</kbd>
-                  </button>
-                  <button type="button" class="btn btn-secondary" id="btn-clear-scan">
-                    Clear
-                  </button>
-                </div>
-              </form>
-
-              <!-- In-line Scanner Result Card -->
-              <div class="scanner-result-box hidden" id="scanner-result-box">
-                <div class="result-header">
-                  <div class="result-source-indicator" id="result-source-badge"></div>
-                  <button class="btn btn-xs btn-outline" id="btn-copy-result-fix">
-                    <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                      <rect x="7" y="7" width="10" height="10" rx="2"/>
-                      <path d="M4 13V4a1 1 0 0 1 1-1h9"/>
-                    </svg>
-                    Copy Fix
-                  </button>
-                </div>
-
-                <div class="result-content">
-                  <div class="result-item">
-                    <span class="result-label">Identified Error Signature</span>
-                    <div class="result-signature font-mono" id="res-signature"></div>
-                  </div>
-
-                  <div class="result-item">
-                    <span class="result-label">Root Cause Analysis</span>
-                    <div class="result-text" id="res-root-cause"></div>
-                  </div>
-
-                  <div class="result-item">
-                    <span class="result-label">Actionable Remediation</span>
-                    <div class="result-fix markdown-body" id="res-fix-steps"></div>
-                  </div>
-                </div>
-
-                <div class="result-footer">
-                  <button class="btn btn-sm btn-primary" id="btn-send-to-chat">
-                    <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                      <path d="M18 13a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                    Inspect in Diff Studio
-                  </button>
-                  <span class="result-db-info" id="res-db-status-info">Persisted to knowledge base.</span>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- TAB 2: MANUAL INCIDENT ENTRY -->
-            <div class="tab-pane" id="tab-manual-entry">
-              <form id="manual-entry-form" class="manual-form">
-                <div class="form-row-metadata">
-                  <div class="form-group flex-1">
-                    <label for="manual-domain-select">Domain Category <span class="required">*</span></label>
-                    <select id="manual-domain-select" class="form-input form-input-sm" required>
-                      <option value="1">Frontend</option>
-                      <option value="2">Backend</option>
-                      <option value="3">Database</option>
-                      <option value="4">Fullstack</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group flex-1">
-                    <label for="manual-tech-input">Tech Stack <span class="required">*</span></label>
-                    <input type="text" id="manual-tech-input" class="form-input form-input-sm" placeholder="e.g. Node.js, Django, PostgreSQL" required>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="manual-signature-input">Canonical Error Signature <span class="required">*</span></label>
-                  <input type="text" id="manual-signature-input" class="form-input form-input-sm font-mono" placeholder="Canonical exception headline or error message" required>
-                </div>
-
-                <div class="form-group">
-                  <label for="manual-cause-input">Root Cause Summary</label>
-                  <input type="text" id="manual-cause-input" class="form-input form-input-sm" placeholder="Brief technical explanation of why failure occurred">
-                </div>
-
-                <div class="form-group">
-                  <label for="manual-fix-textarea">Fix Steps &amp; Solution <span class="required">*</span></label>
-                  <textarea id="manual-fix-textarea" class="form-input font-mono" rows="4" placeholder="1. Specific code change&#10;2. Config update&#10;3. Prevention note" required></textarea>
-                </div>
-
-                <div class="form-group-checkbox">
-                  <label class="checkbox-container">
-                    <input type="checkbox" id="manual-verified-check">
-                    <span class="checkmark"></span>
-                    <span class="checkbox-label">Mark as verified solution</span>
-                  </label>
-                </div>
-
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary" id="btn-save-manual">
-                    <svg class="btn-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                      <path d="M15 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8l4 4v8a2 2 0 0 1-2 2z"/>
-                      <polyline points="14 17 14 10 6 10 6 17"/>
-                      <polyline points="6 3 6 7 12 7"/>
-                    </svg>
-                    Save Incident
-                  </button>
-                  <button type="reset" class="btn btn-secondary">
-                    Reset
-                  </button>
-                </div>
-              </form>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- COLUMN 2: 02 / ROOT CAUSE & DIFF PATCH (DIAGNOSTIC INSPECTOR) -->
-        <div class="workbench-card inspector-panel" id="panel-bot-chat">
-          <div class="card-header">
-            <div class="header-step-tag">
-              <span class="step-num font-mono">02</span>
-              <h2 class="card-title">ROOT CAUSE &amp; DIFF PATCH</h2>
-            </div>
-            <div class="inspector-header-controls">
-              <span class="inspector-status-badge">
-                <span class="pulse-dot"></span>
-                <span>Inspector Live</span>
-              </span>
-              <button class="btn btn-xs btn-outline" id="btn-clear-chat" title="Clear inspector conversation">
-                <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <polyline points="3 6 5 6 17 6"/>
-                  <path d="M15 6v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m2 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
-                </svg>
-                Clear
-              </button>
-            </div>
-          </div>
-
-          <!-- Active Incident Binding Context Bar -->
-          <div class="active-context-bar" id="active-context-bar">
-            <div class="context-info">
-              <span class="context-label">Bound Incident:</span>
-              <span class="context-tag font-mono" id="active-context-name">None bound (Select an incident or analyze a trace)</span>
-            </div>
-            <button class="btn-detach hidden" id="btn-detach-context" title="Detach active context">✕</button>
-          </div>
-
-          <!-- Quick Action Diagnostic Pills -->
-          <div class="action-pills-bar">
-            <button class="prompt-chip" data-prompt="Explain Root Cause in simple terms">
-              <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="9" r="6"/><line x1="13.5" y1="13.5" x2="18" y2="18"/></svg>
-              Root Cause
-            </button>
-            <button class="prompt-chip prompt-chip-accent" data-prompt="Generate patch.diff with verified fix">
-              <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="14 14 18 10 14 6"/><polyline points="6 6 2 10 6 14"/></svg>
-              Diff Patch
-            </button>
-            <button class="prompt-chip" data-prompt="Show 3-step prevention checklist to avoid this">
-              <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 18s7-3.5 7-9V4l-7-3-7 3v5c0 5.5 7 9 7 9z"/></svg>
-              Prevention
-            </button>
-            <button class="prompt-chip" data-prompt="Write a unit test to catch this regression">
-              <svg class="chip-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v4a4 4 0 0 1 4 0V2"/><path d="M6 14a4 4 0 0 0 8 0"/></svg>
-              Unit Test
-            </button>
-          </div>
-
-          <!-- Diagnostic Conversation & Code Diff Stream Area -->
-          <div class="chat-messages-container" id="chat-messages">
-            <div class="chat-message bot-message">
-              <div class="message-avatar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <rect x="4" y="4" width="16" height="14" rx="3"/>
-                  <line x1="8" y1="9" x2="8.01" y2="9"/>
-                  <line x1="16" y1="9" x2="16.01" y2="9"/>
-                  <path d="M9 13h6"/>
-                </svg>
-              </div>
-              <div class="message-content markdown-body">
-                <p><strong>TraceVault Diagnostic Inspector</strong> is initialized and standing by.</p>
-                <p>Click any <strong>Sample Preset</strong> or select an incident from the knowledge vault below to inspect its root cause, or click <strong>Diff Patch</strong> above to generate a unified git diff solution.</p>
-                
-                <!-- Sample initial preview diff block -->
-                <div class="code-diff-block">
-                  <div class="diff-header">
-                    <div class="diff-file-info">
-                      <span class="diff-icon">📄</span>
-                      <span class="diff-filename font-mono">sample_patch.diff</span>
-                      <span class="diff-badge">+1</span>
-                      <span class="diff-badge badge-del">-1</span>
-                    </div>
-                    <button type="button" class="btn-copy-patch" title="Copy patch">
-                      <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4 13V4a1 1 0 0 1 1-1h9"/></svg>
-                      Copy Patch
-                    </button>
-                  </div>
-                  <pre class="diff-body font-mono"><code><span class="diff-line diff-del">- const data = items.map(x => x.name);</span>
-<span class="diff-line diff-add">+ const data = (items || []).map(x => x?.name ?? '');</span></code></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Inspector Command Input Form -->
-          <div class="chat-footer">
-            <form id="chat-input-form" class="chat-form">
-              <input type="text" id="chat-user-input" class="chat-input font-mono" placeholder="Ask follow-up questions, request refactoring, or generate tests..." autocomplete="off">
-              <button type="submit" class="btn btn-primary btn-send" id="btn-send-chat" title="Send message (Enter)">
-                <svg class="send-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <line x1="18" y1="2" x2="9" y2="11"/>
-                  <polygon points="18 2 12 18 9 11 2 8 18 2"/>
-                </svg>
-              </button>
-            </form>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- SECTION: 03 / ERROR KNOWLEDGE VAULT (INTEGRATED DOMAIN & FILTER TABLE) -->
-      <section class="vault-table-section">
-        <div class="workbench-card panel-table">
-          
-          <!-- Unified Knowledge Vault Header (Integrated Domain Segmented Bar) -->
-          <div class="vault-panel-header">
-            <div class="vault-header-top-row">
-              <div class="header-step-tag">
-                <span class="step-num font-mono">03</span>
-                <h2 class="card-title">ERROR KNOWLEDGE VAULT</h2>
-                <span class="records-counter font-mono" id="records-counter-badge">0 records</span>
-              </div>
-
-              <!-- Integrated Domain Segmented Bar -->
-              <div class="integrated-domain-bar">
-                <span class="domain-bar-label">Domain:</span>
-                <div class="domain-pills-list" id="domain-pills-container">
-                  <!-- Dynamically rendered via app.js -->
-                </div>
+              <div class="form-group">
+                <label for="add-stack">Tech Stack *</label>
+                <input type="text" id="add-stack" name="tech_stack" required maxlength="100" placeholder="e.g., MySQL 8 / Node.js">
               </div>
             </div>
 
-            <!-- Table Filter Toolbar Row -->
-            <div class="filter-toolbar">
-              <!-- Search Filter -->
-              <div class="filter-control search-filter-box">
-                <svg class="filter-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <circle cx="9" cy="9" r="6"/>
-                  <line x1="13.5" y1="13.5" x2="18" y2="18"/>
-                </svg>
-                <input type="text" id="filter-search" class="form-input form-input-sm" placeholder="Filter signatures, stacks, causes...">
-              </div>
+            <div class="form-group">
+              <label for="add-cause">Root Cause *</label>
+              <textarea id="add-cause" name="root_cause" rows="2" required placeholder="Explain why this bug occurred..."></textarea>
+            </div>
 
-              <!-- Domain Select (Synchronized) -->
-              <div class="filter-control">
-                <select id="filter-domain" class="form-input form-input-sm">
-                  <option value="all">All Domains</option>
-                  <option value="1">Frontend</option>
-                  <option value="2">Backend</option>
-                  <option value="3">Database</option>
-                  <option value="4">Fullstack</option>
-                </select>
-              </div>
+            <div class="form-group">
+              <label for="add-fix">Fix Requirements / Solution *</label>
+              <textarea id="add-fix" name="fix_requirements" rows="2" required placeholder="Provide the verified fix or configuration..."></textarea>
+            </div>
 
-              <!-- Tech Stack Filter -->
-              <div class="filter-control">
-                <input type="text" id="filter-tech" class="form-input form-input-sm" placeholder="Tech stack...">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="add-hits">Times Hit *</label>
+                <input type="number" id="add-hits" name="times_hit" required min="1" step="1" value="1">
               </div>
-
-              <!-- Verified Status Filter -->
-              <div class="filter-control">
-                <select id="filter-verified" class="form-input form-input-sm">
-                  <option value="all">All Status</option>
-                  <option value="1">Verified Only</option>
+              <div class="form-group">
+                <label for="add-verified">Status *</label>
+                <select id="add-verified" name="is_verified">
+                  <option value="1" selected>Verified Fix</option>
                   <option value="0">Pending Review</option>
                 </select>
               </div>
-
-              <!-- Sort Filter -->
-              <div class="filter-control">
-                <select id="filter-sort" class="form-input form-input-sm">
-                  <option value="hits">Sort: Most Hits</option>
-                  <option value="updated">Sort: Recently Updated</option>
-                  <option value="id_desc">Sort: Newest First</option>
-                  <option value="id_asc">Sort: Oldest First</option>
-                </select>
-              </div>
-
-              <!-- Reset Button -->
-              <button class="btn btn-sm btn-secondary" id="btn-reset-filters" title="Reset all filters">
-                <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M1 4v5h5"/>
-                  <path d="M3.51 14.5a8 8 0 1 0 1.2-8.5L1 9"/>
-                </svg>
-                Reset
-              </button>
             </div>
-          </div>
 
-          <!-- Responsive Table Container -->
-          <div class="table-responsive">
-            <table class="vault-table" id="vault-table">
-              <thead>
-                <tr>
-                  <th style="width: 55px;">ID</th>
-                  <th style="width: 105px;">Domain</th>
-                  <th style="width: 115px;">Tech Stack</th>
-                  <th style="width: 310px;">Signature &amp; Root Cause</th>
-                  <th style="width: 320px;">Fix Requirements</th>
-                  <th style="width: 95px;">Status</th>
-                  <th style="width: 75px;" class="text-center">Hits</th>
-                  <th style="width: 190px;" class="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="vault-table-body">
-                <!-- Dynamically populated via app.js -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Empty State -->
-          <div class="empty-state hidden" id="table-empty-state">
-            <div class="empty-icon">
-              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M6 10h14l4 4h18v24H6V10z"/>
-                <line x1="16" y1="24" x2="32" y2="24"/>
-                <line x1="24" y1="16" x2="24" y2="32"/>
-              </svg>
-            </div>
-            <h3>Knowledge vault is clean</h3>
-            <p>Paste an exception in <strong>01 / INGEST</strong> above or load a sample preset to start indexing debugging intelligence.</p>
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-
-    <!-- FOOTER WITH DEMO SANDBOX TRIGGER -->
-    <footer class="app-footer">
-      <div class="footer-left">
-        <span>TraceVault v2.0 &bull; Developer Suite</span>
-      </div>
-      <div class="footer-center">
-        <span>Dual-Storage Engine: Local Disk Vault + Live MySQL 8+ Bridge</span>
-      </div>
-      <div class="footer-right">
-        <!-- Interactive Live Demo Trigger -->
-        <button class="footer-lab-trigger" id="open-lab-modal-btn" title="Open Interactive Live Demo (Alt+L)">
-          <svg class="footer-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-            <polygon points="10 2 12.5 7.5 18 8.5 14 12.5 15 18 10 15.5 5 18 6 12.5 2 8.5 7.5 7.5 10 2"/>
-          </svg>
-          Live Demo (Alt+L)
-        </button>
-      </div>
-    </footer>
-
-  </div>
-
-  <!-- ===================================================================== -->
-  <!-- MODALS -->
-  <!-- ===================================================================== -->
-
-  <!-- 1. FULLSCREEN INTERACTIVE LIVE DEMO WORKSPACE MODAL (Alt + L) -->
-  <div class="modal-overlay hidden" id="modal-lab-sandbox">
-    <div class="modal-dialog modal-dialog-lab">
-      
-      <div class="modal-header">
-        <div class="brand-main">
-          <svg class="modal-brand-svg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8">
-            <path d="M12 2L20 6.5V17.5L12 22L4 17.5V6.5L12 2Z"/>
-            <path d="M12 2v20"/>
-            <path d="M4 6.5L12 11L20 6.5"/>
-          </svg>
-          <span class="modal-title">Live Demo Sandbox</span>
-          <span class="badge badge-accent">Interactive Demo</span>
-        </div>
-        <div class="modal-header-actions">
-          <button class="btn btn-sm btn-outline" id="btn-lab-reset" title="Reset demo records to default">
-            <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M1 4v5h5"/><path d="M3.51 14.5a8 8 0 1 0 1.2-8.5L1 9"/>
-            </svg>
-            Reset Demo Data
-          </button>
-          <button class="btn-close-modal" id="btn-close-lab-modal">✕</button>
-        </div>
-      </div>
-
-      <div class="modal-body">
-        
-        <!-- Live Demo Banner -->
-        <div class="lab-banner-info">
-          <div class="lab-banner-text">
-            Explore 12 pre-loaded production error logs, test search and filtering, and try full CRUD mutations without altering your personal knowledge base.
-          </div>
-        </div>
-
-        <!-- Lab Aggregate Summary Horizontal Strip -->
-        <div class="telemetry-bar lab-telemetry-bar" style="margin-bottom: 16px;">
-          <div class="telemetry-cell">
-            <span class="telemetry-label">DEMO ISSUES</span>
-            <span class="telemetry-val font-mono" id="lab-kpi-total">12</span>
-            <span class="sql-pill">SEED</span>
-          </div>
-          <div class="telemetry-cell">
-            <span class="telemetry-label">TOTAL HITS</span>
-            <span class="telemetry-val font-mono highlight-emerald" id="lab-kpi-hits">87</span>
-            <span class="sql-pill pill-emerald">SUM</span>
-          </div>
-          <div class="telemetry-cell">
-            <span class="telemetry-label">AVG FREQUENCY</span>
-            <span class="telemetry-val font-mono" id="lab-kpi-avg">7.3</span>
-            <span class="sql-pill">AVG</span>
-          </div>
-          <div class="telemetry-cell">
-            <span class="telemetry-label">SPREAD</span>
-            <div class="telemetry-val font-mono telemetry-spread-box">
-              <span><small>MAX</small> <strong id="lab-kpi-max">15</strong></span>
-              <span class="split-divider">/</span>
-              <span><small>MIN</small> <strong id="lab-kpi-min">2</strong></span>
-            </div>
-            <span class="sql-pill">RANGE</span>
-          </div>
-          <div class="telemetry-cell telemetry-cell-top">
-            <span class="telemetry-label">TOP INCIDENT</span>
-            <div class="telemetry-top-content">
-              <span class="top-bug-title font-mono" id="lab-kpi-top-name">Loading...</span>
-              <span class="top-bug-stack" id="lab-kpi-top-stack">-</span>
-              <span class="top-bug-hits font-mono highlight-emerald" id="lab-kpi-top-hits">0 hits</span>
-            </div>
-            <span class="sql-pill pill-accent">PEAK</span>
-          </div>
-        </div>
-
-        <!-- Lab Quick Add Form -->
-        <div class="lab-quick-add-drawer">
-          <div class="drawer-title">
-            <span>Add Demo Record</span>
-          </div>
-          <form id="lab-quick-add-form" class="form-row-metadata" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            <div class="form-group" style="margin-bottom: 0;">
-              <select id="lab-add-domain" class="form-input form-input-sm" required>
-                <option value="1">Frontend</option>
-                <option value="2">Backend</option>
-                <option value="3">Database</option>
-                <option value="4">Fullstack</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="lab-add-tech" class="form-input form-input-sm" placeholder="Tech Stack (e.g. Redis, Vue, GraphQL)" required>
-            </div>
-            <div class="form-group" style="margin-bottom: 0; grid-column: 1 / -1;">
-              <input type="text" id="lab-add-signature" class="form-input form-input-sm font-mono" placeholder="Canonical Error Signature (e.g. Redis connection timeout)" required>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="lab-add-cause" class="form-input form-input-sm" placeholder="Root Cause Summary">
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="lab-add-fix" class="form-input form-input-sm font-mono" placeholder="Fix Steps" required>
-            </div>
-            <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
-              <button type="submit" class="btn btn-sm btn-primary">
-                Add Record
-              </button>
-            </div>
+            <button type="submit" id="add-submit-btn" class="btn-primary">Save Bug Record</button>
           </form>
-        </div>
+        </section>
 
-        <!-- Lab Filter Bar -->
-        <div class="filter-toolbar" style="margin-bottom: 12px;">
-          <div class="filter-control search-filter-box">
-            <input type="text" id="lab-filter-search" class="form-input form-input-sm" placeholder="Search demo records...">
+        <!-- Manage Parent Domains (1:N Parent Table) -->
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Manage Domains (Parent Table)</h2>
+            <span id="domain-count-pill" class="sql-tag">4 total</span>
           </div>
-          <div class="filter-control">
-            <select id="lab-filter-domain" class="form-input form-input-sm">
+
+          <form id="add-domain-form" class="domain-inline-form" novalidate>
+            <input type="text" id="new-domain-name" name="domain_name" required maxlength="50" placeholder="New domain (e.g., DevOps)">
+            <button type="submit" class="btn-secondary">Add</button>
+          </form>
+
+          <ul id="domain-list" class="domain-list"></ul>
+        </section>
+      </aside>
+
+      <!-- Right Column: Search, Filter & Saved Bug Records Table -->
+      <section class="panel table-panel">
+        <form id="filter-form" class="filter-bar">
+          <div class="form-group search-group">
+            <label for="search-input">Search Error Inventory (SQL WHERE &amp; LIKE)</label>
+            <input type="search" id="search-input" name="search" placeholder="Search by ID, error signature, tech stack, or root cause... (Ctrl+K)" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="domain-filter">Filter Domain (FK)</label>
+            <select id="domain-filter" name="domain_id">
               <option value="all">All Domains</option>
-              <option value="1">Frontend</option>
-              <option value="2">Backend</option>
-              <option value="3">Database</option>
-              <option value="4">Fullstack</option>
             </select>
           </div>
-          <div class="filter-control">
-            <select id="lab-filter-sort" class="form-input form-input-sm">
-              <option value="hits">Sort: Most Hits</option>
-              <option value="updated">Sort: Recently Updated</option>
-              <option value="id_desc">Sort: Newest ID</option>
-              <option value="id_asc">Sort: Oldest ID</option>
-            </select>
-          </div>
-          <button class="btn btn-sm btn-secondary" id="btn-lab-reset-filters">
-            Reset
-          </button>
+
+          <button type="reset" id="clear-filter-btn" class="btn-secondary">Clear</button>
+        </form>
+
+        <div class="table-header-bar">
+          <span id="records-caption" class="table-caption-text">Saved Error Records (0 items)</span>
+          <span class="sql-tag">SELECT ... INNER JOIN domains</span>
         </div>
 
-        <!-- Lab Table -->
-        <div class="table-responsive" style="max-height: 380px;">
-          <table class="vault-table" id="lab-table">
+        <div class="table-scroll">
+          <table>
             <thead>
               <tr>
-                <th style="width: 45px;">ID</th>
-                <th style="width: 95px;">Domain</th>
-                <th style="width: 100px;">Tech Stack</th>
-                <th style="width: 250px;">Signature &amp; Root Cause</th>
-                <th style="width: 260px;">Fix Requirements</th>
-                <th style="width: 85px;">Source</th>
-                <th style="width: 70px;" class="text-center">Hits</th>
-                <th style="width: 180px;" class="text-right">Actions</th>
+                <th class="col-id">ID</th>
+                <th>Error Signature &amp; Root Cause</th>
+                <th>Domain</th>
+                <th>Tech Stack</th>
+                <th>Fix Requirements</th>
+                <th class="col-center">Hits</th>
+                <th class="col-center">Status</th>
+                <th class="col-center">Actions</th>
               </tr>
             </thead>
-            <tbody id="lab-table-body">
-              <!-- Dynamically populated via app.js -->
+            <tbody id="errors-tbody">
+              <tr>
+                <td colspan="8" class="empty-cell">Loading bug inventory records...</td>
+              </tr>
             </tbody>
           </table>
         </div>
-
-      </div>
-
-      <div class="modal-footer">
-        <span style="font-size: 0.75rem; color: var(--text-tertiary); margin-right: auto;">
-          Press <kbd class="shortcut-pill">Esc</kbd> or <kbd class="shortcut-pill">Alt+L</kbd> to exit.
-        </span>
-        <button type="button" class="btn btn-secondary" id="btn-close-lab-footer">Close Demo</button>
-      </div>
-
-    </div>
+      </section>
+    </main>
   </div>
 
-  <!-- 2. EDIT RECORD MODAL -->
-  <div class="modal-overlay hidden" id="modal-edit-record">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <div class="brand-main">
-          <svg class="modal-brand-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M11 4H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
-            <path d="M14.5 2.5a2.121 2.121 0 0 1 3 3L10 13l-4 1 1-4 7.5-7.5z"/>
-          </svg>
-          <h3 class="modal-title">Edit Incident Record</h3>
-        </div>
-        <button class="btn-close-modal" id="btn-close-edit-modal">✕</button>
+  <!-- Update Error Record Modal Dialog -->
+  <dialog id="edit-dialog" class="modal-dialog">
+    <div class="modal-header">
+      <h2 id="edit-dialog-title">Update Error Record</h2>
+      <span class="sql-tag">UPDATE ... WHERE</span>
+    </div>
+    <form id="edit-error-form" novalidate>
+      <input type="hidden" id="edit-id" name="error_id">
+
+      <div class="form-group">
+        <label for="edit-signature">Error Signature / Message *</label>
+        <input type="text" id="edit-signature" name="error_signature" required maxlength="255">
       </div>
-      <form id="edit-record-form" class="modal-form">
-        <input type="hidden" id="edit-error-id">
-        <input type="hidden" id="edit-error-mode" value="real">
 
-        <div class="form-row-metadata">
-          <div class="form-group flex-1">
-            <label for="edit-domain-select">Domain Category <span class="required">*</span></label>
-            <select id="edit-domain-select" class="form-input form-input-sm" required>
-              <option value="1">Frontend</option>
-              <option value="2">Backend</option>
-              <option value="3">Database</option>
-              <option value="4">Fullstack</option>
-            </select>
-          </div>
-
-          <div class="form-group flex-1">
-            <label for="edit-tech-input">Tech Stack <span class="required">*</span></label>
-            <input type="text" id="edit-tech-input" class="form-input form-input-sm" required>
-          </div>
-        </div>
-
+      <div class="form-row-2">
         <div class="form-group">
-          <label for="edit-signature-input">Canonical Error Signature <span class="required">*</span></label>
-          <input type="text" id="edit-signature-input" class="form-input form-input-sm font-mono" required>
+          <label for="edit-domain">Domain Category (FK) *</label>
+          <select id="edit-domain" name="domain_id" required></select>
         </div>
-
         <div class="form-group">
-          <label for="edit-cause-input">Root Cause Analysis</label>
-          <input type="text" id="edit-cause-input" class="form-input form-input-sm">
+          <label for="edit-stack">Tech Stack *</label>
+          <input type="text" id="edit-stack" name="tech_stack" required maxlength="100">
         </div>
+      </div>
 
+      <div class="form-group">
+        <label for="edit-cause">Root Cause *</label>
+        <textarea id="edit-cause" name="root_cause" rows="2" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-fix">Fix Requirements / Solution *</label>
+        <textarea id="edit-fix" name="fix_requirements" rows="2" required></textarea>
+      </div>
+
+      <div class="form-row-2">
         <div class="form-group">
-          <label for="edit-fix-textarea">Fix Requirements &amp; Steps <span class="required">*</span></label>
-          <textarea id="edit-fix-textarea" class="form-input font-mono" rows="5" required></textarea>
+          <label for="edit-times-hit">Times Hit *</label>
+          <input type="number" id="edit-times-hit" name="times_hit" required min="1" step="1">
         </div>
-
-        <div class="form-group-checkbox">
-          <label class="checkbox-container">
-            <input type="checkbox" id="edit-verified-check">
-            <span class="checkmark"></span>
-            <span class="checkbox-label">Mark as verified solution</span>
-          </label>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" id="btn-cancel-edit">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="btn-save-edit">Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 3. DELETE CONFIRMATION MODAL -->
-  <div class="modal-overlay hidden" id="modal-delete-confirm">
-    <div class="modal-dialog modal-dialog-sm">
-      <div class="modal-header">
-        <div class="brand-main">
-          <svg class="modal-brand-svg danger-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M10 2L2 17h16L10 2z"/>
-            <line x1="10" y1="8" x2="10" y2="12"/>
-            <line x1="10" y1="14" x2="10.01" y2="14"/>
-          </svg>
-          <h3 class="modal-title modal-danger-title">Delete Incident Record</h3>
-        </div>
-        <button class="btn-close-modal" id="btn-close-delete-modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="color: var(--text-secondary); font-size: 0.85rem;">Are you sure you want to permanently delete this incident record?</p>
-        <div class="delete-preview-box">
-          <div class="preview-sig font-mono" id="delete-preview-signature">Cannot read properties of undefined</div>
-          <div class="preview-id font-mono" id="delete-preview-id">Record ID: #1</div>
-        </div>
-        <p class="warning-text">This will permanently remove the record from the knowledge base. This action cannot be undone.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-cancel-delete">Cancel</button>
-        <button type="button" class="btn btn-danger" id="btn-confirm-delete">Delete Record</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. UNIVERSAL AI KEY CONFIGURATION MODAL -->
-  <div class="modal-overlay hidden" id="modal-byok-config">
-    <div class="modal-dialog modal-dialog-sm">
-      <div class="modal-header">
-        <div class="brand-main">
-          <svg class="modal-brand-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M17.5 2.5l-2 2m-1.5 1.5l-2 2-2-2-1.5 1.5 2 2-1 1-1.5-1.5-2 2 1.5 1.5-3.5 3.5a5 5 0 1 1-2.5-2.5l3.5-3.5 1.5 1.5 2-2-1.5-1.5 1-1 2 2 1.5-1.5-2-2 1.5-1.5 2 2z"/>
-          </svg>
-          <h3 class="modal-title">API Key Configuration</h3>
-        </div>
-        <button class="btn-close-modal" id="btn-close-byok-modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="byok-notice">
-          <strong>Client-Only Privacy:</strong> Your API key is stored securely in your browser's <code>localStorage</code> and transmitted directly to the model provider via HTTPS TLS. It never touches intermediary servers.
-        </div>
-
         <div class="form-group">
-          <label for="byok-key-input">Universal API Key</label>
-          <div class="password-input-wrapper">
-            <input type="password" id="byok-key-input" class="form-input form-input-sm font-mono" placeholder="Paste Gemini, Groq, OpenRouter, or OpenAI key...">
-            <button type="button" class="btn-toggle-eye" id="btn-toggle-key-visibility" title="Show/Hide Key">
-              <svg class="eye-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M1 10s4-7 9-7 9 7 9 7-4 7-9 7-9-7-9-7z"/>
-                <circle cx="10" cy="10" r="3"/>
-              </svg>
-            </button>
-          </div>
-          <div id="byok-detected-badge" class="detected-badge hidden"></div>
-          <small class="form-hint">Supports Google Gemini (AIza...), Groq (gsk_...), OpenRouter (sk-or-...), and OpenAI (sk-...). Provider is detected automatically.</small>
+          <label for="edit-is-verified">Verification Status *</label>
+          <select id="edit-is-verified" name="is_verified">
+            <option value="1">Verified Fix</option>
+            <option value="0">Pending Review</option>
+          </select>
         </div>
+      </div>
 
-        <div class="test-connection-box">
-          <button type="button" class="btn btn-sm btn-secondary" id="btn-test-ai-key">
-            <svg class="btn-micro-svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
-              <polygon points="11 2 3 11 10 11 9 18 17 9 10 9 11 2"/>
-            </svg>
-            Test Connection
-          </button>
-          <span class="test-result-status" id="test-key-result"></span>
-        </div>
+      <div class="modal-actions">
+        <button type="button" id="edit-cancel-btn" class="btn-secondary">Cancel</button>
+        <button type="submit" id="edit-submit-btn" class="btn-primary">Update Changes</button>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-clear-byok">Disconnect</button>
-        <button type="button" class="btn btn-primary" id="btn-save-byok">Save Key</button>
-      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete Confirmation Modal Dialog -->
+  <dialog id="delete-dialog" class="modal-dialog modal-sm">
+    <div class="modal-header">
+      <h2 id="delete-dialog-title">Confirm Record Deletion</h2>
+      <span class="sql-tag tag-danger">DELETE WHERE</span>
     </div>
-  </div>
-
-  <!-- 5. MYSQL 3306 LIVE CONNECTION INSPECTOR MODAL -->
-  <div class="modal-overlay hidden" id="modal-mysql-sync">
-    <div class="modal-dialog" style="max-width: 640px;">
-      <div class="modal-header">
-        <div class="brand-main">
-          <span class="mysql-dot" style="width: 8px; height: 8px; background-color: var(--accent-emerald);"></span>
-          <h3 class="modal-title" style="margin-left: 6px;">Database Connection Inspector</h3>
-        </div>
-        <div class="modal-header-actions">
-          <span class="badge badge-primary" id="modal-db-status-badge">MySQL 3306 Live</span>
-          <button class="btn-close-modal" id="btn-close-mysql-modal">✕</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <!-- Live Connection Spec Grid -->
-        <div class="db-inspector-grid">
-          <div class="db-inspector-card">
-            <div class="db-inspector-label">Active Host &amp; Port</div>
-            <div class="db-inspector-value font-mono" id="inspect-host">127.0.0.1:3306</div>
-          </div>
-          <div class="db-inspector-card">
-            <div class="db-inspector-label">Database Schema</div>
-            <div class="db-inspector-value font-mono highlight-emerald" id="inspect-db">tracevault</div>
-          </div>
-          <div class="db-inspector-card">
-            <div class="db-inspector-label">Database Driver</div>
-            <div class="db-inspector-value font-mono" id="inspect-driver">mysql2/promise</div>
-          </div>
-          <div class="db-inspector-card">
-            <div class="db-inspector-label">Normalization</div>
-            <div class="db-inspector-value font-mono highlight-emerald" id="inspect-norm">3NF Relational Model</div>
-          </div>
-        </div>
-
-        <!-- Relational Schema Architecture Objects -->
-        <div class="db-objects-list">
-          <div class="db-object-row">
-            <div>
-              <strong>Parent Table:</strong> <code>domains</code>
-              <span class="text-muted" style="font-size: 0.75rem; margin-left: 6px;">Primary Key (domain_id)</span>
-            </div>
-            <span class="db-object-tag badge-primary">PK PARENT</span>
-          </div>
-          <div class="db-object-row">
-            <div>
-              <strong>Child Table:</strong> <code>error_logs</code>
-              <span class="text-muted" style="font-size: 0.75rem; margin-left: 6px;">Foreign Key (domain_id &rarr; domains.domain_id)</span>
-            </div>
-            <span class="db-object-tag badge-accent">FK CHILD</span>
-          </div>
-          <div class="db-object-row">
-            <div>
-              <strong>Summary View:</strong> <code>v_domain_summary</code>
-              <span class="text-muted" style="font-size: 0.75rem; margin-left: 6px;">Aggregates error counts &amp; hit stats</span>
-            </div>
-            <span class="db-object-tag badge-subtle">VIEW</span>
-          </div>
-          <div class="db-object-row">
-            <div>
-              <strong>Mutation Procedure:</strong> <code>sp_increment_error_hit</code>
-              <span class="text-muted" style="font-size: 0.75rem; margin-left: 6px;">Atomic bug hit counter</span>
-            </div>
-            <span class="db-object-tag badge-subtle">PROCEDURE</span>
-          </div>
-          <div class="db-object-row">
-            <div>
-              <strong>Database Trigger:</strong> <code>trg_error_logs_before_update</code>
-              <span class="text-muted" style="font-size: 0.75rem; margin-left: 6px;">Enforces timestamp synchronization</span>
-            </div>
-            <span class="db-object-tag badge-subtle">TRIGGER</span>
-          </div>
-        </div>
-
-        <!-- Real-Time SQL Query & Ping Verification Panel -->
-        <div class="ping-panel-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div style="font-weight: 600; font-size: 0.8rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-              <span>Live SQL Execution Test</span>
-              <span class="badge badge-primary font-mono" id="sql-ping-latency">0 ms</span>
-            </div>
-            <button type="button" class="btn btn-sm btn-primary" id="btn-run-sql-ping">
-              Run SQL Ping
-            </button>
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-tertiary); margin-bottom: 4px;">SQL Query:</div>
-          <div class="font-mono" style="background: var(--bg-code); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--accent-cyan); word-break: break-all;">
-            SELECT 1 AS ping, DATABASE() AS active_db, VERSION() AS mysql_version, NOW() AS server_time, (SELECT COUNT(*) FROM error_logs) AS total_vault_records;
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-tertiary); margin-top: 8px; margin-bottom: 4px;">Response:</div>
-          <pre id="sql-ping-result" class="code-box font-mono" style="margin: 0; padding: 10px; border-radius: 6px; background: var(--bg-code); border: 1px solid var(--border-subtle); color: #34d399; font-size: 0.75rem; max-height: 120px; overflow: auto;">Ready to verify. Click "Run SQL Ping".</pre>
-        </div>
-      </div>
-      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.75rem; color: var(--text-tertiary);">
-          Direct connection to MySQL port 3306
-        </span>
-        <button type="button" class="btn btn-secondary" id="btn-close-mysql-footer">Close</button>
-      </div>
+    <p id="delete-dialog-message" class="delete-msg">Are you sure you want to permanently delete this bug record from the database?</p>
+    <div class="modal-actions">
+      <button type="button" id="delete-cancel-btn" class="btn-secondary">Cancel</button>
+      <button type="button" id="delete-confirm-btn" class="btn-danger">Delete Permanently</button>
     </div>
-  </div>
+  </dialog>
 
-  <script src="app.js?v=human_v2"></script>
+  <script src="./app.js?v=clean_dbms_v1" defer></script>
 </body>
 </html>

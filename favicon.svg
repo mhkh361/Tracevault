@@ -73,7 +73,7 @@
     <path d="M194 220 L256 256 L256 328 L194 292 Z" fill="url(#coreGradLeft)" />
     <!-- Core Right -->
     <path d="M256 256 L318 220 L318 292 L256 328 Z" fill="url(#coreGradRight)" />
-    <!-- Core Seams & Highlights -->
+    <!-- Core Seams and Highlights -->
     <path d="M256 184 L318 220 L256 256 L194 220 Z" stroke="rgba(255, 255, 255, 0.9)" stroke-width="2" />
     <path d="M256 256 L256 328" stroke="rgba(255, 255, 255, 0.75)" stroke-width="2" />
     <path d="M194 220 L256 328 L318 220" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1.5" />
