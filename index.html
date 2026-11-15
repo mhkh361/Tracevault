@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=human_v3">
+  <link rel="stylesheet" href="./style.css?v=human_v5">
 </head>
 <body>
   <div class="layout-container">
@@ -100,64 +100,80 @@
     <!-- =================================================================== -->
     <!-- VIEW 2 (HIDDEN BY DEFAULT, TOGGLED VIA Alt+L): LIVE CODE BUG FIXER  -->
     <!-- =================================================================== -->
-    <section id="live-fixer-workspace" class="fixer-workbench" hidden>
-      <div class="workbench-header">
-        <div>
-          <h2 class="section-heading">Live Code &amp; Stack-Trace Diagnostic Workbench</h2>
-          <p class="section-desc">Paste broken source code or a terminal exception below to diagnose the root cause, generate a verified fix, and commit it directly to the MySQL inventory table.</p>
-        </div>
-        <div class="sample-bar">
-          <span class="sample-label">Load Broken Code Sample:</span>
-          <button type="button" class="chip-btn" data-preset="cors">1. Express CORS Block</button>
-          <button type="button" class="chip-btn" data-preset="react">2. React Infinite Render</button>
-          <button type="button" class="chip-btn" data-preset="mysql">3. MySQL Foreign Key Fail</button>
-          <button type="button" class="chip-btn" data-preset="async">4. Express Headers Sent</button>
-        </div>
-      </div>
-
-      <div class="fixer-split">
-        <!-- Left Pane: Broken Code & Exception Input -->
-        <div class="editor-card">
-          <div class="card-bar">
-            <span class="card-bar-title">1. Broken Code / Exception Stack Trace</span>
-            <div class="inline-selects">
-              <select id="fixer-domain" aria-label="Domain Category"></select>
-              <input type="text" id="fixer-stack" placeholder="Tech stack (e.g., Node.js / Express)">
+        <!-- =================================================================== -->
+    <!-- LARGE POPUP MODAL (TOGGLED VIA Alt+L): LIVE CODE BUG FIXER          -->
+    <!-- =================================================================== -->
+    <div id="live-fixer-workspace" class="fixer-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="fixer-modal-title" hidden>
+      <div class="fixer-modal-window">
+        <div class="workbench-header">
+          <div class="workbench-title-group">
+            <div class="workbench-badge-row">
+              <span class="live-pulse-dot"></span>
+              <h2 id="fixer-modal-title" class="section-heading">Live Code &amp; Stack-Trace Diagnostic Workbench</h2>
+              <code class="metric-fn">Shortcut: Alt + L</code>
             </div>
+            <p class="section-desc">Paste broken source code or a terminal exception below to diagnose the root cause, generate a verified multi-line patch, and commit it directly to the MySQL inventory table.</p>
           </div>
-          <textarea id="fixer-code-input" class="code-textarea" rows="10" placeholder="// Paste broken code or error stack trace here..."></textarea>
-          <div class="card-footer">
-            <button type="button" id="run-diagnosis-btn" class="btn-primary">Diagnose Code &amp; Generate Fix</button>
+
+          <div class="workbench-header-actions">
+            <div class="sample-bar">
+              <span class="sample-label">Load Sample:</span>
+              <button type="button" class="chip-btn" data-preset="cors">1. Express CORS Block</button>
+              <button type="button" class="chip-btn" data-preset="react">2. React Infinite Render</button>
+              <button type="button" class="chip-btn" data-preset="mysql">3. MySQL Foreign Key Fail</button>
+              <button type="button" class="chip-btn" data-preset="async">4. Express Headers Sent</button>
+            </div>
+            <button type="button" id="close-fixer-modal-btn" class="btn-close-popup" title="Close Popup (Esc or Alt+L)">
+              ✕ Close <kbd>Esc</kbd>
+            </button>
           </div>
         </div>
 
-        <!-- Right Pane: Live Diagnosis & Direct MySQL Commit -->
-        <div class="editor-card">
-          <div class="card-bar">
-            <span class="card-bar-title">2. Diagnostic Output &amp; Database Commit</span>
-            <code class="metric-fn">INSERT INTO error_logs</code>
-          </div>
-          <div class="diagnosis-body">
-            <div class="field-block">
-              <label for="fixer-out-sig">Detected Error Signature *</label>
-              <input type="text" id="fixer-out-sig" placeholder="Error signature will appear here...">
+        <div class="fixer-split">
+          <!-- Left Pane: Large Broken Code & Exception Editor -->
+          <div class="editor-card">
+            <div class="card-bar">
+              <span class="card-bar-title">1. Broken Code / Exception Stack Trace</span>
+              <div class="inline-selects">
+                <select id="fixer-domain" aria-label="Domain Category"></select>
+                <input type="text" id="fixer-stack" spellcheck="false" placeholder="Tech stack (e.g., Node.js / MySQL)">
+              </div>
             </div>
-            <div class="field-block">
-              <label for="fixer-out-cause">Diagnosed Root Cause *</label>
-              <textarea id="fixer-out-cause" rows="2" placeholder="Root cause analysis..."></textarea>
-            </div>
-            <div class="field-block">
-              <label for="fixer-out-fix">Patched Code / Fix Requirements *</label>
-              <textarea id="fixer-out-fix" class="mono-textarea" rows="4" placeholder="Patched solution code..."></textarea>
+            <textarea id="fixer-code-input" class="code-textarea" rows="15" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="// Paste broken source code or error stack trace here..."></textarea>
+            <div class="card-footer">
+              <span class="footer-note">Auto-detects Domain, Tech Stack, Root Cause &amp; Multi-Line Patch</span>
+              <button type="button" id="run-diagnosis-btn" class="btn-primary btn-lg">Diagnose Code &amp; Generate Fix</button>
             </div>
           </div>
-          <div class="card-footer split-footer">
-            <span class="footer-note">Saves directly to MySQL &amp; switches to Inventory Table</span>
-            <button type="button" id="commit-diagnosis-btn" class="btn-primary">Commit Fix to MySQL Inventory</button>
+
+          <!-- Right Pane: Large Live Diagnosis & Direct MySQL Commit -->
+          <div class="editor-card">
+            <div class="card-bar">
+              <span class="card-bar-title">2. Diagnostic Output &amp; Database Commit</span>
+              <code class="metric-fn">INSERT INTO error_logs</code>
+            </div>
+            <div class="diagnosis-body">
+              <div class="field-block">
+                <label for="fixer-out-sig">Detected Error Signature *</label>
+                <input type="text" id="fixer-out-sig" spellcheck="false" autocorrect="off" placeholder="Error signature will appear here...">
+              </div>
+              <div class="field-block">
+                <label for="fixer-out-cause">Diagnosed Root Cause *</label>
+                <textarea id="fixer-out-cause" rows="3" spellcheck="false" placeholder="Detailed root cause analysis..."></textarea>
+              </div>
+              <div class="field-block">
+                <label for="fixer-out-fix">Patched Code / Fix Requirements *</label>
+                <textarea id="fixer-out-fix" class="mono-textarea patched-code-box" rows="9" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="Complete patched solution code will appear here..."></textarea>
+              </div>
+            </div>
+            <div class="card-footer split-footer">
+              <span class="footer-note">Saves directly to MySQL &amp; updates Inventory Table</span>
+              <button type="button" id="commit-diagnosis-btn" class="btn-primary btn-lg">Commit Fix to MySQL Inventory</button>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- =================================================================== -->
     <!-- VIEW 1 (DEFAULT ON LOAD): DBMS LAB INVENTORY & CRUD WORKSPACE       -->
@@ -174,7 +190,7 @@
           <form id="add-error-form" novalidate>
             <div class="field-block">
               <label for="add-signature">Error Signature *</label>
-              <input type="text" id="add-signature" name="error_signature" required maxlength="255" placeholder="e.g., ER_NO_REFERENCED_ROW_2: Foreign key fail">
+              <input type="text" id="add-signature" name="error_signature" required maxlength="255" spellcheck="false" placeholder="e.g., ER_NO_REFERENCED_ROW_2: Foreign key fail">
             </div>
 
             <div class="field-row-2">
@@ -184,7 +200,7 @@
               </div>
               <div class="field-block">
                 <label for="add-stack">Tech Stack *</label>
-                <input type="text" id="add-stack" name="tech_stack" required maxlength="100" placeholder="e.g., MySQL / Node.js">
+                <input type="text" id="add-stack" name="tech_stack" required maxlength="100" spellcheck="false" placeholder="e.g., MySQL / Node.js">
               </div>
             </div>
 
@@ -195,7 +211,7 @@
 
             <div class="field-block">
               <label for="add-fix">Fix Requirements / Solution *</label>
-              <textarea id="add-fix" name="fix_requirements" rows="2" required placeholder="How to resolve and prevent it..."></textarea>
+              <textarea id="add-fix" name="fix_requirements" rows="2" required spellcheck="false" placeholder="How to resolve and prevent it..."></textarea>
             </div>
 
             <div class="field-row-2">
@@ -293,7 +309,7 @@
 
       <div class="field-block">
         <label for="edit-signature">Error Signature *</label>
-        <input type="text" id="edit-signature" name="error_signature" required maxlength="255">
+        <input type="text" id="edit-signature" name="error_signature" required maxlength="255" spellcheck="false">
       </div>
 
       <div class="field-row-2">
@@ -303,7 +319,7 @@
         </div>
         <div class="field-block">
           <label for="edit-stack">Tech Stack *</label>
-          <input type="text" id="edit-stack" name="tech_stack" required maxlength="100">
+          <input type="text" id="edit-stack" name="tech_stack" required maxlength="100" spellcheck="false">
         </div>
       </div>
 
@@ -314,7 +330,7 @@
 
       <div class="field-block">
         <label for="edit-fix">Fix Requirements *</label>
-        <textarea id="edit-fix" name="fix_requirements" rows="2" required></textarea>
+        <textarea id="edit-fix" name="fix_requirements" rows="2" required spellcheck="false"></textarea>
       </div>
 
       <div class="field-row-2">
@@ -351,6 +367,6 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=human_v3" defer></script>
+  <script src="./app.js?v=human_v5" defer></script>
 </body>
 </html>
