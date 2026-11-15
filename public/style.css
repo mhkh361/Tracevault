@@ -437,8 +437,11 @@ button {
   vertical-align: top;
 }
 
-.inventory-table td:nth-child(2) { max-width: 240px; }
-.inventory-table td:nth-child(5) { max-width: 210px; }
+.inventory-table td:nth-child(2) { max-width: 300px; }
+.inventory-table td:nth-child(5) { max-width: 260px; overflow-wrap: break-word; }
+.row-sig, .row-cause { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.inventory-table td:nth-child(2):hover .row-sig,
+.inventory-table td:nth-child(2):hover .row-cause { white-space: normal; overflow: visible; }
 
 .w-id { width: 48px; }
 .t-center { text-align: center; }

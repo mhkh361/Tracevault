@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const mysql = require('mysql2/promise');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -62,8 +63,9 @@ async function initDatabasePool() {
     pool = mysql.createPool(dbConfig);
     console.log('[MySQL 3306] Connection pool initialized successfully.');
   } catch (err) {
-    console.error('[MySQL Init Warning]:', err.message);
-    pool = mysql.createPool(dbConfig);
+    console.error('[MySQL Init Fatal]:', err.message);
+    console.error('Database schema initialization failed. Please run: node setup-mysql.js');
+    process.exit(1); // Stop server if DB schema is invalid
   }
 }
 
@@ -76,6 +78,14 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { success: false, error: 'Too many requests, please try again later.' }
+});
+app.use('/api/', apiLimiter);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 1. Health Check Route

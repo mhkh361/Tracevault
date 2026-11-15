@@ -152,6 +152,27 @@ function showBanner(msg, tone = 'success') {
 }
 
 // ===================================================================
+// SHA-256 SIGNATURE HASH & DEDUPLICATION (BROWSER FALLBACK)
+// ===================================================================
+async function computeSignatureHash(signature) {
+  const buf = await crypto.subtle.digest('SHA-256',
+    new TextEncoder().encode(String(signature || '').trim().toLowerCase()));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function backfillLocalHashes() {
+  const { domains, errors } = getLocalVault();
+  let dirty = false;
+  for (const e of errors) {
+    if (!e.signature_hash) {
+      e.signature_hash = await computeSignatureHash(e.error_signature);
+      dirty = true;
+    }
+  }
+  if (dirty) saveLocalVault(domains, errors);
+}
+
+// ===================================================================
 // PURE UNIVERSAL API FRAMEWORK CONNECTOR (BRAND-FREE)
 // ===================================================================
 function resolveUniversalEndpoint(rawKey) {
@@ -387,12 +408,12 @@ function runLocalHeuristicDiagnosis(raw) {
   const errorLine = lines.find((l) => /error[:\s]|exception|er_[a-z0-9_]+|lock wait timeout|foreign key|headers_sent|cors|re-renders|hydration|eaddrinuse|econnrefused/i.test(l));
   const codeLines = lines.filter((l) => {
     const t = l.trim();
-    return t !== '' && !t.startsWith('//') && !t.startsWith('--');
+    return t !== '' && !t.startsWith('//') && !t.startsWith('--') && !t.startsWith('#');
   });
 
   let sig = errorLine
-    ? errorLine.replace(/^\s*(\/\/|--|\/\*+|\*+)\s*/, '').replace(/\*+\/\s*$/, '').trim()
-    : (codeLines[0] || lines[0]).replace(/^\s*(\/\/|--)\s*/, '').trim();
+    ? errorLine.replace(/^\s*(\/\/|--|#|\/\*+|\*+)\s*/, '').replace(/\*+\/\s*$/, '').trim()
+    : (codeLines[0] || lines[0]).replace(/^\s*(\/\/|--|#)\s*/, '').trim();
 
   let domainId = Number(fixerDomainSelect.value || 1);
   let stack = fixerLangSelect.value !== 'auto' ? fixerLangSelect.value : '';
@@ -405,9 +426,9 @@ function runLocalHeuristicDiagnosis(raw) {
     cause = 'Database transaction executes pooled queries without try/catch rollback handling and fails to release the pooled connection in a finally block, causing locked rows and connection exhaustion.';
 
     // Extract user's actual route path and queries dynamically
-    const routeMatch = raw.match(/app\.(post|get|put|delete)\s*\(\s*['"]([^'"]+)['"]/i);
+    const routeMatch = raw.match(/app\.(post|get|put|delete)\s*\(\s*(['"])([^'"]+)\2/i);
     const routeMethod = routeMatch ? routeMatch[1].toLowerCase() : 'post';
-    const routePath = routeMatch ? routeMatch[2] : '/api/transaction';
+    const routePath = routeMatch ? routeMatch[3] : '/api/transaction';
 
     const queryLines = codeLines.filter((l) => /conn\.(execute|query)|execute\(|query\(|UPDATE|INSERT|SELECT|DELETE|pool\./i.test(l) && !/getConnection|beginTransaction|commit|rollback|release/i.test(l));
     const queryBlock = queryLines.length > 0
@@ -442,8 +463,29 @@ ${queryBlock}
   } else if (/useState|re-renders|useEffect/i.test(raw)) {
     domainId = 1;
     stack = stack || 'React 18 / Hooks';
-    cause = 'State setter is invoked unconditionally directly inside the component render body, causing an infinite loop.';
-    fix = `useEffect(() => {\n  ${codeLines.join('\n  ')}\n}, [/* dependencies */]);`;
+    
+    // Sub-case 1: async useEffect + missing dependency array (LiveDashboard pattern)
+    if (/useEffect\(\s*async|\}\);\s*\/\/.*missing dependency/i.test(raw)) {
+      cause = 'An async callback is passed to useEffect and/or the dependency array is missing, causing unhandled promise rejections and infinite refetch loops.';
+      fix = `useEffect(() => {
+  const ctrl = new AbortController();
+  (async () => {
+    const res = await fetch(url, { signal: ctrl.signal });
+    setData(await res.json());
+  })();
+  return () => ctrl.abort();
+}, [projectId]);`;
+    } else {
+      // Sub-case 2: direct state setter call in render body
+      cause = 'State setter is invoked unconditionally directly inside the component render body, causing an infinite loop.';
+      
+      // Use \bset[A-Z]\w* to avoid matching reset(), setup(), offset()
+      const setterLine = codeLines.find(l => /\bset[A-Z]\w*\s*\(/i.test(l)) || codeLines[0] || 'setCount(c + 1)';
+      const depMatch = setterLine.match(/\bset[A-Z]\w*\s*\(\s*([A-Za-z_$][\w$.]*)/);
+      const depVar = depMatch ? depMatch[1].trim() : 'count';
+      
+      fix = `useEffect(() => {\n  ${setterLine.trim()}\n}, [${depVar}]);`;
+    }
   } else if (/foreign key|ER_NO_REFERENCED_ROW|1452/i.test(raw)) {
     domainId = 3;
     stack = stack || 'MySQL 8.0 / InnoDB';
@@ -458,13 +500,27 @@ ${queryBlock}
     if (!stack) {
       if (/SELECT|INSERT|UPDATE|DELETE|CREATE TABLE/i.test(raw)) { domainId = 3; stack = 'MySQL / SQL'; }
       else if (/def |import |print\(/i.test(raw)) { domainId = 2; stack = 'Python'; }
+      else if (/<\?php|echo \$|->\w+\(/i.test(raw)) { domainId = 2; stack = 'PHP'; }
       else if (/#include|std::|printf\(/i.test(raw)) { domainId = 2; stack = 'C / C++'; }
       else if (/app\.(get|post|put|delete)|req,\s*res/i.test(raw)) { domainId = 2; stack = 'Node.js / Express'; }
       else { stack = 'JavaScript / Runtime'; }
     }
     cause = `Unhandled runtime exception in ${stack} block without defensive error boundary.`;
     const body = (codeLines.length ? codeLines : lines).map((l) => `  ${l}`).join('\n');
-    fix = `try {\n${body}\n} catch (err) {\n  console.error('[Handled Exception]:', err.message);\n  return res?.status ? res.status(500).json({ error: err.message }) : null;\n}`;
+    
+    // CRITICAL: order matters — Java BEFORE JavaScript, use negative lookahead
+    if (/Python/i.test(stack)) {
+      fix = `try:\n${body}\nexcept Exception as e:\n    print(f'[Error]: {e}')\n    import traceback\n    traceback.print_exc()`;
+    } else if (/PHP/i.test(stack)) {
+      fix = `try {\n${body}\n} catch (Exception $e) {\n    error_log('[Error]: ' . $e->getMessage());\n    echo json_encode(['error' => $e->getMessage()]);\n}`;
+    } else if (/C \/ C\+\+/i.test(stack)) {
+      fix = `try {\n${body}\n} catch (const std::exception& e) {\n    std::cerr << "[Error]: " << e.what() << std::endl;\n    return EXIT_FAILURE;\n}`;
+    } else if (/Java(?!Script)/i.test(stack)) {
+      fix = `try {\n${body}\n} catch (Exception e) {\n    System.err.println("[Error]: " + e.getMessage());\n    e.printStackTrace();\n}`;
+    } else {
+      // JavaScript fallback
+      fix = `try {\n${body}\n} catch (err) {\n  console.error('[Handled Exception]:', err.message);\n  return res?.status ? res.status(500).json({ error: err.message }) : null;\n}`;
+    }
   }
 
   return { domainId, stack, sig: sig.slice(0, 240), cause, fix };
@@ -502,7 +558,8 @@ runDiagnosisBtn.addEventListener('click', async () => {
       if (parsed.fixed_code) fixerOutFix.value = parsed.fixed_code;
       appendChat('ai', parsed.chat_summary || `Analyzed live! Root cause: ${fixerOutCause.value}`);
     } catch (_err) {
-      appendChat('ai', `Diagnosed "${heur.sig}" (${heur.stack}). Root Cause: ${heur.cause}`);
+      showBanner('⚠️ Live AI unavailable. Using built-in diagnostic engine.', 'error');
+      appendChat('ai', `[Offline Mode] Diagnosed "${heur.sig}" (${heur.stack}).\n• Root Cause: ${heur.cause}\n• Fixed code has been generated. Click "💾 Save Fix to Database Table" to store it!`);
     }
   } else {
     appendChat('ai', `Diagnosed "${heur.sig}" (${heur.stack}).\n• Root Cause: ${heur.cause}\n• Fixed code has been generated in the box above. Click "💾 Save Fix to Database Table" to store it!`);
@@ -517,63 +574,73 @@ function generateDetailedLocalExplanation(question) {
   const currentSig = fixerOutSig.value.trim();
   const currentCause = fixerOutCause.value.trim();
   const currentFix = fixerOutFix.value.trim();
-  const currentStack = fixerStackInput.value.trim() || 'application code';
 
   if (!currentCode && !currentSig) {
     return 'Please paste broken code or an error trace into Step 1 on the left and click "⚡ Analyze & Fix Bug with AI", or configure your API Key using the 🔑 button above to chat freely!';
   }
 
-  const isTx = /beginTransaction|getConnection|transaction|pool/i.test(currentCode);
-  const isCors = /cors|Access-Control/i.test(currentCode);
-  const isReact = /useState|render|useEffect|hook/i.test(currentCode);
-  const isFk = /foreign key|1452|domain_id/i.test(currentCode);
-  const isHeaders = /headers_sent|headers after/i.test(currentCode);
+  const q = String(question || '').toLowerCase();
+  const isStepByStep = /step by step|how to fix|resolve|concurrency|100 users/i.test(q);
+  const isLineByLine = /line by line|explain|why|reason/i.test(q);
+  const isOptimize = /optim|prevent|best practice|improve/i.test(q);
 
-  let faultQuote = '';
-  let whyFault = '';
-  let stepByStep = '';
+  if (isStepByStep) {
+    return `### Step-by-Step Fix / Concurrency Analysis for: ${currentSig || 'Detected Bug'}
 
-  if (isTx) {
-    faultQuote = 'const conn = await pool.getConnection();\nawait conn.beginTransaction();\nawait conn.execute(...) // Missing try/catch and conn.release()!';
-    whyFault = 'When a database error occurs inside a raw transaction without a try/catch rollback block, the transaction stays uncommitted (locking database tables and rows), and the MySQL connection is NEVER returned to the connection pool. Subsequent requests stall indefinitely waiting for a connection.';
-    stepByStep = '1. Always wrap transaction queries inside a try { ... } block.\n2. Roll back explicitly on failure: await conn.rollback(); in the catch block.\n3. Crucial: Always call conn.release(); in the finally block so the connection is returned to the pool even if the query fails or throws.';
-  } else if (isCors) {
-    faultQuote = "fetch('http://localhost:4000/api/orders', { method: 'POST', credentials: 'include' });";
-    whyFault = 'The browser strictly enforces CORS security. When the client makes a cross-origin request with credentials, the server MUST respond with explicit Access-Control-Allow-Origin (matching the exact origin, not wildcard *) and Access-Control-Allow-Credentials: true headers.';
-    stepByStep = '1. Install cors middleware: npm install cors.\n2. Configure explicit origin and credentials support before defining route handlers.\n3. Test the preflight OPTIONS request returns 204 or 200 with appropriate CORS headers.';
-  } else if (isReact) {
-    faultQuote = 'setTotal(items.length); // Called directly in component render body!';
-    whyFault = 'Calling a state setter during rendering schedules an immediate re-render before the current render completes. This triggers an infinite rendering cycle that crashes the browser.';
-    stepByStep = '1. Wrap state updates in a useEffect hook with an explicit dependency array ([items.length]).\n2. Or compute derived state dynamically (const total = items.length;) without storing it in separate state.';
-  } else if (isFk) {
-    faultQuote = "INSERT INTO error_logs (domain_id, ...) VALUES (99, ...);";
-    whyFault = 'Foreign key constraint fails because the foreign key column (domain_id = 99) has no matching primary key in the referenced parent table (domains).';
-    stepByStep = '1. Insert the parent record in domains first: INSERT IGNORE INTO domains (domain_id, domain_name) VALUES (...).\n2. Then insert the child record into error_logs with the verified domain_id.';
-  } else if (isHeaders) {
-    faultQuote = "res.status(400).json({ error: '...' }); // Missing return keyword!";
-    whyFault = 'HTTP protocol only allows headers and response status to be sent once. When a return keyword is omitted, JavaScript continues executing and hits a second res.json() call on the same request.';
-    stepByStep = '1. Place return before every res.status().json() call: return res.status(400).json(...).\n2. Ensure all conditional branching paths terminate with a single response.';
-  } else {
-    faultQuote = currentCode.split('\n').slice(0, 3).join('\n');
-    whyFault = currentCause || `Unhandled runtime exception in ${currentStack} block without defensive error handling.`;
-    stepByStep = '1. Wrap the execution block in a defensive try/catch error boundary.\n2. Log the exact error message and return an appropriate HTTP status or user-facing error response.\n3. Check input parameters and environment variables before execution.';
-  }
+**Root Cause:**
+${currentCause}
 
-  return `### Detailed Technical Analysis for: ${currentSig || 'Detected Bug'}
+**Step-by-Step Resolution:**
+1. Isolate the vulnerable code block preventing concurrent requests or proper execution.
+2. Wrap database or async calls in defensive try/catch/finally boundaries.
+3. Verify connection pool releases and rollback integrity.
 
-**1. What is broken in your code:**
-\`\`\`
-${faultQuote}
-\`\`\`
-${whyFault}
-
-**2. Step-by-Step Resolution:**
-${stepByStep}
-
-**3. Complete Verified Solution Code:**
+**Verified Solution:**
 \`\`\`
 ${currentFix}
 \`\`\``;
+  } else if (isLineByLine) {
+    return `### Line-by-Line Analysis: ${currentSig || 'Detected Bug'}
+
+**Why This Bug Happens:**
+${currentCause}
+
+**Technical Breakdown:**
+- The runtime exception occurs due to unguarded async execution or missing error boundaries.
+- Specific fix applied to remediate the vulnerability.
+
+**Fixed Code:**
+\`\`\`
+${currentFix}
+\`\`\``;
+  } else if (isOptimize) {
+    return `### Optimization & Prevention: ${currentSig || 'Detected Bug'}
+
+**Current Issue:**
+${currentCause}
+
+**Prevention Strategies:**
+1. Always validate inputs and parameters.
+2. Use parameterized prepared statements (?) for SQL operations.
+3. Implement proper connection pooling and cleanup hooks.
+
+**Optimized Solution:**
+\`\`\`
+${currentFix}
+\`\`\``;
+  } else {
+    return `### Technical Analysis: ${currentSig || 'Detected Bug'}
+
+**Root Cause:**
+${currentCause}
+
+**Verified Solution:**
+\`\`\`
+${currentFix}
+\`\`\`
+
+Ask me for "step-by-step fix", "line-by-line explanation", or "optimization tips" for more details!`;
+  }
 }
 
 async function handleChatQuestion(questionText) {
@@ -600,6 +667,7 @@ async function handleChatQuestion(questionText) {
       return;
     } catch (e) {
       console.warn('Live AI Chat call failed, falling back to local technical explanation:', e.message);
+      showBanner('⚠️ Live AI chat unavailable. Using built-in explanation engine.', 'error');
     }
   }
 
@@ -947,10 +1015,24 @@ async function refreshWorkspace() {
 async function saveBugRecord(payload) {
   if (useLocalFallback) {
     const { domains, errors } = getLocalVault();
+    const signatureHash = await computeSignatureHash(payload.error_signature);
+    
+    // Deduplication check
+    const existing = errors.find((r) => r.signature_hash === signatureHash);
+    if (existing) {
+      existing.times_hit = Number(existing.times_hit || 1) + Number(payload.times_hit || 1);
+      existing.updated_at = new Date().toISOString();
+      saveLocalVault(domains, errors);
+      showBanner(`SHA-256 Dedup: Incremented hit count for record #${existing.error_id} to ${existing.times_hit}.`, 'success');
+      await refreshWorkspace();
+      return;
+    }
+    
+    // New record
     const nextId = errors.length ? Math.max(...errors.map((r) => Number(r.error_id))) + 1 : 1;
-    errors.push({ error_id: nextId, ...payload });
+    errors.push({ error_id: nextId, signature_hash: signatureHash, ...payload });
     saveLocalVault(domains, errors);
-    showBanner(`Saved bug record #${nextId} to inventory.`);
+    showBanner(`Saved new bug record #${nextId} to browser vault.`, 'success');
     await refreshWorkspace();
     return;
   }
@@ -1153,4 +1235,5 @@ domainFilterSelect.addEventListener('change', refreshWorkspace);
 filterForm.addEventListener('reset', () => setTimeout(refreshWorkspace, 0));
 
 refreshAiKeyUI();
+backfillLocalHashes();
 detectBackendMode().then(refreshWorkspace);
