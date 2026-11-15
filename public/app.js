@@ -748,8 +748,14 @@ function saveLocalVault(domains, errors) {
 }
 
 async function detectBackendMode() {
+  if (window?.location?.hostname && window.location.hostname.endsWith('github.io')) {
+    useLocalFallback = true;
+    dbStatusText.textContent = 'Browser Vault Active';
+    return;
+  }
+
   try {
-    const res = await fetch('/api/health', { cache: 'no-store' });
+    const res = await fetch('./api/health', { cache: 'no-store' });
     if (res.ok) {
       apiBase = '';
       useLocalFallback = false;
