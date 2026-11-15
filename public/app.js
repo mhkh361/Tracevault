@@ -56,6 +56,10 @@ const CODE_PRESETS = {
 };
 
 const AI_KEY_STORAGE = 'tv_universal_api_key_v1';
+const AI_PROVIDER_STORAGE = 'tv_ai_provider_choice_v1';
+const labWorkspace = document.getElementById('lab-inventory-workspace');
+const apiProviderSelect = document.getElementById('api-provider-select');
+const clearChatHistoryBtn = document.getElementById('clear-chat-history-btn');
 let useLocalFallback = false;
 let apiBase = '';
 let domainsState = [];
@@ -146,26 +150,27 @@ function showBanner(msg, tone = 'success') {
 // ===================================================================
 // UNIVERSAL API KEY AUTO-ROUTER
 // ===================================================================
-function detectProviderFromKey(rawKey) {
-  const key = String(rawKey || '').trim();
+function detectProviderFromKey(rawKey, forcedChoice = 'auto') {
+  const key = String(rawKey || '').replace(/["'\s]/g, '');
   if (!key) return null;
-  if (key.startsWith('AIza')) {
-    return { id: 'gemini', name: 'Google Gemini', model: 'gemini-2.5-flash', key };
+  const choice = (forcedChoice && forcedChoice !== 'auto') ? forcedChoice : (localStorage.getItem(AI_PROVIDER_STORAGE) || 'auto');
+
+  if (choice === 'gemini' || /^AIza/i.test(key) || (!key.startsWith('sk-') && !key.startsWith('gsk_') && key.length >= 35 && key.length <= 45)) {
+    return { id: 'gemini', name: 'Google Gemini', models: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'], key };
   }
-  if (key.startsWith('gsk_')) {
+  if (choice === 'groq' || /^gsk_/i.test(key)) {
     return { id: 'groq', name: 'Groq Llama-3.3', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile', key };
   }
-  if (key.startsWith('sk-or-')) {
+  if (choice === 'openrouter' || /^sk-or-/i.test(key)) {
     return { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: 'openai/gpt-4o-mini', key };
   }
-  if (key.startsWith('sk-')) {
-    return { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
-  }
-  return { id: 'custom', name: 'Custom AI API', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
+  return { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
 }
 
 function getSavedProvider() {
-  return detectProviderFromKey(localStorage.getItem(AI_KEY_STORAGE) || '');
+  const raw = localStorage.getItem(AI_KEY_STORAGE) || '';
+  const choice = localStorage.getItem(AI_PROVIDER_STORAGE) || 'auto';
+  return detectProviderFromKey(raw, choice);
 }
 
 function refreshAiKeyUI() {
@@ -177,7 +182,8 @@ function refreshAiKeyUI() {
     modalKeyLabel.textContent = `🔑 ${p.name} Active`;
     chatProviderPill.textContent = `${p.name} Connected`;
     detectedProviderPill.textContent = p.name;
-    apiKeyFeedback.textContent = `Active: ${p.name} (${p.model}) connected and ready.`;
+    const modelDesc = p.models ? p.models[0] : p.model;
+    apiKeyFeedback.textContent = `Active: ${p.name} (${modelDesc}) connected and ready.`;
   } else {
     navKeyDot.classList.remove('is-active');
     modalKeyDot.classList.remove('is-active');
@@ -194,19 +200,31 @@ async function callUniversalAI(systemPrompt, userPrompt) {
   if (!p) throw new Error('NO_API_KEY');
 
   if (p.id === 'gemini') {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${p.model}:generateContent?key=${encodeURIComponent(p.key)}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: { temperature: 0.2 }
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error?.message || 'Gemini API request failed.');
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let lastErr = null;
+    for (const modelName of p.models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(p.key)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [{ text: `${systemPrompt}\n\nUser Input:\n${userPrompt}` }]
+            }],
+            generationConfig: { temperature: 0.25 }
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        }
+        lastErr = new Error(data.error?.message || `Gemini ${modelName} error`);
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw lastErr || new Error('Gemini API call failed.');
   }
 
   const res = await fetch(p.endpoint, {
@@ -221,7 +239,7 @@ async function callUniversalAI(systemPrompt, userPrompt) {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      temperature: 0.2
+      temperature: 0.25
     })
   });
   const data = await res.json();
@@ -231,6 +249,9 @@ async function callUniversalAI(systemPrompt, userPrompt) {
 
 function openKeyDialog() {
   apiKeyInput.value = localStorage.getItem(AI_KEY_STORAGE) || '';
+  if (apiProviderSelect) {
+    apiProviderSelect.value = localStorage.getItem(AI_PROVIDER_STORAGE) || 'auto';
+  }
   refreshAiKeyUI();
   apiKeyModal.showModal();
 }
@@ -239,14 +260,22 @@ openApiKeyBtn.addEventListener('click', openKeyDialog);
 modalApiKeyBtn.addEventListener('click', openKeyDialog);
 closeApiKeyBtn.addEventListener('click', () => apiKeyModal.close());
 
-apiKeyInput.addEventListener('input', () => {
-  const p = detectProviderFromKey(apiKeyInput.value);
+function updateKeyModalFeedback() {
+  const chosen = apiProviderSelect ? apiProviderSelect.value : 'auto';
+  const p = detectProviderFromKey(apiKeyInput.value, chosen);
   detectedProviderPill.textContent = p ? p.name : 'Auto-Detect';
-});
+}
+
+apiKeyInput.addEventListener('input', updateKeyModalFeedback);
+if (apiProviderSelect) {
+  apiProviderSelect.addEventListener('change', updateKeyModalFeedback);
+}
 
 removeApiKeyBtn.addEventListener('click', () => {
   localStorage.removeItem(AI_KEY_STORAGE);
+  localStorage.removeItem(AI_PROVIDER_STORAGE);
   apiKeyInput.value = '';
+  if (apiProviderSelect) apiProviderSelect.value = 'auto';
   refreshAiKeyUI();
   apiKeyModal.close();
   appendChat('ai', 'API key removed. Switched to built-in diagnostic engine.');
@@ -254,36 +283,36 @@ removeApiKeyBtn.addEventListener('click', () => {
 
 apiKeyForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  const raw = apiKeyInput.value.trim();
+  const raw = apiKeyInput.value.trim().replace(/["'\s]/g, '');
   if (!raw) return;
-  const p = detectProviderFromKey(raw);
+  const choice = apiProviderSelect ? apiProviderSelect.value : 'auto';
+  const p = detectProviderFromKey(raw, choice);
   localStorage.setItem(AI_KEY_STORAGE, raw);
+  localStorage.setItem(AI_PROVIDER_STORAGE, choice);
   refreshAiKeyUI();
   apiKeyModal.close();
-  appendChat('ai', `Connected ${p.name} (${p.model})! You can now analyze code or chat with me live.`);
+  appendChat('ai', `Connected ${p.name}! You can now analyze code or chat with me live.`);
   showBanner(`Connected ${p.name} API key.`);
 });
 
 // ===================================================================
-// WORKSPACE MODE SWITCHING (DEFAULT LAB VIEW vs Alt+L POPUP)
+// WORKSPACE MODE SWITCHING (DEFAULT LAB VIEW vs Alt+L FULLPAGE)
 // ===================================================================
 function setWorkspaceMode(mode) {
   const isFixer = mode === 'fixer';
   fixerWorkspace.hidden = !isFixer;
+  if (labWorkspace) labWorkspace.hidden = isFixer;
   tabLiveFixer.classList.toggle('is-active', isFixer);
   tabLabView.classList.toggle('is-active', !isFixer);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   if (isFixer) {
-    setTimeout(() => fixerCodeInput.focus(), 40);
+    setTimeout(() => fixerCodeInput.focus(), 50);
   }
 }
 
 tabLabView.addEventListener('click', () => setWorkspaceMode('lab'));
 tabLiveFixer.addEventListener('click', () => setWorkspaceMode('fixer'));
 closeFixerModalBtn.addEventListener('click', () => setWorkspaceMode('lab'));
-
-fixerWorkspace.addEventListener('click', (e) => {
-  if (e.target === fixerWorkspace) setWorkspaceMode('lab');
-});
 
 document.addEventListener('keydown', (e) => {
   if (e.altKey && e.key.toLowerCase() === 'l') {
@@ -353,27 +382,57 @@ function runLocalHeuristicDiagnosis(raw) {
   if (/beginTransaction|getConnection|ER_LOCK_WAIT_TIMEOUT|lock wait timeout/i.test(raw)) {
     domainId = 3;
     stack = stack || 'Node.js / MySQL Transaction';
-    cause = 'Database transaction lacks try/catch rollback handling and fails to release the pooled connection in a finally block.';
-    fix = `app.post('/api/checkout', async (req, res) => {\n  const conn = await pool.getConnection();\n  try {\n    await conn.beginTransaction();\n    const [order] = await conn.execute('INSERT INTO orders (user_id) VALUES (?)', [req.body.userId]);\n    await conn.commit();\n    return res.json({ success: true, orderId: order.insertId });\n  } catch (err) {\n    await conn.rollback();\n    return res.status(500).json({ error: err.message });\n  } finally {\n    conn.release();\n  }\n});`;
+    cause = 'Database transaction executes pooled queries without try/catch rollback handling and fails to release the pooled connection in a finally block, causing locked rows and connection exhaustion.';
+
+    // Extract user's actual route path and queries dynamically
+    const routeMatch = raw.match(/app\.(post|get|put|delete)\s*\(\s*['"]([^'"]+)['"]/i);
+    const routeMethod = routeMatch ? routeMatch[1].toLowerCase() : 'post';
+    const routePath = routeMatch ? routeMatch[2] : '/api/transaction';
+
+    const queryLines = codeLines.filter((l) => /conn\.(execute|query)|execute\(|query\(|UPDATE|INSERT|SELECT|DELETE|pool\./i.test(l) && !/getConnection|beginTransaction|commit|rollback|release/i.test(l));
+    const queryBlock = queryLines.length > 0
+      ? queryLines.map((l) => {
+          const trimmed = l.trim();
+          return trimmed.startsWith('await ') ? `    ${trimmed}` : `    await ${trimmed}`;
+        }).join('\n')
+      : "    await conn.execute('UPDATE accounts SET balance = balance - 500 WHERE id = ?', [req.body.fromId]);\n    await conn.execute('UPDATE accounts SET balance = balance + 500 WHERE id = ?', [req.body.toId]);";
+
+    fix = `app.${routeMethod}('${routePath}', async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+${queryBlock}
+    await conn.commit();
+    return res.json({ success: true, message: 'Transaction committed successfully' });
+  } catch (err) {
+    await conn.rollback();
+    console.error('[Transaction Error]:', err.message);
+    return res.status(500).json({ error: 'Transaction failed', details: err.message });
+  } finally {
+    conn.release(); // Crucial: Always return connection back to MySQL pool
+  }
+});`;
   } else if (/cors|Access-Control-Allow-Origin/i.test(raw)) {
     domainId = 1;
     stack = stack || 'Express / Fetch CORS';
-    cause = 'Cross-origin request blocked because backend omitted Access-Control-Allow-Origin headers.';
-    fix = `const cors = require('cors');\napp.use(cors({ origin: 'http://localhost:3000', credentials: true }));`;
+    cause = 'Cross-origin browser request blocked because the backend server omitted Access-Control-Allow-Origin and credentials response headers.';
+    const portMatch = raw.match(/localhost:(\d+)/);
+    const origin = portMatch ? `http://localhost:${portMatch[1]}` : 'http://localhost:3000';
+    fix = `const cors = require('cors');\napp.use(cors({\n  origin: '${origin}',\n  methods: ['GET', 'POST', 'PUT', 'DELETE'],\n  credentials: true\n}));`;
   } else if (/useState|re-renders|useEffect/i.test(raw)) {
     domainId = 1;
     stack = stack || 'React 18 / Hooks';
-    cause = 'State setter invoked directly inside component render body, causing an infinite loop.';
-    fix = `useEffect(() => {\n  ${codeLines.join('\n  ')}\n}, [dependencies]);`;
+    cause = 'State setter is invoked unconditionally directly inside the component render body, causing an infinite loop.';
+    fix = `useEffect(() => {\n  ${codeLines.join('\n  ')}\n}, [/* dependencies */]);`;
   } else if (/foreign key|ER_NO_REFERENCED_ROW|1452/i.test(raw)) {
     domainId = 3;
     stack = stack || 'MySQL 8.0 / InnoDB';
-    cause = 'Child row references a domain_id that does not exist in parent table domains.';
-    fix = `INSERT IGNORE INTO domains (domain_id, domain_name, description) VALUES (1, 'Frontend', 'UI layer');\n${codeLines.join('\n')}`;
+    cause = 'Child row references a domain_id that does not exist in the parent domains table.';
+    fix = `-- 1. Ensure parent record exists first:\nINSERT IGNORE INTO domains (domain_id, domain_name, description) VALUES (1, 'Frontend', 'UI Layer');\n-- 2. Execute child insert with valid FK:\n${codeLines.join('\n')}`;
   } else if (/HEADERS_SENT|headers after they are sent/i.test(raw)) {
     domainId = 2;
     stack = stack || 'Node.js / Express';
-    cause = 'Multiple res.json() calls executed in one route handler due to missing return statement.';
+    cause = 'Multiple res.json() calls executed in one request lifecycle due to a missing return statement.';
     fix = codeLines.map((l) => (l.includes('res.status(') && !l.trim().startsWith('return ') ? l.replace('res.status(', 'return res.status(') : l)).join('\n');
   } else {
     if (!stack) {
@@ -385,7 +444,7 @@ function runLocalHeuristicDiagnosis(raw) {
     }
     cause = `Unhandled runtime exception in ${stack} block without defensive error boundary.`;
     const body = (codeLines.length ? codeLines : lines).map((l) => `  ${l}`).join('\n');
-    fix = `try {\n${body}\n} catch (err) {\n  console.error('Handled error:', err.message);\n}`;
+    fix = `try {\n${body}\n} catch (err) {\n  console.error('[Handled Exception]:', err.message);\n  return res?.status ? res.status(500).json({ error: err.message }) : null;\n}`;
   }
 
   return { domainId, stack, sig: sig.slice(0, 240), cause, fix };
@@ -433,10 +492,74 @@ runDiagnosisBtn.addEventListener('click', async () => {
   runDiagnosisBtn.textContent = '⚡ Analyze & Fix Bug with AI';
 });
 
-chatForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const q = chatInput.value.trim();
+function generateDetailedLocalExplanation(question) {
+  const currentCode = fixerCodeInput.value.trim();
+  const currentSig = fixerOutSig.value.trim();
+  const currentCause = fixerOutCause.value.trim();
+  const currentFix = fixerOutFix.value.trim();
+  const currentStack = fixerStackInput.value.trim() || 'application code';
+
+  if (!currentCode && !currentSig) {
+    return 'Please paste broken code or an error trace into Step 1 on the left and click "⚡ Analyze & Fix Bug with AI", or configure your API Key using the 🔑 button above to chat freely!';
+  }
+
+  const isTx = /beginTransaction|getConnection|transaction|pool/i.test(currentCode);
+  const isCors = /cors|Access-Control/i.test(currentCode);
+  const isReact = /useState|render|useEffect|hook/i.test(currentCode);
+  const isFk = /foreign key|1452|domain_id/i.test(currentCode);
+  const isHeaders = /headers_sent|headers after/i.test(currentCode);
+
+  let faultQuote = '';
+  let whyFault = '';
+  let stepByStep = '';
+
+  if (isTx) {
+    faultQuote = 'const conn = await pool.getConnection();\nawait conn.beginTransaction();\nawait conn.execute(...) // Missing try/catch and conn.release()!';
+    whyFault = 'When a database error occurs inside a raw transaction without a try/catch rollback block, the transaction stays uncommitted (locking database tables and rows), and the MySQL connection is NEVER returned to the connection pool. Subsequent requests stall indefinitely waiting for a connection.';
+    stepByStep = '1. Always wrap transaction queries inside a try { ... } block.\n2. Roll back explicitly on failure: await conn.rollback(); in the catch block.\n3. Crucial: Always call conn.release(); in the finally block so the connection is returned to the pool even if the query fails or throws.';
+  } else if (isCors) {
+    faultQuote = "fetch('http://localhost:4000/api/orders', { method: 'POST', credentials: 'include' });";
+    whyFault = 'The browser strictly enforces CORS security. When the client makes a cross-origin request with credentials, the server MUST respond with explicit Access-Control-Allow-Origin (matching the exact origin, not wildcard *) and Access-Control-Allow-Credentials: true headers.';
+    stepByStep = '1. Install cors middleware: npm install cors.\n2. Configure explicit origin and credentials support before defining route handlers.\n3. Test the preflight OPTIONS request returns 204 or 200 with appropriate CORS headers.';
+  } else if (isReact) {
+    faultQuote = 'setTotal(items.length); // Called directly in component render body!';
+    whyFault = 'Calling a state setter during rendering schedules an immediate re-render before the current render completes. This triggers an infinite rendering cycle that crashes the browser.';
+    stepByStep = '1. Wrap state updates in a useEffect hook with an explicit dependency array ([items.length]).\n2. Or compute derived state dynamically (const total = items.length;) without storing it in separate state.';
+  } else if (isFk) {
+    faultQuote = "INSERT INTO error_logs (domain_id, ...) VALUES (99, ...);";
+    whyFault = 'Foreign key constraint fails because the foreign key column (domain_id = 99) has no matching primary key in the referenced parent table (domains).';
+    stepByStep = '1. Insert the parent record in domains first: INSERT IGNORE INTO domains (domain_id, domain_name) VALUES (...).\n2. Then insert the child record into error_logs with the verified domain_id.';
+  } else if (isHeaders) {
+    faultQuote = "res.status(400).json({ error: '...' }); // Missing return keyword!";
+    whyFault = 'HTTP protocol only allows headers and response status to be sent once. When a return keyword is omitted, JavaScript continues executing and hits a second res.json() call on the same request.';
+    stepByStep = '1. Place return before every res.status().json() call: return res.status(400).json(...).\n2. Ensure all conditional branching paths terminate with a single response.';
+  } else {
+    faultQuote = currentCode.split('\n').slice(0, 3).join('\n');
+    whyFault = currentCause || `Unhandled runtime exception in ${currentStack} block without defensive error handling.`;
+    stepByStep = '1. Wrap the execution block in a defensive try/catch error boundary.\n2. Log the exact error message and return an appropriate HTTP status or user-facing error response.\n3. Check input parameters and environment variables before execution.';
+  }
+
+  return `### Detailed Technical Analysis for: ${currentSig || 'Detected Bug'}
+
+**1. What is broken in your code:**
+\`\`\`
+${faultQuote}
+\`\`\`
+${whyFault}
+
+**2. Step-by-Step Resolution:**
+${stepByStep}
+
+**3. Complete Verified Solution Code:**
+\`\`\`
+${currentFix}
+\`\`\``;
+}
+
+async function handleChatQuestion(questionText) {
+  const q = String(questionText || '').trim();
   if (!q) return;
+
   appendChat('user', q);
   chatInput.value = '';
   chatSendBtn.disabled = true;
@@ -444,22 +567,55 @@ chatForm.addEventListener('submit', async (e) => {
   const waitingMsg = appendChat('ai', 'Thinking...');
   const currentCode = fixerCodeInput.value.trim();
   const currentSig = fixerOutSig.value.trim();
-  const sys = `You are TraceVault AI Assistant. Answer concisely with clear code or SQL examples.\nCurrent Code Context: ${currentCode || 'None'}\nCurrent Error Signature: ${currentSig || 'General Project Question'}`;
+  const currentFix = fixerOutFix.value.trim();
 
-  try {
-    const ans = await callUniversalAI(sys, q);
-    waitingMsg.textContent = `AI: ${ans.trim()}`;
-  } catch (_err) {
-    if (currentSig) {
-      waitingMsg.textContent = `AI: For "${currentSig}", the root cause is: ${fixerOutCause.value}. Use the patched code shown above to resolve it. (Tip: Click "🔑 API Key" at the top right of this window and paste a Gemini/Groq/OpenAI key for live custom chat!)`;
-    } else {
-      waitingMsg.textContent = `AI: Please click "🔑 API Key" at the top right of this popup and paste a free Gemini (AIza...) or Groq (gsk_...) key to chat freely on any topic, or paste broken code on the left and click "⚡ Analyze & Fix Bug with AI"!`;
+  const provider = getSavedProvider();
+  if (provider) {
+    try {
+      const sys = `You are TraceVault AI Diagnostic Assistant. Provide clear, in-depth technical explanations with code snippets.\nCurrent Code:\n${currentCode || 'None'}\nCurrent Detected Error:\n${currentSig || 'None'}\nCurrent Fix:\n${currentFix || 'None'}`;
+      const ans = await callUniversalAI(sys, q);
+      waitingMsg.textContent = ans.trim();
+      chatSendBtn.disabled = false;
+      chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+      return;
+    } catch (e) {
+      console.warn('Live AI Chat call failed, falling back to local technical explanation:', e.message);
     }
-  } finally {
-    chatSendBtn.disabled = false;
-    chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+  }
+
+  // Comprehensive local fallback
+  const detailedAnswer = generateDetailedLocalExplanation(q);
+  waitingMsg.textContent = detailedAnswer;
+  chatSendBtn.disabled = false;
+  chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+}
+
+chatForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  handleChatQuestion(chatInput.value);
+});
+
+chatInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleChatQuestion(chatInput.value);
   }
 });
+
+// Quick question chip buttons
+document.querySelectorAll('.quick-ask-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    handleChatQuestion(btn.dataset.q);
+  });
+});
+
+if (clearChatHistoryBtn) {
+  clearChatHistoryBtn.addEventListener('click', () => {
+    chatMessagesBox.innerHTML = `
+      <div class="chat-msg is-ai"><strong>AI Assistant:</strong> Chat history cleared. Paste any broken code on the left and click <strong>⚡ Analyze &amp; Fix Bug with AI</strong>, or ask any question below!</div>
+    `;
+  });
+}
 
 commitDiagnosisBtn.addEventListener('click', async () => {
   const payload = {
