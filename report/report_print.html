@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>TraceVault — DBMS Laboratory Report</title>
+  <title>TraceVault — DBMS Laboratory Project Report (Feni University)</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
     @page {
       size: A4;
-      margin: 14mm 14mm 14mm 14mm;
+      margin: 10mm 12mm 12mm 12mm;
     }
 
     * {
@@ -18,7 +16,7 @@
     }
 
     body {
-      font-family: 'Crimson Pro', serif, 'Times New Roman';
+      font-family: 'Times New Roman', Times, Georgia, serif;
       font-size: 10pt;
       line-height: 1.35;
       color: #111827;
@@ -27,13 +25,177 @@
 
     .page {
       width: 100%;
-      min-height: 269mm;
-      max-height: 269mm;
+      height: 275mm;
+      max-height: 275mm;
       overflow: hidden;
       page-break-after: always;
       position: relative;
       display: flex;
       flex-direction: column;
+    }
+
+    /* Cover Page Styles */
+    .cover-frame {
+      width: 100%;
+      height: 100%;
+      border: 2px solid #0f172a;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      background: #ffffff;
+    }
+
+    .cover-top-inst {
+      margin-top: 10px;
+    }
+
+    .univ-name {
+      font-size: 26pt;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-family: 'Crimson Pro', serif;
+    }
+
+    .dept-name {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 6px;
+    }
+
+    .prog-name {
+      font-size: 10.5pt;
+      color: #475569;
+      margin-top: 4px;
+    }
+
+    .cover-divider {
+      width: 90%;
+      height: 1.5px;
+      background: #0f172a;
+      margin: 16px auto;
+    }
+
+    .report-badge-box {
+      margin: 12px auto;
+    }
+
+    .report-badge {
+      display: inline-block;
+      border: 1.5px solid #0f172a;
+      padding: 6px 20px;
+      font-size: 11pt;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0f172a;
+      background: #f8fafc;
+      border-radius: 4px;
+    }
+
+    .course-title-text {
+      font-size: 12.5pt;
+      font-weight: 700;
+      color: #0f2d59;
+      margin-top: 12px;
+    }
+
+    .project-title-box {
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin: 22px auto;
+      width: 92%;
+      text-align: center;
+    }
+
+    .project-label {
+      font-size: 9.5pt;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .project-name-main {
+      font-size: 17pt;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .project-sub-topic {
+      font-size: 10.5pt;
+      color: #0369a1;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .project-links {
+      font-size: 8.5pt;
+      color: #334155;
+      font-family: 'Consolas', 'Courier New', monospace;
+      line-height: 1.4;
+    }
+
+    .submission-table {
+      width: 92%;
+      margin: 15px auto;
+      border: 1px solid #cbd5e1;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 9.5pt;
+    }
+
+    .submission-table th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      padding: 7px 12px;
+      border: 1px solid #cbd5e1;
+      width: 50%;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      letter-spacing: 0.5px;
+    }
+
+    .submission-table td {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+      background: #ffffff;
+      line-height: 1.45;
+    }
+
+    .sub-field-label {
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .cover-date-footer {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    /* Inside Pages Headers & Footers */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 600;
     }
 
     .page-footer {
@@ -47,45 +209,6 @@
       padding-top: 4px;
       font-size: 8pt;
       color: #64748b;
-    }
-
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #cbd5e1;
-      padding-bottom: 4px;
-      margin-bottom: 10px;
-      font-size: 8pt;
-      color: #64748b;
-      font-weight: 600;
-    }
-
-    /* Title Block */
-    .title-block {
-      text-align: center;
-      margin-bottom: 10px;
-      padding-bottom: 8px;
-      border-bottom: 1.5px solid #0f172a;
-    }
-
-    .title-course {
-      font-size: 13pt;
-      font-weight: 700;
-      color: #0f2d59;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .title-main {
-      font-size: 16pt;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 3px 0;
-    }
-
-    .title-meta {
-      font-size: 9pt;
-      color: #475569;
     }
 
     h2 {
@@ -103,7 +226,7 @@
       font-size: 9.5pt;
       font-weight: 700;
       color: #1e293b;
-      margin: 5px 0 2px 0;
+      margin: 6px 0 2px 0;
     }
 
     p {
@@ -121,7 +244,7 @@
     }
 
     code, pre {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Consolas', 'Courier New', monospace;
     }
 
     code {
@@ -132,21 +255,21 @@
       color: #0f2d59;
     }
 
-    /* Tables */
-    table {
+    /* Content Tables */
+    table.data-table {
       width: 100%;
       border-collapse: collapse;
       margin: 5px 0 8px 0;
       font-size: 8pt;
     }
 
-    th, td {
+    table.data-table th, table.data-table td {
       padding: 4px 6px;
       text-align: left;
       vertical-align: middle;
     }
 
-    th {
+    table.data-table th {
       border-top: 1.5px solid #0f172a;
       border-bottom: 1px solid #0f172a;
       font-weight: 700;
@@ -154,13 +277,16 @@
       background: #f8fafc;
     }
 
-    td {
+    table.data-table td {
       border-bottom: 1px solid #e2e8f0;
     }
 
-    tr:last-child td {
+    table.data-table tr:last-child td {
       border-bottom: 1.5px solid #0f172a;
     }
+
+    .badge-pk { color: #0284c7; font-weight: 700; }
+    .badge-fk { color: #d97706; font-weight: 700; }
 
     /* Code Blocks */
     .code-box {
@@ -169,7 +295,7 @@
       border-radius: 4px;
       padding: 5px 8px;
       margin: 4px 0 6px 0;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Consolas', 'Courier New', monospace;
       font-size: 7.2pt;
       line-height: 1.25;
       color: #1e293b;
@@ -181,7 +307,16 @@
     .str { color: #16a34a; }
     .com { color: #64748b; font-style: italic; }
 
-    /* Figures */
+    /* Figure Containers */
+    .full-fig img {
+      width: 100%;
+      max-height: 185px;
+      object-fit: cover;
+      object-position: top;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+    }
+
     .fig-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -210,67 +345,106 @@
       background: #f8fafc;
       line-height: 1.2;
     }
-
-    .full-fig img {
-      width: 100%;
-      max-height: 185px;
-      object-fit: cover;
-      object-position: top;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-    }
-
-    .badge-pk { color: #0284c7; font-weight: 700; }
-    .badge-fk { color: #d97706; font-weight: 700; }
   </style>
 </head>
 <body>
 
   <!-- =================================================================== -->
-  <!-- PAGE 1: OBJECTIVES, TOOLS, DATABASE DESIGN & ER DIAGRAM             -->
+  <!-- PAGE 1: FENI UNIVERSITY OFFICIAL LAB COVER PAGE                     -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="cover-frame">
+      <div class="cover-top-inst">
+        <h1 class="univ-name">FENI UNIVERSITY</h1>
+        <div class="dept-name">Department of Computer Science and Engineering (CSE)</div>
+        <div class="prog-name">Program: Undergraduate Bachelor of Science (B.Sc. in CSE)</div>
+        <div class="cover-divider"></div>
+
+        <div class="report-badge-box">
+          <div class="report-badge">LAB PROJECT REPORT</div>
+        </div>
+
+        <div class="course-title-text">Course Title: Database Management System Lab</div>
+      </div>
+
+      <div class="project-title-box">
+        <div class="project-label">PROJECT TITLE</div>
+        <div class="project-name-main">TraceVault: Software Bug &amp; Error Inventory Management System</div>
+        <div class="project-sub-topic">Core Lab Category: Inventory / Product Management</div>
+        <div class="project-links">
+          GitHub Repository: https://github.com/mhkh361/Tracevault<br>
+          Live Web Application: https://mhkh361.github.io/Tracevault/
+        </div>
+      </div>
+
+      <div>
+        <table class="submission-table">
+          <thead>
+            <tr>
+              <th>Submitted By</th>
+              <th>Submitted To</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="sub-field-label">Name:</span> Mahamud Hasan Fahad<br>
+                <span class="sub-field-label">Student ID:</span> 251031050<br>
+                <span class="sub-field-label">Batch:</span> CSE 34th Batch<br>
+                <span class="sub-field-label">Program:</span> B.Sc. in CSE<br>
+                <span class="sub-field-label">Department:</span> Dept. of CSE, Feni University
+              </td>
+              <td>
+                <span class="sub-field-label">Name:</span> Faria Sultana Bintha Rohman<br>
+                <span class="sub-field-label">Designation:</span> Lab Technical Officer (LTO)<br>
+                <span class="sub-field-label">Department:</span> Dept. of CSE, Feni University
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="cover-date-footer">
+          Date of Submission: November 16, 2026
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 2: OBJECTIVES, TOOLS, DATABASE DESIGN & ER DIAGRAM             -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
-      <span>Database Management System (DBMS) Laboratory</span>
-      <span>TraceVault Error Inventory System</span>
-      <span>Fall 2026</span>
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
     </div>
 
-    <div class="title-block">
-      <div class="title-course">Database Management System (DBMS) Laboratory</div>
-      <div class="title-main">TraceVault: Software Bug &amp; Error Inventory Management System</div>
-      <div class="title-meta">
-        <strong>Topic:</strong> Inventory / Product Management &nbsp;|&nbsp;
-        <strong>Architecture:</strong> Single-Page Application (SPA) &nbsp;|&nbsp;
-        <strong>Database:</strong> MySQL 8.0 InnoDB
-      </div>
-    </div>
-
-    <h2>1. Project Objective &amp; Topic Scope</h2>
+    <h2>1. Project Objective &amp; Topic Selection</h2>
     <p>
-      The goal of this laboratory project is to design, implement, and evaluate a single-page application (SPA) backed by a relational database to perform full <strong>CRUD operations</strong> (Create, Read, Update, Delete) and <strong>real-time SQL aggregation</strong>. Within the approved domain of <strong>Inventory Management</strong>, <em>TraceVault</em> models an engineering repository of software exceptions, runtime defects, occurrence frequencies, and verified resolutions. The project demonstrates:
+      The objective of this laboratory project is to develop, deploy, and evaluate a single-page application (SPA) backed by a normalized relational database (MySQL 8.0) demonstrating end-to-end <strong>CRUD operations</strong> (Create, Read, Update, Delete) and <strong>real-time SQL aggregation</strong>. Under the designated topic of <strong>Inventory Management</strong>, <em>TraceVault</em> manages an operational repository of software bugs, runtime exceptions, occurrence frequencies, and verified engineering solutions. The project satisfies all core academic requirements:
     </p>
     <ul>
-      <li>Strict relational table normalization adhering to <strong>Third Normal Form (3NF)</strong> with foreign key constraints.</li>
-      <li>End-to-end execution of core SQL queries: <code>CREATE</code>, <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, and <code>DELETE</code>.</li>
-      <li>Real-time telemetry using five SQL aggregate functions: <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MAX()</code>, and <code>MIN()</code>.</li>
-      <li>Intuitive single-page user interface without page reloads, featuring search, modal dialogs, and instant deduplication.</li>
+      <li>Strict relational table normalization adhering to <strong>Third Normal Form (3NF)</strong> with foreign key referential integrity.</li>
+      <li>Comprehensive execution of core SQL queries: <code>CREATE</code>, <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, and <code>DELETE</code>.</li>
+      <li>Real-time telemetry computing five SQL aggregate functions: <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MAX()</code>, and <code>MIN()</code>.</li>
+      <li>Fluid single-page user interface without page reloads, featuring live search, modal dialogs, and instant deduplication.</li>
     </ul>
 
     <h2>2. Tools and Technologies Used</h2>
     <ul>
-      <li><strong>Database Management System (RDBMS):</strong> MySQL 8.0 / MariaDB utilizing the <code>InnoDB</code> ACID-compliant storage engine with Foreign Key cascades and <code>ON DELETE RESTRICT</code> integrity rules.</li>
-      <li><strong>Backend Runtime &amp; API:</strong> Node.js (v22 LTS) with Express.js 4.19, utilizing <code>mysql2/promise</code> for connection pooling (10 connections) and <code>express-rate-limit</code> for endpoint security.</li>
+      <li><strong>Database Management System (RDBMS):</strong> MySQL 8.0 / MariaDB utilizing the <code>InnoDB</code> ACID-compliant storage engine, enforcing primary keys, foreign key cascading updates, and <code>ON DELETE RESTRICT</code> integrity rules.</li>
+      <li><strong>Backend Server &amp; API Runtime:</strong> Node.js (v22 LTS) with Express.js 4.19, utilizing <code>mysql2/promise</code> for connection pooling (10 connections) and <code>express-rate-limit</code> for endpoint security.</li>
       <li><strong>Frontend User Interface:</strong> Single-Page Application built with semantic HTML5, CSS3 Matte Carbon Design System, and modern ES6+ JavaScript utilizing the Fetch API and DOM dialogs.</li>
       <li><strong>Cryptographic Deduplication:</strong> Node.js <code>crypto</code> and Web Crypto API generating deterministic SHA-256 fingerprint hashes.</li>
     </ul>
 
     <h2>3. Database Table Design (3NF Normalization)</h2>
     <p>
-      The schema decomposes data into two normalized tables in Third Normal Form (3NF): the parent classification entity <code>domains</code> and the child inventory entity <code>error_logs</code>.
+      The database schema strictly adheres to <strong>Third Normal Form (3NF)</strong>, eliminating update, insertion, and deletion anomalies by separating domain classifications from discrete error records into two tables:
     </p>
 
-    <table>
+    <table class="data-table">
       <thead>
         <tr>
           <th>Table</th>
@@ -384,26 +558,26 @@
 
     <h2>4. Entity-Relationship (ER) Diagram</h2>
     <div style="text-align: center; margin: 4px 0 0 0;">
-      <img src="screenshots/00_er_diagram.png" alt="TraceVault 3NF ER Diagram" style="width: 86%; max-height: 155px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;">
+      <img src="screenshots/00_er_diagram.png" alt="TraceVault 3NF ER Diagram" style="width: 86%; max-height: 145px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;">
     </div>
     <p style="font-size: 8pt; color: #475569; text-align: center; margin-top: 2px;">
       <em>Figure 1: Relational Entity-Relationship Diagram depicting 1:N cardinality between DOMAINS and ERROR_LOGS with foreign key integrity.</em>
     </p>
 
     <div class="page-footer">
-      <span>TraceVault Lab Report</span>
-      <span>Page 1 of 3</span>
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 2 of 5</span>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 2: KEY SQL QUERIES & SAMPLE DATA POPULATION                    -->
+  <!-- PAGE 3: KEY SQL QUERIES                                             -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
-      <span>Database Management System (DBMS) Laboratory</span>
-      <span>TraceVault Error Inventory System</span>
-      <span>Fall 2026</span>
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
     </div>
 
     <h2>5. Key SQL Queries for Database Operations</h2>
@@ -479,12 +653,28 @@
 <span class="com">-- Delete error record after user modal confirmation</span>
 <span class="kw">DELETE FROM</span> error_logs <span class="kw">WHERE</span> error_id = ?;</div>
 
+    <div class="page-footer">
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 3 of 5</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 4: SAMPLE DATA POPULATION & OVERVIEW SCREENSHOT                -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
+    </div>
+
     <h2>6. Sample Data Demonstration (12 Seeded Records)</h2>
     <p>
       The database contains 12 seed records across 4 domains (exceeding the course requirement of 10 records):
     </p>
 
-    <table>
+    <table class="data-table">
       <thead>
         <tr>
           <th style="width: 30px;">ID</th>
@@ -510,36 +700,38 @@
       </tbody>
     </table>
 
-    <div class="page-footer">
-      <span>TraceVault Lab Report</span>
-      <span>Page 2 of 3</span>
-    </div>
-  </div>
-
-  <!-- =================================================================== -->
-  <!-- PAGE 3: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
-  <!-- =================================================================== -->
-  <div class="page">
-    <div class="page-header">
-      <span>Database Management System (DBMS) Laboratory</span>
-      <span>TraceVault Error Inventory System</span>
-      <span>Fall 2026</span>
-    </div>
-
-    <h2>7. Screenshots of the Working Application</h2>
+    <h2>7. Single-Page Application Architecture &amp; User Interface</h2>
     <p>
       TraceVault functions strictly as a single-page application. All record creation, table viewing, searching, modal updates, and deletions occur within one responsive interface without full-page reloads.
     </p>
 
     <!-- Full Width Screenshot 1 -->
-    <div style="margin-bottom: 8px;">
+    <div style="margin-top: 6px;">
       <div class="full-fig">
-        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview">
+        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview" style="max-height: 250px;">
       </div>
-      <p style="font-size: 7.5pt; color: #475569; margin-top: 2px;">
+      <p style="font-size: 8pt; color: #475569; margin-top: 4px;">
         <strong>Figure 2: TraceVault Single-Page Inventory Overview</strong> — Showing real-time SQL aggregate KPI cards (<code>COUNT(*)</code>, <code>SUM(times_hit)</code>, <code>AVG(times_hit)</code>, <code>MAX &amp; MIN</code>), left-hand <code>INSERT INTO</code> submission form, parent domain list, and normalized 8-column records table.
       </p>
     </div>
+
+    <div class="page-footer">
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 4 of 5</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 5: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
+    </div>
+
+    <h2>8. Interactive Application Features in Action</h2>
 
     <!-- 2 Column Grid for Screenshots 2 & 3 -->
     <div class="fig-grid">
@@ -560,14 +752,14 @@
     <!-- Screenshot 4 -->
     <div style="margin-top: 6px; margin-bottom: 8px;">
       <div class="full-fig">
-        <img src="screenshots/04_ai_diagnostic_workbench.png" alt="Diagnostic Workbench" style="max-height: 120px;">
+        <img src="screenshots/04_ai_diagnostic_workbench.png" alt="Diagnostic Workbench" style="max-height: 140px;">
       </div>
-      <p style="font-size: 7.5pt; color: #475569; margin-top: 2px;">
+      <p style="font-size: 8pt; color: #475569; margin-top: 3px;">
         <strong>Figure 5: Live Code Bug Fixer Workbench (Alt + L)</strong> — Interactive diagnostic workspace featuring language auto-detection, local heuristic analysis, and 1-click database commit.
       </p>
     </div>
 
-    <h2>8. Lab Evaluation Compliance &amp; Conclusion</h2>
+    <h2>9. Lab Evaluation Compliance &amp; Conclusion</h2>
     <p>
       The TraceVault project fully satisfies all requirements stipulated in the DBMS Laboratory evaluation guidelines:
     </p>
@@ -580,8 +772,8 @@
     </ol>
 
     <div class="page-footer">
-      <span>TraceVault Lab Report</span>
-      <span>Page 3 of 3</span>
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 5 of 5</span>
     </div>
   </div>
 

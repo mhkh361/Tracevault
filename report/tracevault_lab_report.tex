@@ -1,5 +1,5 @@
 \documentclass[10pt,a4paper]{article}
-\usepackage[margin=0.65in,top=0.65in,bottom=0.65in]{geometry}
+\usepackage[margin=0.7in,top=0.7in,bottom=0.7in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -11,7 +11,6 @@
 \usepackage{fancyhdr}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{multicol}
 
 % Color definitions
 \definecolor{codegreen}{rgb}{0.18,0.63,0.27}
@@ -46,29 +45,92 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{\textbf{DBMS Laboratory Report} --- Fall 2026}
+\lhead{\textbf{Feni University} --- Dept. of CSE}
 \rhead{\textbf{TraceVault}: Error Inventory System}
-\cfoot{\thepage}
+\lfoot{\footnotesize Student: Mahamud Hasan Fahad (ID: 251031050)}
+\rfoot{\thepage}
 
 \begin{document}
 
-% -------------------------------------------------------------------
-% HEADER / TITLE BLOCK
-% -------------------------------------------------------------------
+% ===================================================================
+% COVER PAGE: OFFICIAL FENI UNIVERSITY LAB REPORT FORMAT
+% ===================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+
+% Outer decorative border
+\begin{tikzpicture}[remember picture, overlay]
+  \draw[line width=1.5pt, color=navyaccent] 
+    ($(current page.north west) + (1.2cm,-1.2cm)$) 
+    rectangle 
+    ($(current page.south east) + (-1.2cm,1.2cm)$);
+  \draw[line width=0.5pt, color=navyaccent!60] 
+    ($(current page.north west) + (1.3cm,-1.3cm)$) 
+    rectangle 
+    ($(current page.south east) + (-1.3cm,1.3cm)$);
+\end{tikzpicture}
+
+\vspace{0.4cm}
 \begin{center}
-  {\Large \textbf{\color{navyaccent}Database Management System (DBMS) Laboratory}}\\[4pt]
-  {\LARGE \textbf{TraceVault: Software Bug \& Error Inventory Management System}}\\[6pt]
-  \textbf{Category:} Inventory / Product Management \quad$|$\quad \textbf{Architecture:} Single-Page Application (SPA)\\[4pt]
-  \rule{\linewidth}{1.2pt}
+  {\Huge \textbf{\color{navyaccent}FENI UNIVERSITY}}\\[6pt]
+  {\large \textbf{Department of Computer Science and Engineering (CSE)}}\\[3pt]
+  {\normalsize Program: Undergraduate Bachelor of Science (B.Sc. in CSE)}\\[10pt]
+  \rule{0.85\linewidth}{1.2pt}\\[18pt]
+
+  \vspace{0.6cm}
+  \fbox{\parbox{0.45\linewidth}{\centering \bfseries \large LAB PROJECT REPORT}}\\[18pt]
+
+  {\Large \textbf{Course Title: Database Management System Lab}}\\[25pt]
+
+  % Project Title Box
+  \begin{tikzpicture}
+    \node[draw=navyaccent!80, fill=backcolour, rounded corners=6pt, line width=1.2pt, inner sep=14pt, text width=0.84\linewidth, align=center] {
+      {\footnotesize \textbf{\color{codegray}PROJECT TITLE}}\\[6pt]
+      {\Large \textbf{\color{navyaccent}TraceVault: Software Bug \& Error Inventory Management System}}\\[6pt]
+      {\small \textbf{Core Topic Category:} Inventory / Product Management}\\[8pt]
+      {\scriptsize \texttt{GitHub Repository: https://github.com/mhkh361/Tracevault}}\\[2pt]
+      {\scriptsize \texttt{Live Application: https://mhkh361.github.io/Tracevault/}}
+    };
+  \end{tikzpicture}
+
+  \vspace{1.8cm}
+
+  % Submission Information Table
+  \begin{center}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{|p{0.44\linewidth}|p{0.44\linewidth}|}
+    \hline
+    \rowcolor{backcolour}
+    \textbf{Submitted By} & \textbf{Submitted To} \\
+    \hline
+    \textbf{Name:} Mahamud Hasan Fahad \newline
+    \textbf{Student ID:} 251031050 \newline
+    \textbf{Batch:} CSE 34th Batch \newline
+    \textbf{Program:} B.Sc. in CSE \newline
+    \textbf{Department:} Dept. of CSE, Feni University 
+    & 
+    \textbf{Name:} Faria Sultana Bintha Rohman \newline
+    \textbf{Designation:} Lab Technical Officer (LTO) \newline
+    \textbf{Department:} Dept. of CSE, Feni University \\[22pt]
+    \hline
+  \end{tabular}
+  \end{center}
+
+  \vfill
+  {\large \textbf{Date of Submission:} November 16, 2026}
+  \vspace{0.6cm}
 \end{center}
 
-\vspace{-6pt}
+\end{titlepage}
 
-% -------------------------------------------------------------------
-% 1. PROJECT OBJECTIVE & TOPIC SELECTION
-% -------------------------------------------------------------------
-\section{Project Objective \& Scope}
-The primary objective of this project is to design, implement, and evaluate a responsive, single-page application (SPA) backed by a normalized relational database (MySQL 8.0) to perform end-to-end \textbf{CRUD operations} (Create, Read, Update, Delete) and \textbf{real-time SQL aggregation}. Under the chosen topic of \textbf{Inventory Management}, \textit{TraceVault} models an engineering inventory of software exceptions, runtime defects, and verified remediation procedures. The application demonstrates:
+\newpage
+\setcounter{page}{2}
+
+% ===================================================================
+% SECTION 1 & 2: OBJECTIVE, SCOPE, TOOLS & TECHNOLOGIES
+% ===================================================================
+\section{Project Objective \& Topic Scope}
+The primary objective of this laboratory project is to design, implement, and evaluate a responsive single-page application (SPA) backed by a normalized relational database (MySQL 8.0) to perform end-to-end \textbf{CRUD operations} (Create, Read, Update, Delete) and \textbf{real-time SQL aggregation}. Under the approved academic category of \textbf{Inventory Management}, \textit{TraceVault} models an operational engineering inventory of software bugs, runtime exceptions, occurrence frequencies, and verified remediation procedures. The application demonstrates:
 \begin{itemize}\setlength\itemsep{-2pt}
   \item Strict relational schema design adhering to \textbf{Third Normal Form (3NF)} with parent-child table constraints.
   \item Practical execution of parameterized SQL commands: \texttt{CREATE}, \texttt{INSERT}, \texttt{SELECT}, \texttt{UPDATE}, and \texttt{DELETE}.
@@ -76,21 +138,18 @@ The primary objective of this project is to design, implement, and evaluate a re
   \item High-performance filtering, cryptographic deduplication (SHA-256), and single-page interaction without navigation redirects.
 \end{itemize}
 
-% -------------------------------------------------------------------
-% 2. TOOLS & TECHNOLOGIES
-% -------------------------------------------------------------------
 \section{Tools and Technologies Used}
 \begin{itemize}\setlength\itemsep{-2pt}
-  \item \textbf{Relational Database Management System (RDBMS):} MySQL 8.0 / MariaDB utilizing the \texttt{InnoDB} transactional storage engine, enforcing primary keys, foreign key cascading updates, and \texttt{RESTRICT} delete constraints.
+  \item \textbf{Relational Database Management System (RDBMS):} MySQL 8.0 / MariaDB utilizing the \texttt{InnoDB} transactional storage engine, enforcing primary keys, foreign key cascading updates, and \texttt{ON DELETE RESTRICT} constraints.
   \item \textbf{Backend Server \& API Runtime:} Node.js (v22 LTS) with Express.js 4.19, utilizing \texttt{mysql2/promise} for thread-safe asynchronous connection pooling and \texttt{express-rate-limit} for API traffic protection.
   \item \textbf{Frontend User Interface:} Modern Single-Page Application (HTML5, CSS3 Matte Carbon Design System, and Vanilla JavaScript ES6+) communicating via RESTful endpoints without full-page reloads.
   \item \textbf{Cryptographic Deduplication:} Node.js \texttt{crypto} and Web Crypto API generating deterministic 256-bit signature hashes.
 \end{itemize}
 
-% -------------------------------------------------------------------
-% 3. DATABASE DESIGN & ENTITY-RELATIONSHIP (ER) DIAGRAM
-% -------------------------------------------------------------------
-\section{Database Table Design \& ER Diagram}
+% ===================================================================
+% SECTION 3 & 4: DATABASE SCHEMA & ER DIAGRAM
+% ===================================================================
+\section{Database Table Design (3NF Normalization)}
 The relational schema comprises two normalized tables in \textbf{Third Normal Form (3NF)}: the parent entity \texttt{domains} and the dependent child entity \texttt{error\_logs}.
 
 \subsection{Relational Schema Specification}
@@ -114,67 +173,23 @@ The relational schema comprises two normalized tables in \textbf{Third Normal Fo
  & \texttt{fix\_requirements} & \texttt{TEXT} & \texttt{NOT NULL} & Prescribed remediation and code patch \\
  & \texttt{times\_hit} & \texttt{INT} & \texttt{NOT NULL, DEFAULT 1, CHECK $\ge$ 1} & Cumulative occurrence counter \\
  & \texttt{is\_verified} & \texttt{TINYINT(1)} & \texttt{NOT NULL, DEFAULT 1} & Verification status flag (1=Verified, 0=Pending) \\
- & \texttt{created\_at} & \texttt{TIMESTAMP} & \texttt{DEFAULT CURRENT_TIMESTAMP} & Record creation timestamp \\
+ & \texttt{created\_at} & \texttt{TIMESTAMP} & \texttt{DEFAULT CURRENT\_TIMESTAMP} & Record creation timestamp \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \subsection{Entity-Relationship (ER) Diagram}
 \begin{center}
-\begin{tikzpicture}[
-    entity/.style={rectangle, draw=navyaccent!90, fill=backcolour, thick, minimum width=2.8cm, minimum height=1.6cm, align=center, font=\scriptsize},
-    rel/.style={diamond, draw=codeblue!90, fill=backcolour, thick, minimum width=1.8cm, minimum height=1.4cm, align=center, font=\scriptsize},
-    attr/.style={ellipse, draw=codegray!80, fill=white, thin, align=center, font=\tiny, inner sep=2pt},
-    pkattr/.style={ellipse, draw=navyaccent!90, fill=white, thick, font=\tiny\bfseries, inner sep=2pt},
-    fkattr/.style={ellipse, draw=codeblue!90, fill=white, dashed, font=\tiny, inner sep=2pt},
-    line/.style={draw=darkgray, thick}
-]
-
-% Entities
-\node[entity] (dom) at (0, 0) {\textbf{DOMAINS}\\[2pt]\textit{(Parent Table)}};
-\node[rel] (has) at (4.5, 0) {\textbf{Categorizes}\\[-2pt](1 : N)};
-\node[entity] (err) at (9.0, 0) {\textbf{ERROR\_LOGS}\\[2pt]\textit{(Child Inventory)}};
-
-% Connections
-\path[line] (dom) -- node[above, font=\scriptsize\bfseries] {1} (has);
-\path[line] (has) -- node[above, font=\scriptsize\bfseries] {N} (err);
-
-% Domains Attributes
-\node[pkattr] (d_id) at (-1.8, 1.4) {\underline{domain\_id} (PK)};
-\node[attr] (d_name) at (-0.2, 1.5) {domain\_name};
-\node[attr] (d_desc) at (-1.8, -1.4) {description};
-\node[attr] (d_time) at (-0.2, -1.5) {created\_at};
-
-\path[line] (dom) -- (d_id);
-\path[line] (dom) -- (d_name);
-\path[line] (dom) -- (d_desc);
-\path[line] (dom) -- (d_time);
-
-% Error Logs Attributes
-\node[pkattr] (e_id) at (7.4, 1.4) {\underline{error\_id} (PK)};
-\node[fkattr] (e_fkid) at (9.0, 1.5) {domain\_id (FK)};
-\node[attr] (e_stack) at (10.6, 1.4) {tech\_stack};
-\node[attr] (e_sig) at (11.0, 0.4) {error\_signature};
-\node[attr] (e_hash) at (11.0, -0.6) {signature\_hash};
-\node[attr] (e_cause) at (10.6, -1.4) {root\_cause};
-\node[attr] (e_fix) at (9.0, -1.5) {fix\_requirements};
-\node[attr] (e_hits) at (7.4, -1.4) {times\_hit};
-
-\path[line] (err) -- (e_id);
-\path[line] (err) -- (e_fkid);
-\path[line] (err) -- (e_stack);
-\path[line] (err) -- (e_sig);
-\path[line] (err) -- (e_hash);
-\path[line] (err) -- (e_cause);
-\path[line] (err) -- (e_fix);
-\path[line] (err) -- (e_hits);
-
-\end{tikzpicture}
+  \includegraphics[width=0.88\linewidth]{screenshots/00_er_diagram.png}
+  \captionof{figure}{\textbf{Relational Entity-Relationship Diagram}: Illustrating 1:N cardinality between DOMAINS and ERROR\_LOGS with InnoDB foreign key constraint (\texttt{ON UPDATE CASCADE, ON DELETE RESTRICT}).}
+  \label{fig:er_diagram}
 \end{center}
 
-% -------------------------------------------------------------------
-% 4. KEY SQL QUERIES
-% -------------------------------------------------------------------
+\newpage
+
+% ===================================================================
+% SECTION 5: KEY SQL QUERIES
+% ===================================================================
 \section{Key SQL Queries for Database Operations}
 All database interactions are implemented through standard, parameterized SQL queries executing inside MySQL transactions.
 
@@ -260,15 +275,13 @@ WHERE error_id = ?;
 
 -- Delete record after user confirmation
 DELETE FROM error_logs WHERE error_id = ?;
-
--- Attempting to delete a referenced parent domain is strictly blocked by InnoDB
-DELETE FROM domains WHERE domain_id = ?; 
--- Fails with ER_ROW_IS_REFERENCED_2 if any error_logs row references this domain_id!
 \end{lstlisting}
 
-% -------------------------------------------------------------------
-% 5. SAMPLE DATA DEMONSTRATION
-% -------------------------------------------------------------------
+\newpage
+
+% ===================================================================
+% SECTION 6 & 7A: SAMPLE DATA & INVENTORY SCREENSHOT
+% ===================================================================
 \section{Sample Data Population (12 Seeded Records)}
 The database includes four primary domain categories (\textit{Frontend, Backend, Database, Fullstack}) and 12 complete, verified technical records exceeding the lab rubric's minimum requirement of 10 records:
 \begin{center}
@@ -293,18 +306,22 @@ The database includes four primary domain categories (\textit{Frontend, Backend,
 \end{tabular}
 \end{center}
 
-% -------------------------------------------------------------------
-% 6. APPLICATION SCREENSHOTS & USER INTERFACE
-% -------------------------------------------------------------------
-\section{Screenshots of the Working Application}
+\section{Single-Page Application Architecture \& User Interface}
 TraceVault operates strictly as a single-page application. All record creation, table viewing, searching, modal updates, and deletions occur within one responsive interface without full-page reloads.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.96\linewidth]{screenshots/01_inventory_overview.png}
+  \includegraphics[width=0.98\linewidth]{screenshots/01_inventory_overview.png}
   \caption{\textbf{TraceVault Single-Page Inventory Overview}: Displaying real-time SQL aggregate KPI cards (\texttt{COUNT}, \texttt{SUM}, \texttt{AVG}, \texttt{MAX \& MIN}), left-hand \texttt{INSERT INTO} submission form, parent domain list, and normalized records table.}
   \label{fig:overview}
 \end{figure}
+
+\newpage
+
+% ===================================================================
+% SECTION 7B & 8: INTERACTIVE FEATURES & EVALUATION COMPLIANCE
+% ===================================================================
+\section{Interactive Application Features in Action}
 
 \begin{figure}[htbp]
   \centering
@@ -324,14 +341,11 @@ TraceVault operates strictly as a single-page application. All record creation, 
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.88\linewidth]{screenshots/04_ai_diagnostic_workbench.png}
+  \includegraphics[width=0.92\linewidth]{screenshots/04_ai_diagnostic_workbench.png}
   \caption{\textbf{Diagnostic Workbench \& Fixer (Alt+L)}: Built-in deterministic heuristic analysis and 1-click database commit.}
   \label{fig:workbench}
 \end{figure}
 
-% -------------------------------------------------------------------
-% 7. LAB EVALUATION CHECKLIST & CONCLUSION
-% -------------------------------------------------------------------
 \section{Conclusion \& Evaluation Compliance}
 The TraceVault project fully satisfies all requirements stipulated in the DBMS Laboratory evaluation guidelines:
 \begin{enumerate}\setlength\itemsep{-2pt}

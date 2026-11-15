@@ -3,25 +3,23 @@ const fs = require('fs');
 const path = require('path');
 
 (async () => {
-  const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
   const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-  const execPath = fs.existsSync(edgePath) ? edgePath : chromePath;
+  const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+  const execPath = fs.existsSync(chromePath) ? chromePath : edgePath;
 
   const htmlPath = path.resolve(__dirname, '..', 'report', 'report_print.html');
   const pdfPath = path.resolve(__dirname, '..', 'report', 'tracevault_lab_report.pdf');
   const fileUrl = 'file:///' + htmlPath.replace(/\\/g, '/');
 
-  console.log('Rendering PDF from:', fileUrl);
+  console.log('Rendering 5-page PDF report using:', execPath);
   const browser = await puppeteer.launch({
     executablePath: execPath,
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--allow-file-access-from-files']
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
   });
 
   const page = await browser.newPage();
   await page.goto(fileUrl, { waitUntil: 'load' });
-  await new Promise(r => setTimeout(r, 1000));
-
   await page.pdf({
     path: pdfPath,
     format: 'A4',
