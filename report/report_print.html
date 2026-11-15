@@ -25,8 +25,8 @@
 
     .page {
       width: 100%;
-      height: 275mm;
-      max-height: 275mm;
+      height: 272mm;
+      max-height: 272mm;
       overflow: hidden;
       page-break-after: always;
       position: relative;
@@ -57,7 +57,7 @@
       color: #0f172a;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      font-family: 'Crimson Pro', serif;
+      font-family: 'Times New Roman', Times, serif;
     }
 
     .dept-name {
@@ -217,7 +217,7 @@
       color: #0f2d59;
       border-bottom: 1px solid #e2e8f0;
       padding-bottom: 2px;
-      margin: 8px 0 4px 0;
+      margin: 10px 0 5px 0;
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
@@ -226,11 +226,11 @@
       font-size: 9.5pt;
       font-weight: 700;
       color: #1e293b;
-      margin: 6px 0 2px 0;
+      margin: 8px 0 3px 0;
     }
 
     p {
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       text-align: justify;
     }
 
@@ -259,8 +259,8 @@
     table.data-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 5px 0 8px 0;
-      font-size: 8pt;
+      margin: 6px 0 10px 0;
+      font-size: 8.2pt;
     }
 
     table.data-table th, table.data-table td {
@@ -293,11 +293,11 @@
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 4px;
-      padding: 5px 8px;
-      margin: 4px 0 6px 0;
+      padding: 6px 8px;
+      margin: 5px 0 8px 0;
       font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 7.2pt;
-      line-height: 1.25;
+      font-size: 7.4pt;
+      line-height: 1.28;
       color: #1e293b;
       white-space: pre-wrap;
     }
@@ -310,18 +310,16 @@
     /* Figure Containers */
     .full-fig img {
       width: 100%;
-      max-height: 185px;
-      object-fit: cover;
-      object-position: top;
       border: 1px solid #cbd5e1;
       border-radius: 4px;
+      display: block;
     }
 
     .fig-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin: 6px 0;
+      gap: 10px;
+      margin: 8px 0;
     }
 
     .fig-card {
@@ -339,11 +337,11 @@
     }
 
     .fig-caption {
-      font-size: 7.5pt;
+      font-size: 7.8pt;
       color: #334155;
-      padding: 3px 6px;
+      padding: 4px 6px;
       background: #f8fafc;
-      line-height: 1.2;
+      line-height: 1.25;
     }
   </style>
 </head>
@@ -411,7 +409,7 @@
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 2: OBJECTIVES, TOOLS, DATABASE DESIGN & ER DIAGRAM             -->
+  <!-- PAGE 2: OBJECTIVES, TOOLS, DATABASE DESIGN & SPECIFICATIONS         -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
@@ -556,22 +554,56 @@
       </tbody>
     </table>
 
-    <h2>4. Entity-Relationship (ER) Diagram</h2>
-    <div style="text-align: center; margin: 4px 0 0 0;">
-      <img src="screenshots/00_er_diagram.png" alt="TraceVault 3NF ER Diagram" style="width: 86%; max-height: 145px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;">
-    </div>
-    <p style="font-size: 8pt; color: #475569; text-align: center; margin-top: 2px;">
-      <em>Figure 1: Relational Entity-Relationship Diagram depicting 1:N cardinality between DOMAINS and ERROR_LOGS with foreign key integrity.</em>
-    </p>
-
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 2 of 5</span>
+      <span>Page 2 of 6</span>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 3: KEY SQL QUERIES                                             -->
+  <!-- PAGE 3: FULL ENTITY-RELATIONSHIP (ER) DIAGRAM & 3NF ANALYSIS        -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
+    </div>
+
+    <h2>4. Entity-Relationship (ER) Diagram &amp; Relational Architecture</h2>
+    <p>
+      The Entity-Relationship (ER) model below illustrates the structural design, entity relationships, and integrity constraints governing TraceVault. The parent entity <code>DOMAINS</code> maintains a <strong>one-to-many (1:N) relationship</strong> with the child inventory entity <code>ERROR_LOGS</code>. An error incident must strictly belong to exactly one domain category, while a domain category can classify multiple error incidents.
+    </p>
+
+    <div style="text-align: center; margin: 10px 0 12px 0;">
+      <img src="screenshots/00_er_diagram.png" alt="TraceVault 3NF ER Diagram" style="width: 95%; max-height: 220px; object-fit: contain; border: 1.5px solid #cbd5e1; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    </div>
+    <p style="font-size: 8.5pt; color: #475569; text-align: center; margin-top: -4px; margin-bottom: 12px;">
+      <em>Figure 1: Full Relational Entity-Relationship Diagram depicting 1:N cardinality, Primary/Foreign Keys, and field constraints.</em>
+    </p>
+
+    <h3>A. Cardinality &amp; Referential Integrity Rules</h3>
+    <ul>
+      <li><strong>Parent Key &rarr; Foreign Key Mapping:</strong> The <code>domain_id</code> in the parent table <code>domains</code> acts as the Primary Key and is mapped to <code>domain_id</code> in <code>error_logs</code> as a Foreign Key (<code>fk_error_domain</code>).</li>
+      <li><strong>ON UPDATE CASCADE:</strong> If a domain's primary identifier is updated, the relational engine automatically cascades the modification across all dependent child error logs.</li>
+      <li><strong>ON DELETE RESTRICT:</strong> Deletion of a parent domain is strictly blocked by InnoDB if any child error record references it. This prevents orphan records and guarantees database integrity.</li>
+    </ul>
+
+    <h3>B. Third Normal Form (3NF) Normalization Breakdown</h3>
+    <ul>
+      <li><strong>First Normal Form (1NF):</strong> All table columns contain atomic, non-decomposable values. No repeating groups or array values are stored.</li>
+      <li><strong>Second Normal Form (2NF):</strong> All non-key attributes (e.g., <code>tech_stack</code>, <code>error_signature</code>, <code>root_cause</code>) are fully functionally dependent on the entire primary key (<code>error_id</code>).</li>
+      <li><strong>Third Normal Form (3NF):</strong> There are no transitive dependencies. Domain names and descriptions belong exclusively to the <code>domains</code> table rather than repeating across individual error records.</li>
+    </ul>
+
+    <div class="page-footer">
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 3 of 6</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 4: KEY SQL QUERIES                                             -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
@@ -655,12 +687,12 @@
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 3 of 5</span>
+      <span>Page 4 of 6</span>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 4: SAMPLE DATA POPULATION & OVERVIEW SCREENSHOT                -->
+  <!-- PAGE 5: SAMPLE DATA POPULATION & OVERVIEW SCREENSHOT                -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
@@ -708,7 +740,7 @@
     <!-- Full Width Screenshot 1 -->
     <div style="margin-top: 6px;">
       <div class="full-fig">
-        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview" style="max-height: 250px;">
+        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview" style="max-height: 230px;">
       </div>
       <p style="font-size: 8pt; color: #475569; margin-top: 4px;">
         <strong>Figure 2: TraceVault Single-Page Inventory Overview</strong> — Showing real-time SQL aggregate KPI cards (<code>COUNT(*)</code>, <code>SUM(times_hit)</code>, <code>AVG(times_hit)</code>, <code>MAX &amp; MIN</code>), left-hand <code>INSERT INTO</code> submission form, parent domain list, and normalized 8-column records table.
@@ -717,12 +749,12 @@
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 4 of 5</span>
+      <span>Page 5 of 6</span>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 5: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
+  <!-- PAGE 6: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
@@ -773,7 +805,7 @@
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 5 of 5</span>
+      <span>Page 6 of 6</span>
     </div>
   </div>
 
