@@ -20,6 +20,42 @@ const DEFAULT_ERRORS = [
   { error_id: 12, domain_id: 4, domain_name: 'Fullstack', tech_stack: 'WebSockets / TLS', error_signature: 'Mixed Content: The page at HTTPS was loaded over HTTPS, but requested an insecure ws:// endpoint', root_cause: 'Hardcoded insecure ws:// or http:// protocol used inside an HTTPS production origin.', fix_requirements: 'Upgrade connections to wss:// and https:// when window.location.protocol is https:.', times_hit: 2, is_verified: 1 }
 ];
 
+// Live Code Presets for Alt+L Demonstration
+const CODE_PRESETS = {
+  cors: {
+    domain_id: 1,
+    tech_stack: 'Express / Fetch CORS',
+    code: `// Broken Frontend + Backend Request\nfetch('http://localhost:4000/api/orders', {\n  method: 'POST',\n  credentials: 'include'\n});\n// Console Error: Access to fetch at 'http://localhost:4000/api/orders' from origin 'http://localhost:3000' has been blocked by CORS policy`,
+    signature: 'Access to fetch at origin blocked by CORS policy (credentials mode)',
+    cause: 'Backend server does not include Access-Control-Allow-Origin and Access-Control-Allow-Credentials headers.',
+    fix: `const cors = require('cors');\napp.use(cors({ origin: 'http://localhost:3000', credentials: true }));`
+  },
+  react: {
+    domain_id: 1,
+    tech_stack: 'React 18 / State Hook',
+    code: `function CounterView({ items }) {\n  const [total, setTotal] = useState(0);\n  // BUG: Calling state setter directly during render\n  setTotal(items.length);\n  return <div>{total}</div>;\n}`,
+    signature: 'Too many re-renders. React limits the number of renders to prevent an infinite loop',
+    cause: 'setTotal(items.length) is called unconditionally inside the component render body, triggering an infinite render loop.',
+    fix: `useEffect(() => {\n  setTotal(items.length);\n}, [items.length]);`
+  },
+  mysql: {
+    domain_id: 3,
+    tech_stack: 'MySQL 8.0 / Foreign Key',
+    code: `INSERT INTO error_logs (domain_id, tech_stack, error_signature)\nVALUES (99, 'MySQL 8.0', 'Foreign Key Test');\n-- Error 1452 (23000): Cannot add or update a child row: a foreign key constraint fails`,
+    signature: 'ER_NO_REFERENCED_ROW_2: Foreign key constraint fails on domain_id',
+    cause: 'Attempted to insert child record with domain_id = 99 which does not exist in parent table domains.',
+    fix: `INSERT INTO domains (domain_id, domain_name, description) VALUES (5, 'Cloud', 'Cloud infra');\nINSERT INTO error_logs (domain_id, ...) VALUES (5, ...);`
+  },
+  async: {
+    domain_id: 2,
+    tech_stack: 'Node.js / Express Async',
+    code: `app.post('/api/login', async (req, res) => {\n  if (!req.body.email) {\n    res.status(400).json({ error: 'Email required' }); // Missing return!\n  }\n  res.json({ status: 'ok' });\n});`,
+    signature: 'Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client',
+    cause: 'Missing return keyword before res.status(400).json(), causing execution to continue to the second res.json() call.',
+    fix: `if (!req.body.email) {\n  return res.status(400).json({ error: 'Email required' });\n}\nreturn res.json({ status: 'ok' });`
+  }
+};
+
 let useLocalFallback = false;
 let apiBase = '';
 let domainsState = [];
@@ -35,6 +71,20 @@ const statSumEl = document.getElementById('stat-sum');
 const statAvgEl = document.getElementById('stat-avg');
 const statMaxEl = document.getElementById('stat-max');
 const statMinEl = document.getElementById('stat-min');
+
+const tabLabView = document.getElementById('tab-lab-view');
+const tabLiveFixer = document.getElementById('tab-live-fixer');
+const labWorkspace = document.getElementById('lab-inventory-workspace');
+const fixerWorkspace = document.getElementById('live-fixer-workspace');
+
+const fixerDomainSelect = document.getElementById('fixer-domain');
+const fixerStackInput = document.getElementById('fixer-stack');
+const fixerCodeInput = document.getElementById('fixer-code-input');
+const fixerOutSig = document.getElementById('fixer-out-sig');
+const fixerOutCause = document.getElementById('fixer-out-cause');
+const fixerOutFix = document.getElementById('fixer-out-fix');
+const runDiagnosisBtn = document.getElementById('run-diagnosis-btn');
+const commitDiagnosisBtn = document.getElementById('commit-diagnosis-btn');
 
 const addErrorForm = document.getElementById('add-error-form');
 const addDomainSelect = document.getElementById('add-domain');
@@ -67,8 +117,97 @@ function showBanner(msg, tone = 'success') {
   statusBanner.hidden = false;
   bannerTimeout = setTimeout(() => {
     statusBanner.hidden = true;
-  }, 4200);
+  }, 4000);
 }
+
+// Switch between Default Lab View and Alt+L Live Code Bug Fixer
+function setWorkspaceMode(mode) {
+  const isFixer = mode === 'fixer';
+  fixerWorkspace.hidden = !isFixer;
+  labWorkspace.hidden = isFixer;
+  tabLiveFixer.classList.toggle('is-active', isFixer);
+  tabLabView.classList.toggle('is-active', !isFixer);
+  tabLiveFixer.setAttribute('aria-selected', String(isFixer));
+  tabLabView.setAttribute('aria-selected', String(!isFixer));
+}
+
+tabLabView.addEventListener('click', () => setWorkspaceMode('lab'));
+tabLiveFixer.addEventListener('click', () => setWorkspaceMode('fixer'));
+
+// Alt + L Keyboard Shortcut to toggle Live Code Bug Fixer
+document.addEventListener('keydown', (e) => {
+  if (e.altKey && e.key.toLowerCase() === 'l') {
+    e.preventDefault();
+    const nextMode = fixerWorkspace.hidden ? 'fixer' : 'lab';
+    setWorkspaceMode(nextMode);
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    setWorkspaceMode('lab');
+    searchInput.focus();
+  }
+});
+
+// Live Code Bug Fixer Presets & Heuristic Analyzer
+document.querySelectorAll('.chip-btn[data-preset]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const p = CODE_PRESETS[btn.dataset.preset];
+    if (!p) return;
+    fixerDomainSelect.value = String(p.domain_id);
+    fixerStackInput.value = p.tech_stack;
+    fixerCodeInput.value = p.code;
+    fixerOutSig.value = p.signature;
+    fixerOutCause.value = p.cause;
+    fixerOutFix.value = p.fix;
+  });
+});
+
+runDiagnosisBtn.addEventListener('click', () => {
+  const raw = fixerCodeInput.value.trim();
+  if (!raw) {
+    showBanner('Paste a broken code snippet or error trace first.', 'error');
+    return;
+  }
+  const firstLine = raw.split('\n').find((l) => /error|exception|fail|blocked|warning/i.test(l)) || raw.split('\n')[0];
+  const cleanSig = firstLine.replace(/^\/\/\s*|^--\s*/, '').trim().slice(0, 180);
+
+  if (!fixerOutSig.value.trim()) {
+    fixerOutSig.value = cleanSig || 'Runtime Exception in Code Block';
+  }
+  if (!fixerOutCause.value.trim()) {
+    if (/cors/i.test(raw)) {
+      fixerOutCause.value = 'Cross-origin request blocked due to missing Access-Control-Allow-Origin response header.';
+      fixerOutFix.value = "app.use(cors({ origin: 'http://localhost:3000', credentials: true }));";
+    } else if (/foreign key|1452/i.test(raw)) {
+      fixerOutCause.value = 'Child row references a non-existent parent domain_id in domains table.';
+      fixerOutFix.value = 'Verify parent domain_id exists in domains before executing INSERT INTO error_logs.';
+    } else if (/headers_sent|headers after/i.test(raw)) {
+      fixerOutCause.value = 'Multiple HTTP responses sent in a single handler due to missing return statement.';
+      fixerOutFix.value = 'Add explicit return before res.status(...).json(...) in conditional blocks.';
+    } else {
+      fixerOutCause.value = `Unhandled runtime exception detected in ${fixerStackInput.value || 'application module'}.`; fixerOutFix.value = `try {\n  ${raw.split('\n')[0]}\n} catch (err) {\n  console.error('Handled error:', err.message);\n}`;
+    }
+  }
+  showBanner('Live code diagnosis complete. Ready to commit to MySQL inventory.');
+});
+
+commitDiagnosisBtn.addEventListener('click', async () => {
+  const payload = {
+    domain_id: Number(fixerDomainSelect.value || 1),
+    tech_stack: fixerStackInput.value.trim() || 'Node.js / Runtime',
+    error_signature: fixerOutSig.value.trim(),
+    root_cause: fixerOutCause.value.trim(),
+    fix_requirements: fixerOutFix.value.trim(),
+    times_hit: 1,
+    is_verified: 1
+  };
+  if (!payload.error_signature || !payload.root_cause || !payload.fix_requirements) {
+    showBanner('Please run diagnosis or fill in Signature, Cause, and Fix before committing.', 'error');
+    return;
+  }
+  await saveBugRecord(payload);
+  setWorkspaceMode('lab');
+});
 
 function getLocalVault() {
   try {
@@ -97,7 +236,7 @@ async function detectBackendMode() {
     if (res.ok) {
       apiBase = '';
       useLocalFallback = false;
-      dbStatusText.textContent = 'MySQL 3306 Connected';
+      dbStatusText.textContent = 'MySQL 3306 Live';
       return;
     }
   } catch (_e) {}
@@ -107,62 +246,48 @@ async function detectBackendMode() {
     if (resLocal.ok) {
       apiBase = 'http://localhost:3000';
       useLocalFallback = false;
-      dbStatusText.textContent = 'MySQL 3306 Connected';
+      dbStatusText.textContent = 'MySQL 3306 Live';
       return;
     }
   } catch (_e) {}
 
   useLocalFallback = true;
-  dbStatusText.textContent = 'Cloud Vault Active';
+  dbStatusText.textContent = 'Browser Vault Active';
 }
 
 function populateDomainDropdowns(domains) {
   const prevAdd = addDomainSelect.value;
   const prevFilter = domainFilterSelect.value;
   const prevEdit = editDomainSelect.value;
+  const prevFixer = fixerDomainSelect.value;
 
   addDomainSelect.innerHTML = '';
   editDomainSelect.innerHTML = '';
-  domainFilterSelect.innerHTML = '<option value="all">All Domains</option>';
+  fixerDomainSelect.innerHTML = '';
+  domainFilterSelect.innerHTML = '<option value="all">All Domains (FK)</option>';
 
   domains.forEach((d) => {
-    const optAdd = new Option(d.domain_name, String(d.domain_id));
-    const optEdit = new Option(d.domain_name, String(d.domain_id));
-    const optFilter = new Option(d.domain_name, String(d.domain_id));
-    addDomainSelect.add(optAdd);
-    editDomainSelect.add(optEdit);
-    domainFilterSelect.add(optFilter);
+    addDomainSelect.add(new Option(d.domain_name, String(d.domain_id)));
+    editDomainSelect.add(new Option(d.domain_name, String(d.domain_id)));
+    fixerDomainSelect.add(new Option(d.domain_name, String(d.domain_id)));
+    domainFilterSelect.add(new Option(d.domain_name, String(d.domain_id)));
   });
 
   if (prevAdd) addDomainSelect.value = prevAdd;
   if (prevEdit) editDomainSelect.value = prevEdit;
+  if (prevFixer) fixerDomainSelect.value = prevFixer;
   if (prevFilter) domainFilterSelect.value = prevFilter;
 }
 
 function renderDomainSidebar(domains) {
-  domainCountPill.textContent = `${domains.length} total`;
-  domainListEl.innerHTML = '';
-
-  domains.forEach((d) => {
-    const li = document.createElement('li');
-    li.className = 'domain-item';
-
-    const left = document.createElement('div');
-    left.className = 'domain-item-left';
-
-    const nameSpan = document.createElement('span');
-    nameSpan.textContent = d.domain_name;
-
-    const countSpan = document.createElement('span');
-    countSpan.className = 'domain-count-badge';
-    countSpan.textContent = `${d.bug_count || 0} bugs`;
+  domainCountPill.textContent = `${domains.length} rows`; domainListEl.innerHTML = '';  domains.forEach((d) => { const li = document.createElement('li'); li.className = 'domain-row-item';  const left = document.createElement('div'); left.className = 'domain-row-meta';  const nameSpan = document.createElement('span'); nameSpan.textContent = d.domain_name;  const countSpan = document.createElement('span'); countSpan.className = 'domain-row-count'; countSpan.textContent = `(${d.bug_count || 0})`;
 
     left.append(nameSpan, countSpan);
 
     const delBtn = document.createElement('button');
     delBtn.type = 'button';
-    delBtn.className = 'btn-secondary btn-sm';
-    delBtn.textContent = 'Delete';
+    delBtn.className = 'btn-secondary btn-xs';
+    delBtn.textContent = 'Remove';
     delBtn.addEventListener('click', () => promptDeleteDomain(d));
 
     li.append(left, delBtn);
@@ -173,160 +298,39 @@ function renderDomainSidebar(domains) {
 function renderErrorsTable(errors) {
   errorsMap.clear();
   errorsTbody.innerHTML = '';
-  recordsCaption.textContent = `Saved Error Records (${errors.length} ${errors.length === 1 ? 'item' : 'items'})`;
+  recordsCaption.textContent = `Saved Error Records (${errors.length} ${errors.length === 1 ? 'item' : 'items'})`;  if (errors.length === 0) { const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 8; td.className = 'empty-row'; td.textContent = 'No matching bug records found.'; tr.appendChild(td); errorsTbody.appendChild(tr); return; }  errors.forEach((err) => { errorsMap.set(Number(err.error_id), err); const tr = document.createElement('tr');  const tdId = document.createElement('td'); tdId.className = 'mono-id'; tdId.textContent = `#${err.error_id}`;
 
-  if (errors.length === 0) {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    td.colSpan = 8;
-    td.className = 'empty-cell';
-    td.textContent = 'No matching bug records found.';
-    tr.appendChild(td);
-    errorsTbody.appendChild(tr);
-    return;
-  }
-
-  errors.forEach((err) => {
-    errorsMap.set(Number(err.error_id), err);
-    const tr = document.createElement('tr');
-
-    // ID
-    const tdId = document.createElement('td');
-    tdId.className = 'col-id';
-    const idPill = document.createElement('span');
-    idPill.className = 'id-pill';
-    idPill.textContent = `#${err.error_id}`;
-    tdId.appendChild(idPill);
-
-    // Signature + Root Cause
     const tdSig = document.createElement('td');
     const sigTitle = document.createElement('div');
-    sigTitle.className = 'sig-title';
+    sigTitle.className = 'row-sig';
     sigTitle.textContent = err.error_signature;
     const causeSub = document.createElement('div');
-    causeSub.className = 'cause-sub';
-    causeSub.textContent = `Cause: ${err.root_cause}`;
+    causeSub.className = 'row-cause';
+    causeSub.textContent = err.root_cause;
     tdSig.append(sigTitle, causeSub);
 
-    // Domain
     const tdDom = document.createElement('td');
     const domBadge = document.createElement('span');
-    domBadge.className = 'domain-badge';
+    domBadge.className = 'tag-domain';
     domBadge.textContent = err.domain_name || 'General';
     tdDom.appendChild(domBadge);
 
-    // Tech Stack
     const tdStack = document.createElement('td');
+    tdStack.className = 'mono-stack';
     tdStack.textContent = err.tech_stack;
 
-    // Fix Requirements
     const tdFix = document.createElement('td');
     tdFix.textContent = err.fix_requirements || err.fixed_code || '';
 
-    // Hits
     const tdHits = document.createElement('td');
-    tdHits.className = 'col-center';
-    const hitsSpan = document.createElement('span');
-    hitsSpan.className = 'hits-pill';
-    hitsSpan.textContent = String(err.times_hit || 1);
-    tdHits.appendChild(hitsSpan);
+    tdHits.className = 't-center mono-hits';
+    tdHits.textContent = String(err.times_hit || 1);
 
-    // Verified Status
     const tdStatus = document.createElement('td');
-    tdStatus.className = 'col-center';
+    tdStatus.className = 't-center';
     const statusPill = document.createElement('span');
     const verified = Number(err.is_verified ?? 1) === 1;
-    statusPill.className = verified ? 'verified-pill' : 'pending-pill';
-    statusPill.textContent = verified ? 'Verified' : 'Pending';
-    tdStatus.appendChild(statusPill);
-
-    // Actions
-    const tdActions = document.createElement('td');
-    tdActions.className = 'col-center';
-    const actionWrap = document.createElement('div');
-    actionWrap.className = 'action-group';
-
-    const editBtn = document.createElement('button');
-    editBtn.type = 'button';
-    editBtn.className = 'btn-secondary btn-sm';
-    editBtn.textContent = 'Edit';
-    editBtn.addEventListener('click', () => openEditModal(err.error_id));
-
-    const delBtn = document.createElement('button');
-    delBtn.type = 'button';
-    delBtn.className = 'btn-danger btn-sm';
-    delBtn.textContent = 'Delete';
-    delBtn.addEventListener('click', () => promptDeleteError(err));
-
-    actionWrap.append(editBtn, delBtn);
-    tdActions.appendChild(actionWrap);
-
-    tr.append(tdId, tdSig, tdDom, tdStack, tdFix, tdHits, tdStatus, tdActions);
-    errorsTbody.appendChild(tr);
-  });
-}
-
-function updateSummaryCards(stats) {
-  statCountEl.textContent = String(stats.total_bugs ?? 0);
-  statSumEl.textContent = String(stats.total_hits ?? 0);
-  statAvgEl.textContent = Number(stats.avg_hits ?? 0).toFixed(1);
-  statMaxEl.textContent = String(stats.max_hits ?? 0);
-  statMinEl.textContent = String(stats.min_hits ?? 0);
-}
-
-async function refreshWorkspace() {
-  const search = searchInput.value.trim();
-  const domain_id = domainFilterSelect.value || 'all';
-
-  if (useLocalFallback) {
-    const { domains, errors } = getLocalVault();
-    const enrichedDomains = domains.map((d) => ({
-      ...d,
-      bug_count: errors.filter((e) => Number(e.domain_id) === Number(d.domain_id)).length
-    }));
-    domainsState = enrichedDomains;
-    populateDomainDropdowns(enrichedDomains);
-    renderDomainSidebar(enrichedDomains);
-
-    let filtered = errors.map((e) => {
-      const dom = domains.find((d) => Number(d.domain_id) === Number(e.domain_id));
-      return { ...e, domain_name: dom ? dom.domain_name : 'General' };
-    });
-
-    if (domain_id !== 'all') {
-      filtered = filtered.filter((e) => Number(e.domain_id) === Number(domain_id));
-    }
-    if (search) {
-      const q = search.toLowerCase();
-      const numId = Number(q.replace(/^#/, ''));
-      filtered = filtered.filter((e) =>
-        (Number.isInteger(numId) && numId > 0 && Number(e.error_id) === numId) ||
-        String(e.error_signature).toLowerCase().includes(q) ||
-        String(e.tech_stack).toLowerCase().includes(q) ||
-        String(e.root_cause).toLowerCase().includes(q) ||
-        String(e.fix_requirements).toLowerCase().includes(q) ||
-        String(e.domain_name).toLowerCase().includes(q)
-      );
-    }
-
-    const total_bugs = filtered.length;
-    const total_hits = filtered.reduce((acc, r) => acc + Number(r.times_hit || 1), 0);
-    const avg_hits = total_bugs ? (total_hits / total_bugs).toFixed(1) : 0;
-    const max_hits = total_bugs ? Math.max(...filtered.map((r) => Number(r.times_hit || 1))) : 0;
-    const min_hits = total_bugs ? Math.min(...filtered.map((r) => Number(r.times_hit || 1))) : 0;
-
-    updateSummaryCards({ total_bugs, total_hits, avg_hits, max_hits, min_hits });
-    renderErrorsTable(filtered);
-    return;
-  }
-
-  try {
-    const qs = new URLSearchParams();
-    if (domain_id && domain_id !== 'all') qs.set('domain_id', domain_id);
-    if (search) qs.set('search', search);
-
-    const [domRes, errRes, statRes] = await Promise.all([
-      fetch(`${apiBase}/api/domains`),
+    statusPill.className = `state-tag ${verified ? 'state-verified' : 'state-pending'}`; statusPill.textContent = verified ? 'Verified' : 'Pending'; tdStatus.appendChild(statusPill);  const tdActions = document.createElement('td'); tdActions.className = 't-right'; const actionWrap = document.createElement('div'); actionWrap.className = 'row-actions';  const editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'btn-secondary btn-xs'; editBtn.textContent = 'Edit'; editBtn.addEventListener('click', () => openEditModal(err.error_id));  const delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.className = 'btn-danger btn-xs'; delBtn.textContent = 'Delete'; delBtn.addEventListener('click', () => promptDeleteError(err));  actionWrap.append(editBtn, delBtn); tdActions.appendChild(actionWrap);  tr.append(tdId, tdSig, tdDom, tdStack, tdFix, tdHits, tdStatus, tdActions); errorsTbody.appendChild(tr); }); }  function updateSummaryCards(stats) { statCountEl.textContent = String(stats.total_bugs ?? 0); statSumEl.textContent = String(stats.total_hits ?? 0); statAvgEl.textContent = Number(stats.avg_hits ?? 0).toFixed(1); statMaxEl.textContent = String(stats.max_hits ?? 0); statMinEl.textContent = String(stats.min_hits ?? 0); }  async function refreshWorkspace() { const search = searchInput.value.trim(); const domain_id = domainFilterSelect.value || 'all';  if (useLocalFallback) { const { domains, errors } = getLocalVault(); const enrichedDomains = domains.map((d) => ({ ...d, bug_count: errors.filter((e) => Number(e.domain_id) === Number(d.domain_id)).length })); domainsState = enrichedDomains; populateDomainDropdowns(enrichedDomains); renderDomainSidebar(enrichedDomains);  let filtered = errors.map((e) => { const dom = domains.find((d) => Number(d.domain_id) === Number(e.domain_id)); return { ...e, domain_name: dom ? dom.domain_name : 'General' }; });  if (domain_id !== 'all') { filtered = filtered.filter((e) => Number(e.domain_id) === Number(domain_id)); } if (search) { const q = search.toLowerCase(); const numId = Number(q.replace(/^#/, '')); filtered = filtered.filter((e) => (Number.isInteger(numId) && numId > 0 && Number(e.error_id) === numId) || String(e.error_signature).toLowerCase().includes(q) || String(e.tech_stack).toLowerCase().includes(q) || String(e.root_cause).toLowerCase().includes(q) || String(e.fix_requirements).toLowerCase().includes(q) || String(e.domain_name).toLowerCase().includes(q) ); }  const total_bugs = filtered.length; const total_hits = filtered.reduce((acc, r) => acc + Number(r.times_hit || 1), 0); const avg_hits = total_bugs ? (total_hits / total_bugs).toFixed(1) : 0; const max_hits = total_bugs ? Math.max(...filtered.map((r) => Number(r.times_hit || 1))) : 0; const min_hits = total_bugs ? Math.min(...filtered.map((r) => Number(r.times_hit || 1))) : 0;  updateSummaryCards({ total_bugs, total_hits, avg_hits, max_hits, min_hits }); renderErrorsTable(filtered); return; }  try { const qs = new URLSearchParams(); if (domain_id && domain_id !== 'all') qs.set('domain_id', domain_id); if (search) qs.set('search', search);  const [domRes, errRes, statRes] = await Promise.all([ fetch(`${apiBase}/api/domains`),
       fetch(`${apiBase}/api/errors?${qs.toString()}`),
       fetch(`${apiBase}/api/stats?${qs.toString()}`)
     ]);
@@ -351,7 +355,25 @@ async function refreshWorkspace() {
   }
 }
 
-// Add New Bug Record
+async function saveBugRecord(payload) {
+  if (useLocalFallback) {
+    const { domains, errors } = getLocalVault();
+    const nextId = errors.length ? Math.max(...errors.map((r) => Number(r.error_id))) + 1 : 1;
+    errors.push({ error_id: nextId, ...payload });
+    saveLocalVault(domains, errors);
+    showBanner(`Saved bug record #${nextId} to inventory.`);
+    await refreshWorkspace();
+    return;
+  }
+
+  try {
+    const res = await fetch(`${apiBase}/api/errors`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await res.json(); if (!res.ok || !data.success) throw new Error(data.error || 'Could not save bug record.'); showBanner(`Saved "${payload.error_signature}" to MySQL database.`);
+    await refreshWorkspace();
+  } catch (err) {
+    showBanner(err.message, 'error');
+  }
+}
+
 addErrorForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const payload = {
@@ -369,36 +391,11 @@ addErrorForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  if (useLocalFallback) {
-    const { domains, errors } = getLocalVault();
-    const nextId = errors.length ? Math.max(...errors.map((r) => Number(r.error_id))) + 1 : 1;
-    errors.push({ error_id: nextId, ...payload });
-    saveLocalVault(domains, errors);
-    addErrorForm.reset();
-    document.getElementById('add-hits').value = '1';
-    showBanner(`Saved bug record #${nextId} to vault.`);
-    await refreshWorkspace();
-    return;
-  }
-
-  try {
-    const res = await fetch(`${apiBase}/api/errors`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.error || 'Could not save bug record.');
-    addErrorForm.reset();
-    document.getElementById('add-hits').value = '1';
-    showBanner(`Saved bug record "${payload.error_signature}" to MySQL.`);
-    await refreshWorkspace();
-  } catch (err) {
-    showBanner(err.message, 'error');
-  }
+  await saveBugRecord(payload);
+  addErrorForm.reset();
+  document.getElementById('add-hits').value = '1';
 });
 
-// Add New Domain Category
 addDomainForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const domain_name = newDomainInput.value.trim();
@@ -410,13 +407,7 @@ addDomainForm.addEventListener('submit', async (e) => {
     domains.push({ domain_id: nextId, domain_name, description: 'Custom category' });
     saveLocalVault(domains, errors);
     addDomainForm.reset();
-    showBanner(`Added domain "${domain_name}".`);
-    await refreshWorkspace();
-    return;
-  }
-
-  try {
-    const res = await fetch(`${apiBase}/api/domains`, {
+    showBanner(`Added domain "${domain_name}".`); await refreshWorkspace(); return; }  try { const res = await fetch(`${apiBase}/api/domains`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ domain_name })
@@ -431,7 +422,6 @@ addDomainForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Open Edit Modal (Including times_hit and is_verified)
 function openEditModal(errorId) {
   const rec = errorsMap.get(Number(errorId));
   if (!rec) return;
@@ -471,7 +461,7 @@ editErrorForm.addEventListener('submit', async (e) => {
       saveLocalVault(domains, errors);
     }
     editDialog.close();
-    showBanner(`Updated record #${error_id} successfully.`);
+    showBanner(`Updated record #${error_id}.`);
     await refreshWorkspace();
     return;
   }
@@ -492,11 +482,10 @@ editErrorForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Delete Confirmation Prompts
 function promptDeleteError(err) {
   pendingDeleteTarget = { type: 'error', id: Number(err.error_id) };
   deleteDialogTitle.textContent = 'Delete Bug Record?';
-  deleteDialogMessage.textContent = `Permanently delete "#${err.error_id} ${err.error_signature}" from the database? This action cannot be undone.`;
+  deleteDialogMessage.textContent = `Permanently delete "#${err.error_id}${err.error_signature}" from the database?`;
   deleteConfirmBtn.hidden = false;
   deleteDialog.showModal();
 }
@@ -504,15 +493,15 @@ function promptDeleteError(err) {
 function promptDeleteDomain(dom) {
   if (Number(dom.bug_count || 0) > 0) {
     pendingDeleteTarget = null;
-    deleteDialogTitle.textContent = 'Domain In Use (Foreign Key Protected)';
-    deleteDialogMessage.textContent = `Cannot delete "${dom.domain_name}" because ${dom.bug_count} bug record(s) reference it. Reassign or delete those records first.`;
+    deleteDialogTitle.textContent = 'Foreign Key Restriction';
+    deleteDialogMessage.textContent = `Cannot delete "${dom.domain_name}" because ${dom.bug_count} bug record(s) reference it.`;
     deleteConfirmBtn.hidden = true;
     deleteDialog.showModal();
     return;
   }
   pendingDeleteTarget = { type: 'domain', id: Number(dom.domain_id), name: dom.domain_name };
   deleteDialogTitle.textContent = 'Delete Domain Category?';
-  deleteDialogMessage.textContent = `Permanently remove "${dom.domain_name}" from the domains table?`;
+  deleteDialogMessage.textContent = `Permanently remove "${dom.domain_name}" from domains?`;
   deleteConfirmBtn.hidden = false;
   deleteDialog.showModal();
 }
@@ -531,12 +520,10 @@ deleteConfirmBtn.addEventListener('click', async () => {
   if (useLocalFallback) {
     const { domains, errors } = getLocalVault();
     if (target.type === 'error') {
-      const nextErrors = errors.filter((r) => Number(r.error_id) !== target.id);
-      saveLocalVault(domains, nextErrors);
+      saveLocalVault(domains, errors.filter((r) => Number(r.error_id) !== target.id));
       showBanner(`Deleted record #${target.id}.`);
     } else {
-      const nextDomains = domains.filter((d) => Number(d.domain_id) !== target.id);
-      saveLocalVault(nextDomains, errors);
+      saveLocalVault(domains.filter((d) => Number(d.domain_id) !== target.id), errors);
       showBanner(`Deleted domain "${target.name}".`);
     }
     await refreshWorkspace();
@@ -547,31 +534,20 @@ deleteConfirmBtn.addEventListener('click', async () => {
     const endpoint = target.type === 'error' ? `/api/errors/${target.id}` : `/api/domains/${target.id}`;
     const res = await fetch(`${apiBase}${endpoint}`, { method: 'DELETE' });
     const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.error || 'Delete operation failed.');
-    showBanner(data.message || 'Deleted successfully.');
+    if (!res.ok || !data.success) throw new Error(data.error || 'Delete failed.');
+    showBanner(data.message || 'Deleted.');
     await refreshWorkspace();
   } catch (err) {
     showBanner(err.message, 'error');
   }
 });
 
-// Search & Filter Listeners
 let debounceTimer = null;
 searchInput.addEventListener('input', () => {
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(refreshWorkspace, 150);
+  debounceTimer = setTimeout(refreshWorkspace, 140);
 });
 domainFilterSelect.addEventListener('change', refreshWorkspace);
-filterForm.addEventListener('reset', () => {
-  setTimeout(refreshWorkspace, 0);
-});
+filterForm.addEventListener('reset', () => setTimeout(refreshWorkspace, 0));
 
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-    e.preventDefault();
-    searchInput.focus();
-  }
-});
-
-// Initialize Application
 detectBackendMode().then(refreshWorkspace);
