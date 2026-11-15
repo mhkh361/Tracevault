@@ -127,7 +127,7 @@
 \setcounter{page}{2}
 
 % ===================================================================
-% SECTION 1 & 2: OBJECTIVE, SCOPE, TOOLS & TECHNOLOGIES
+% PAGE 2: OBJECTIVES, TOOLS, DATABASE DESIGN & SPECIFICATIONS
 % ===================================================================
 \section{Project Objective \& Topic Scope}
 The primary objective of this laboratory project is to design, implement, and evaluate a responsive single-page application (SPA) backed by a normalized relational database (MySQL 8.0) to perform end-to-end \textbf{CRUD operations} (Create, Read, Update, Delete) and \textbf{real-time SQL aggregation}. Under the approved academic category of \textbf{Inventory Management}, \textit{TraceVault} models an operational engineering inventory of software bugs, runtime exceptions, occurrence frequencies, and verified remediation procedures. The application demonstrates:
@@ -146,9 +146,6 @@ The primary objective of this laboratory project is to design, implement, and ev
   \item \textbf{Cryptographic Deduplication:} Node.js \texttt{crypto} and Web Crypto API generating deterministic 256-bit signature hashes.
 \end{itemize}
 
-% ===================================================================
-% SECTION 3 & 4: DATABASE SCHEMA & ER DIAGRAM
-% ===================================================================
 \section{Database Table Design (3NF Normalization)}
 The relational schema comprises two normalized tables in \textbf{Third Normal Form (3NF)}: the parent entity \texttt{domains} and the dependent child entity \texttt{error\_logs}.
 
@@ -178,20 +175,41 @@ The relational schema comprises two normalized tables in \textbf{Third Normal Fo
 \end{tabular}
 \end{center}
 
-\subsection{Entity-Relationship (ER) Diagram}
+\newpage
+
+% ===================================================================
+% PAGE 3: FULL ENTITY-RELATIONSHIP (ER) DIAGRAM & 3NF ANALYSIS
+% ===================================================================
+\section{Entity-Relationship (ER) Diagram \& Relational Architecture}
+The Entity-Relationship (ER) model below illustrates the structural design, entity relationships, and integrity constraints governing TraceVault. The parent entity \texttt{DOMAINS} maintains a \textbf{one-to-many (1:N) relationship} with the child inventory entity \texttt{ERROR\_LOGS}. An error incident must strictly belong to exactly one domain category, while a domain category can classify multiple error incidents.
+
 \begin{center}
-  \includegraphics[width=0.88\linewidth]{screenshots/00_er_diagram.png}
+  \includegraphics[width=0.95\linewidth]{screenshots/00_er_diagram.png}
   \captionof{figure}{\textbf{Relational Entity-Relationship Diagram}: Illustrating 1:N cardinality between DOMAINS and ERROR\_LOGS with InnoDB foreign key constraint (\texttt{ON UPDATE CASCADE, ON DELETE RESTRICT}).}
   \label{fig:er_diagram}
 \end{center}
 
+\subsection{Cardinality \& Referential Integrity Rules}
+\begin{itemize}
+  \item \textbf{Parent Key $\to$ Foreign Key Mapping:} The \texttt{domain\_id} in the parent table \texttt{domains} acts as the Primary Key and is mapped to \texttt{domain\_id} in \texttt{error\_logs} as a Foreign Key (\texttt{fk\_error\_domain}).
+  \item \textbf{ON UPDATE CASCADE:} If a domain's primary identifier is updated, the relational engine automatically cascades the modification across all dependent child error logs.
+  \item \textbf{ON DELETE RESTRICT:} Deletion of a parent domain is strictly blocked by InnoDB if any child error record references it. This prevents orphan records and guarantees database integrity.
+\end{itemize}
+
+\subsection{Third Normal Form (3NF) Normalization Breakdown}
+\begin{itemize}
+  \item \textbf{First Normal Form (1NF):} All table columns contain atomic, non-decomposable values. No repeating groups or array values are stored.
+  \item \textbf{Second Normal Form (2NF):} All non-key attributes (e.g., \texttt{tech\_stack}, \texttt{error\_signature}, \texttt{root\_cause}) are fully functionally dependent on the entire primary key (\texttt{error\_id}).
+  \item \textbf{Third Normal Form (3NF):} There are no transitive dependencies. Domain names and descriptions belong exclusively to the \texttt{domains} table rather than repeating across individual error records.
+\end{itemize}
+
 \newpage
 
 % ===================================================================
-% SECTION 5: KEY SQL QUERIES
+% PAGE 4: KEY SQL QUERIES (PART 1: DDL, INSERT & SELECT FILTERING)
 % ===================================================================
-\section{Key SQL Queries for Database Operations}
-All database interactions are implemented through standard, parameterized SQL queries executing inside MySQL transactions.
+\section{Key SQL Queries for Database Operations (Part 1)}
+The following SQL statements demonstrate the practical database operations executing within TraceVault for schema definition, record creation, and dynamic filtering:
 
 \subsection{Data Definition Language (DDL) --- Schema \& Constraints}
 \begin{lstlisting}[language=SQL, caption={DDL Table Creation with Referential Integrity and Check Constraints}]
@@ -249,6 +267,13 @@ WHERE (e.domain_id = ? OR ? = 'all')
 ORDER BY e.error_id ASC;
 \end{lstlisting}
 
+\newpage
+
+% ===================================================================
+% PAGE 5: KEY SQL QUERIES (PART 2: AGGREGATES & MUTATIONS) + DATA
+% ===================================================================
+\section{Key SQL Queries for Database Operations (Part 2)}
+
 \subsection{SQL Aggregate Telemetry (COUNT, SUM, AVG, MAX, MIN)}
 TraceVault executes real-time aggregate calculations that adapt instantaneously to user filter and search criteria:
 \begin{lstlisting}[language=SQL, caption={Statistical Telemetry utilizing SQL Aggregate Functions}]
@@ -277,13 +302,8 @@ WHERE error_id = ?;
 DELETE FROM error_logs WHERE error_id = ?;
 \end{lstlisting}
 
-\newpage
-
-% ===================================================================
-% SECTION 6 & 7A: SAMPLE DATA & INVENTORY SCREENSHOT
-% ===================================================================
-\section{Sample Data Population (12 Seeded Records)}
-The database includes four primary domain categories (\textit{Frontend, Backend, Database, Fullstack}) and 12 complete, verified technical records exceeding the lab rubric's minimum requirement of 10 records:
+\section{Sample Data Demonstration (12 Seeded Records)}
+The database contains 12 seed records across 4 domains (exceeding the course requirement of 10 records):
 \begin{center}
 \scriptsize
 \begin{tabular}{ccllc}
@@ -306,12 +326,17 @@ The database includes four primary domain categories (\textit{Frontend, Backend,
 \end{tabular}
 \end{center}
 
+\newpage
+
+% ===================================================================
+% PAGE 6: SINGLE-PAGE UI OVERVIEW & DASHBOARD SCREENSHOT
+% ===================================================================
 \section{Single-Page Application Architecture \& User Interface}
 TraceVault operates strictly as a single-page application. All record creation, table viewing, searching, modal updates, and deletions occur within one responsive interface without full-page reloads.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.98\linewidth]{screenshots/01_inventory_overview.png}
+  \includegraphics[width=\linewidth]{screenshots/01_inventory_overview.png}
   \caption{\textbf{TraceVault Single-Page Inventory Overview}: Displaying real-time SQL aggregate KPI cards (\texttt{COUNT}, \texttt{SUM}, \texttt{AVG}, \texttt{MAX \& MIN}), left-hand \texttt{INSERT INTO} submission form, parent domain list, and normalized records table.}
   \label{fig:overview}
 \end{figure}
@@ -319,7 +344,7 @@ TraceVault operates strictly as a single-page application. All record creation, 
 \newpage
 
 % ===================================================================
-% SECTION 7B & 8: INTERACTIVE FEATURES & EVALUATION COMPLIANCE
+% PAGE 7: INTERACTIVE FEATURES & EVALUATION COMPLIANCE
 % ===================================================================
 \section{Interactive Application Features in Action}
 
@@ -349,10 +374,10 @@ TraceVault operates strictly as a single-page application. All record creation, 
 \section{Conclusion \& Evaluation Compliance}
 The TraceVault project fully satisfies all requirements stipulated in the DBMS Laboratory evaluation guidelines:
 \begin{enumerate}\setlength\itemsep{-2pt}
-  \item \textbf{Single-Page Design:} All tasks (insert, view, filter, edit, delete, telemetry) operate on one unified page.
-  \item \textbf{Relational Database Schema:} Two 3NF normalized tables with explicit Primary Keys, Foreign Key with \texttt{ON DELETE RESTRICT}, unique SHA-256 indexes, and check constraints.
-  \item \textbf{Core SQL Operations:} Complete implementation of \texttt{CREATE}, \texttt{INSERT}, \texttt{SELECT}, \texttt{UPDATE}, and \texttt{DELETE}.
-  \item \textbf{SQL Aggregation:} Implementation of all required aggregate functions (\texttt{COUNT}, \texttt{SUM}, \texttt{AVG}, \texttt{MAX}, \texttt{MIN}) with live metric cards.
+  \item \textbf{Single-Page Architecture:} All functional requirements (insert, view, filter, edit, delete, telemetry) operate on one page without navigation reloads.
+  \item \textbf{Database Requirements:} Strict 3NF schema featuring explicit Primary Keys, Foreign Key with \texttt{ON DELETE RESTRICT}, unique SHA-256 indexes, and check constraints.
+  \item \textbf{SQL Command Coverage:} Production-grade implementation of \texttt{CREATE}, \texttt{INSERT}, \texttt{SELECT}, \texttt{UPDATE}, and \texttt{DELETE}.
+  \item \textbf{SQL Aggregate Functions:} Full implementation of five aggregate functions (\texttt{COUNT}, \texttt{SUM}, \texttt{AVG}, \texttt{MAX}, \texttt{MIN}) with live metric cards.
   \item \textbf{Demonstration Data:} 12 structured engineering records spanning 4 domains, fully documented and seeded via \texttt{database.sql}.
 \end{enumerate}
 

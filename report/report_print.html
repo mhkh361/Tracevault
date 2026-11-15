@@ -294,7 +294,7 @@
       border: 1px solid #cbd5e1;
       border-radius: 4px;
       padding: 6px 8px;
-      margin: 5px 0 8px 0;
+      margin: 4px 0 8px 0;
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: 7.4pt;
       line-height: 1.28;
@@ -556,7 +556,7 @@
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 2 of 6</span>
+      <span>Page 2 of 7</span>
     </div>
   </div>
 
@@ -598,12 +598,12 @@
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 3 of 6</span>
+      <span>Page 3 of 7</span>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 4: KEY SQL QUERIES                                             -->
+  <!-- PAGE 4: KEY SQL QUERIES (PART 1: DDL, INSERT & SELECT FILTERING)    -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
@@ -612,9 +612,9 @@
       <span>November 2026</span>
     </div>
 
-    <h2>5. Key SQL Queries for Database Operations</h2>
+    <h2>5. Key SQL Queries for Database Operations (Part 1)</h2>
     <p>
-      The following SQL statements demonstrate the practical database operations executing within TraceVault:
+      The following SQL statements demonstrate the practical database operations executing within TraceVault for schema definition, record creation, and dynamic filtering:
     </p>
 
     <h3>A. DDL: Table Definition &amp; Foreign Key Constraints</h3>
@@ -663,6 +663,24 @@
   <span class="kw">AND</span> (e.error_id = ? <span class="kw">OR</span> e.error_signature <span class="kw">LIKE</span> ? <span class="kw">OR</span> e.tech_stack <span class="kw">LIKE</span> ? <span class="kw">OR</span> e.root_cause <span class="kw">LIKE</span> ?)
 <span class="kw">ORDER BY</span> e.error_id <span class="kw">ASC</span>;</div>
 
+    <div class="page-footer">
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 4 of 7</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 5: KEY SQL QUERIES (PART 2: AGGREGATES & MUTATIONS) + DATA     -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
+    </div>
+
+    <h2>5. Key SQL Queries for Database Operations (Part 2)</h2>
+
     <h3>D. DML: Real-Time Telemetry via SQL Aggregate Functions</h3>
     <div class="code-box"><span class="kw">SELECT</span> 
   <span class="fn">COUNT</span>(e.error_id) <span class="kw">AS</span> total_bugs,
@@ -684,22 +702,6 @@
 
 <span class="com">-- Delete error record after user modal confirmation</span>
 <span class="kw">DELETE FROM</span> error_logs <span class="kw">WHERE</span> error_id = ?;</div>
-
-    <div class="page-footer">
-      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 4 of 6</span>
-    </div>
-  </div>
-
-  <!-- =================================================================== -->
-  <!-- PAGE 5: SAMPLE DATA POPULATION & OVERVIEW SCREENSHOT                -->
-  <!-- =================================================================== -->
-  <div class="page">
-    <div class="page-header">
-      <span>Feni University &bull; Dept. of CSE</span>
-      <span>DBMS Lab Project Report: TraceVault</span>
-      <span>November 2026</span>
-    </div>
 
     <h2>6. Sample Data Demonstration (12 Seeded Records)</h2>
     <p>
@@ -732,29 +734,45 @@
       </tbody>
     </table>
 
+    <div class="page-footer">
+      <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
+      <span>Page 5 of 7</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 6: SINGLE-PAGE UI OVERVIEW & DASHBOARD SCREENSHOT              -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Feni University &bull; Dept. of CSE</span>
+      <span>DBMS Lab Project Report: TraceVault</span>
+      <span>November 2026</span>
+    </div>
+
     <h2>7. Single-Page Application Architecture &amp; User Interface</h2>
     <p>
       TraceVault functions strictly as a single-page application. All record creation, table viewing, searching, modal updates, and deletions occur within one responsive interface without full-page reloads.
     </p>
 
     <!-- Full Width Screenshot 1 -->
-    <div style="margin-top: 6px;">
+    <div style="margin-top: 10px;">
       <div class="full-fig">
-        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview" style="max-height: 230px;">
+        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview" style="max-height: 480px; width: 100%; object-fit: contain;">
       </div>
-      <p style="font-size: 8pt; color: #475569; margin-top: 4px;">
+      <p style="font-size: 8.5pt; color: #475569; margin-top: 8px; text-align: center;">
         <strong>Figure 2: TraceVault Single-Page Inventory Overview</strong> — Showing real-time SQL aggregate KPI cards (<code>COUNT(*)</code>, <code>SUM(times_hit)</code>, <code>AVG(times_hit)</code>, <code>MAX &amp; MIN</code>), left-hand <code>INSERT INTO</code> submission form, parent domain list, and normalized 8-column records table.
       </p>
     </div>
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 5 of 6</span>
+      <span>Page 6 of 7</span>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PAGE 6: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
+  <!-- PAGE 7: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
   <!-- =================================================================== -->
   <div class="page">
     <div class="page-header">
@@ -805,7 +823,7 @@
 
     <div class="page-footer">
       <span>Student: Mahamud Hasan Fahad (ID: 251031050) &bull; Feni University</span>
-      <span>Page 6 of 6</span>
+      <span>Page 7 of 7</span>
     </div>
   </div>
 
