@@ -295,7 +295,7 @@ async function callUniversalAI(systemPrompt, userPrompt) {
 function openKeyDialog() {
   apiKeyInput.value = localStorage.getItem(AI_KEY_STORAGE) || '';
   refreshAiKeyUI();
-  apiKeyModal.showModal();
+  if (!apiKeyModal.open) apiKeyModal.showModal();
 }
 
 openApiKeyBtn.addEventListener('click', openKeyDialog);
@@ -758,15 +758,18 @@ async function detectBackendMode() {
     }
   } catch (_e) {}
 
-  try {
-    const resLocal = await fetch('http://localhost:3000/api/health', { cache: 'no-store' });
-    if (resLocal.ok) {
-      apiBase = 'http://localhost:3000';
-      useLocalFallback = false;
-      dbStatusText.textContent = 'MySQL 3306 Live';
-      return;
-    }
-  } catch (_e) {}
+  // Avoid mixed-content security errors when hosted over HTTPS (e.g. GitHub Pages)
+  if (window?.location?.protocol !== 'https:') {
+    try {
+      const resLocal = await fetch('http://localhost:3000/api/health', { cache: 'no-store' });
+      if (resLocal.ok) {
+        apiBase = 'http://localhost:3000';
+        useLocalFallback = false;
+        dbStatusText.textContent = 'MySQL 3306 Live';
+        return;
+      }
+    } catch (_e) {}
+  }
 
   useLocalFallback = true;
   dbStatusText.textContent = 'Browser Vault Active';
@@ -1081,6 +1084,10 @@ addDomainForm.addEventListener('submit', async (e) => {
 
   if (useLocalFallback) {
     const { domains, errors } = getLocalVault();
+    if (domains.some((d) => d.domain_name.toLowerCase() === domain_name.toLowerCase())) {
+      showBanner(`Domain "${domain_name}" already exists.`, 'error');
+      return;
+    }
     const nextId = domains.length ? Math.max(...domains.map((d) => Number(d.domain_id))) + 1 : 1;
     domains.push({ domain_id: nextId, domain_name, description: 'Custom category' });
     saveLocalVault(domains, errors);
@@ -1119,7 +1126,7 @@ function openEditModal(errorId) {
   document.getElementById('edit-times-hit').value = String(rec.times_hit || 1);
   document.getElementById('edit-is-verified').value = String(rec.is_verified ?? 1);
 
-  editDialog.showModal();
+  if (!editDialog.open) editDialog.showModal();
 }
 
 editCancelBtn.addEventListener('click', () => editDialog.close());
@@ -1139,9 +1146,18 @@ editErrorForm.addEventListener('submit', async (e) => {
 
   if (useLocalFallback) {
     const { domains, errors } = getLocalVault();
+    const signature_hash = await computeSignatureHash(payload.error_signature);
+    
+    // Check if another record already has this exact signature hash
+    const dup = errors.find((r) => r.signature_hash === signature_hash && Number(r.error_id) !== error_id);
+    if (dup) {
+      showBanner(`Another record (#${dup.error_id}) already uses this exact Error Signature.`, 'error');
+      return;
+    }
+
     const idx = errors.findIndex((r) => Number(r.error_id) === error_id);
     if (idx !== -1) {
-      errors[idx] = { ...errors[idx], ...payload };
+      errors[idx] = { ...errors[idx], ...payload, signature_hash };
       saveLocalVault(domains, errors);
     }
     editDialog.close();
@@ -1171,7 +1187,7 @@ function promptDeleteError(err) {
   deleteDialogTitle.textContent = 'Delete Bug Record?';
   deleteDialogMessage.textContent = `Permanently delete "#${err.error_id} ${err.error_signature}" from the database?`;
   deleteConfirmBtn.hidden = false;
-  deleteDialog.showModal();
+  if (!deleteDialog.open) deleteDialog.showModal();
 }
 
 function promptDeleteDomain(dom) {
@@ -1180,14 +1196,14 @@ function promptDeleteDomain(dom) {
     deleteDialogTitle.textContent = 'Foreign Key Restriction';
     deleteDialogMessage.textContent = `Cannot delete "${dom.domain_name}" because ${dom.bug_count} bug record(s) reference it.`;
     deleteConfirmBtn.hidden = true;
-    deleteDialog.showModal();
+    if (!deleteDialog.open) deleteDialog.showModal();
     return;
   }
   pendingDeleteTarget = { type: 'domain', id: Number(dom.domain_id), name: dom.domain_name };
   deleteDialogTitle.textContent = 'Delete Domain Category?';
   deleteDialogMessage.textContent = `Permanently remove "${dom.domain_name}" from domains?`;
   deleteConfirmBtn.hidden = false;
-  deleteDialog.showModal();
+  if (!deleteDialog.open) deleteDialog.showModal();
 }
 
 deleteCancelBtn.addEventListener('click', () => {
@@ -1235,5 +1251,4 @@ domainFilterSelect.addEventListener('change', refreshWorkspace);
 filterForm.addEventListener('reset', () => setTimeout(refreshWorkspace, 0));
 
 refreshAiKeyUI();
-backfillLocalHashes();
-detectBackendMode().then(refreshWorkspace);
+backfillLocalHashes().then(() => detectBackendMode().then(refreshWorkspace));
