@@ -389,7 +389,13 @@ function renderErrorsTable(errors) {
     tdStatus.className = 't-center';
     const statusPill = document.createElement('span');
     const verified = Number(err.is_verified ?? 1) === 1;
-    statusPill.className = `state-tag ${verified ? 'state-verified' : 'state-pending'}`; statusPill.textContent = verified ? 'Verified' : 'Pending'; tdStatus.appendChild(statusPill);  const tdActions = document.createElement('td'); tdActions.className = 't-right'; const actionWrap = document.createElement('div'); actionWrap.className = 'row-actions';  const editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'btn-secondary btn-xs'; editBtn.textContent = 'Edit'; editBtn.addEventListener('click', () => openEditModal(err.error_id));  const delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.className = 'btn-danger btn-xs'; delBtn.textContent = 'Delete'; delBtn.addEventListener('click', () => promptDeleteError(err));  actionWrap.append(editBtn, delBtn); tdActions.appendChild(actionWrap);  tr.append(tdId, tdSig, tdDom, tdStack, tdFix, tdHits, tdStatus, tdActions); errorsTbody.appendChild(tr); }); }  function updateSummaryCards(stats) { statCountEl.textContent = String(stats.total_bugs ?? 0); statSumEl.textContent = String(stats.total_hits ?? 0); statAvgEl.textContent = Number(stats.avg_hits ?? 0).toFixed(1); statMaxEl.textContent = String(stats.max_hits ?? 0); statMinEl.textContent = String(stats.min_hits ?? 0); }  async function refreshWorkspace() { const search = searchInput.value.trim(); const domain_id = domainFilterSelect.value || 'all';  if (useLocalFallback) { const { domains, errors } = getLocalVault(); const enrichedDomains = domains.map((d) => ({ ...d, bug_count: errors.filter((e) => Number(e.domain_id) === Number(d.domain_id)).length })); domainsState = enrichedDomains; populateDomainDropdowns(enrichedDomains); renderDomainSidebar(enrichedDomains);  let filtered = errors.map((e) => { const dom = domains.find((d) => Number(d.domain_id) === Number(e.domain_id)); return { ...e, domain_name: dom ? dom.domain_name : 'General' }; });  if (domain_id !== 'all') { filtered = filtered.filter((e) => Number(e.domain_id) === Number(domain_id)); } if (search) { const q = search.toLowerCase(); const numId = Number(q.replace(/^#/, '')); filtered = filtered.filter((e) => (Number.isInteger(numId) && numId > 0 && Number(e.error_id) === numId) || String(e.error_signature).toLowerCase().includes(q) || String(e.tech_stack).toLowerCase().includes(q) || String(e.root_cause).toLowerCase().includes(q) || String(e.fix_requirements).toLowerCase().includes(q) || String(e.domain_name).toLowerCase().includes(q) ); }  const total_bugs = filtered.length; const total_hits = filtered.reduce((acc, r) => acc + Number(r.times_hit || 1), 0); const avg_hits = total_bugs ? (total_hits / total_bugs).toFixed(1) : 0; const max_hits = total_bugs ? Math.max(...filtered.map((r) => Number(r.times_hit || 1))) : 0; const min_hits = total_bugs ? Math.min(...filtered.map((r) => Number(r.times_hit || 1))) : 0;  updateSummaryCards({ total_bugs, total_hits, avg_hits, max_hits, min_hits }); renderErrorsTable(filtered); return; }  try { const qs = new URLSearchParams(); if (domain_id && domain_id !== 'all') qs.set('domain_id', domain_id); if (search) qs.set('search', search);  const [domRes, errRes, statRes] = await Promise.all([ fetch(`${apiBase}/api/domains`),
+    statusPill.className = `state-tag ${verified ? 'state-verified' : 'state-pending'}`; statusPill.textContent = verified ? 'Verified' : 'Pending'; tdStatus.appendChild(statusPill);  const tdActions = document.createElement('td'); tdActions.className = 't-right'; const actionWrap = document.createElement('div'); actionWrap.className = 'row-actions';  const editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'btn-secondary btn-xs'; editBtn.textContent = 'Edit'; editBtn.addEventListener('click', () => openEditModal(err.error_id));  const delBtn = document.createElement('button'); delBtn.type = 'button'; delBtn.className = 'btn-danger btn-xs'; delBtn.textContent = 'Delete'; delBtn.addEventListener('click', () => promptDeleteError(err));
+    const askAiBtn = document.createElement('button');
+    askAiBtn.type = 'button';
+    askAiBtn.className = 'btn-secondary btn-xs';
+    askAiBtn.textContent = 'Ask AI';
+    askAiBtn.addEventListener('click', () => openAiChatWithContext(err));
+    actionWrap.append(askAiBtn, editBtn, delBtn); tdActions.appendChild(actionWrap);  tr.append(tdId, tdSig, tdDom, tdStack, tdFix, tdHits, tdStatus, tdActions); errorsTbody.appendChild(tr); }); }  function updateSummaryCards(stats) { statCountEl.textContent = String(stats.total_bugs ?? 0); statSumEl.textContent = String(stats.total_hits ?? 0); statAvgEl.textContent = Number(stats.avg_hits ?? 0).toFixed(1); statMaxEl.textContent = String(stats.max_hits ?? 0); statMinEl.textContent = String(stats.min_hits ?? 0); }  async function refreshWorkspace() { const search = searchInput.value.trim(); const domain_id = domainFilterSelect.value || 'all';  if (useLocalFallback) { const { domains, errors } = getLocalVault(); const enrichedDomains = domains.map((d) => ({ ...d, bug_count: errors.filter((e) => Number(e.domain_id) === Number(d.domain_id)).length })); domainsState = enrichedDomains; populateDomainDropdowns(enrichedDomains); renderDomainSidebar(enrichedDomains);  let filtered = errors.map((e) => { const dom = domains.find((d) => Number(d.domain_id) === Number(e.domain_id)); return { ...e, domain_name: dom ? dom.domain_name : 'General' }; });  if (domain_id !== 'all') { filtered = filtered.filter((e) => Number(e.domain_id) === Number(domain_id)); } if (search) { const q = search.toLowerCase(); const numId = Number(q.replace(/^#/, '')); filtered = filtered.filter((e) => (Number.isInteger(numId) && numId > 0 && Number(e.error_id) === numId) || String(e.error_signature).toLowerCase().includes(q) || String(e.tech_stack).toLowerCase().includes(q) || String(e.root_cause).toLowerCase().includes(q) || String(e.fix_requirements).toLowerCase().includes(q) || String(e.domain_name).toLowerCase().includes(q) ); }  const total_bugs = filtered.length; const total_hits = filtered.reduce((acc, r) => acc + Number(r.times_hit || 1), 0); const avg_hits = total_bugs ? (total_hits / total_bugs).toFixed(1) : 0; const max_hits = total_bugs ? Math.max(...filtered.map((r) => Number(r.times_hit || 1))) : 0; const min_hits = total_bugs ? Math.min(...filtered.map((r) => Number(r.times_hit || 1))) : 0;  updateSummaryCards({ total_bugs, total_hits, avg_hits, max_hits, min_hits }); renderErrorsTable(filtered); return; }  try { const qs = new URLSearchParams(); if (domain_id && domain_id !== 'all') qs.set('domain_id', domain_id); if (search) qs.set('search', search);  const [domRes, errRes, statRes] = await Promise.all([ fetch(`${apiBase}/api/domains`),
       fetch(`${apiBase}/api/errors?${qs.toString()}`),
       fetch(`${apiBase}/api/stats?${qs.toString()}`)
     ]);
@@ -610,3 +616,288 @@ domainFilterSelect.addEventListener('change', refreshWorkspace);
 filterForm.addEventListener('reset', () => setTimeout(refreshWorkspace, 0));
 
 detectBackendMode().then(refreshWorkspace);
+// ===================================================================
+// UNIVERSAL API KEY AUTO-ROUTER & LIVE AI CHAT / DIAGNOSIS ENGINE
+// ===================================================================
+const AI_KEY_STORAGE = 'tv_universal_api_key_v1';
+let activeChatContext = null;
+let chatHistory = [];
+
+const openAiChatBtn = document.getElementById('open-ai-chat-btn');
+const openApiKeyBtn = document.getElementById('open-api-key-btn');
+const aiKeyDot = document.getElementById('ai-key-dot');
+const aiKeyStatusText = document.getElementById('ai-key-status-text');
+
+const aiChatModal = document.getElementById('ai-chat-modal');
+const chatProviderBadge = document.getElementById('chat-provider-badge');
+const chatContextText = document.getElementById('chat-context-text');
+const chatUnbindBtn = document.getElementById('chat-unbind-btn');
+const chatClearBtn = document.getElementById('chat-clear-btn');
+const chatCloseBtn = document.getElementById('chat-close-btn');
+const chatMessagesBox = document.getElementById('chat-messages');
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+
+const apiKeyModal = document.getElementById('api-key-modal');
+const apiKeyForm = document.getElementById('api-key-form');
+const apiKeyInput = document.getElementById('api-key-input');
+const detectedProviderPill = document.getElementById('detected-provider-pill');
+const apiKeyFeedback = document.getElementById('api-key-feedback');
+const removeApiKeyBtn = document.getElementById('remove-api-key-btn');
+const closeApiKeyBtn = document.getElementById('close-api-key-btn');
+
+function detectProviderFromKey(rawKey) {
+  const key = String(rawKey || '').trim();
+  if (!key) return null;
+  if (key.startsWith('AIza')) {
+    return { id: 'gemini', name: 'Google Gemini', model: 'gemini-2.5-flash', key };
+  }
+  if (key.startsWith('gsk_')) {
+    return { id: 'groq', name: 'Groq Llama-3.3', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile', key };
+  }
+  if (key.startsWith('sk-or-')) {
+    return { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: 'openai/gpt-4o-mini', key };
+  }
+  if (key.startsWith('sk-')) {
+    return { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
+  }
+  return { id: 'openai-compatible', name: 'Custom AI API', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
+}
+
+function getSavedProvider() {
+  const saved = localStorage.getItem(AI_KEY_STORAGE) || '';
+  return detectProviderFromKey(saved);
+}
+
+function refreshAiKeyBadge() {
+  const provider = getSavedProvider();
+  if (provider && aiKeyDot && aiKeyStatusText) {
+    aiKeyDot.classList.add('is-active');
+    aiKeyStatusText.textContent = `AI: ${provider.name}`;
+    if (chatProviderBadge) chatProviderBadge.textContent = `${provider.name} Live`;
+    if (detectedProviderPill) detectedProviderPill.textContent = provider.name;
+    if (apiKeyFeedback) apiKeyFeedback.textContent = `Connected: ${provider.name} (${provider.model}) active in browser.`;
+  } else if (aiKeyDot && aiKeyStatusText) {
+    aiKeyDot.classList.remove('is-active');
+    aiKeyStatusText.textContent = 'API Key';
+    if (chatProviderBadge) chatProviderBadge.textContent = 'Built-in Engine';
+    if (detectedProviderPill) detectedProviderPill.textContent = 'No Key Set';
+    if (apiKeyFeedback) apiKeyFeedback.textContent = 'Status: Using built-in diagnostic engine (Paste an API key for live LLM calls).';
+  }
+}
+
+async function callUniversalAI(systemPrompt, userPrompt, jsonMode = false) {
+  const provider = getSavedProvider();
+  if (!provider) {
+    throw new Error('NO_API_KEY');
+  }
+
+  if (provider.id === 'gemini') {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${provider.model}:generateContent?key=${encodeURIComponent(provider.key)}`;
+    const body = {
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      generationConfig: jsonMode ? { responseMimeType: 'application/json', temperature: 0.2 } : { temperature: 0.3 }
+    };
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Gemini API request failed.');
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  }
+
+  // OpenAI / Groq / OpenRouter compatible chat completions
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${provider.key}`
+  };
+  const payload = {
+    model: provider.model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ],
+    temperature: 0.2
+  };
+  if (jsonMode && provider.id !== 'openrouter') {
+    payload.response_format = { type: 'json_object' };
+  }
+
+  const res = await fetch(provider.endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || `${provider.name} API error.`);
+  return data.choices?.[0]?.message?.content || '';
+}
+
+// Wire up API Key Modal
+if (openApiKeyBtn) {
+  openApiKeyBtn.addEventListener('click', () => {
+    apiKeyInput.value = localStorage.getItem(AI_KEY_STORAGE) || '';
+    refreshAiKeyBadge();
+    apiKeyModal.showModal();
+  });
+}
+
+if (apiKeyInput) {
+  apiKeyInput.addEventListener('input', () => {
+    const p = detectProviderFromKey(apiKeyInput.value);
+    detectedProviderPill.textContent = p ? p.name : 'Auto-Detect';
+  });
+}
+
+if (closeApiKeyBtn) {
+  closeApiKeyBtn.addEventListener('click', () => apiKeyModal.close());
+}
+
+if (removeApiKeyBtn) {
+  removeApiKeyBtn.addEventListener('click', () => {
+    localStorage.removeItem(AI_KEY_STORAGE);
+    apiKeyInput.value = '';
+    refreshAiKeyBadge();
+    apiKeyModal.close();
+    showBanner('Removed saved API key. Switched to built-in engine.');
+  });
+}
+
+if (apiKeyForm) {
+  apiKeyForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const raw = apiKeyInput.value.trim();
+    if (!raw) {
+      showBanner('Please paste a valid API key.', 'error');
+      return;
+    }
+    const provider = detectProviderFromKey(raw);
+    localStorage.setItem(AI_KEY_STORAGE, raw);
+    refreshAiKeyBadge();
+    apiKeyModal.close();
+    showBanner(`Connected ${provider ? provider.name : 'API'} key successfully.`);
+  });
+}
+
+// Wire up Top Popup AI Chat Modal
+function openAiChatWithContext(record = null) {
+  if (record) {
+    activeChatContext = record;
+    if (chatContextText) {
+      chatContextText.textContent = `#${record.error_id} [${record.domain_name || 'Bug'}] ${record.error_signature} (${record.tech_stack})`;
+    }
+    if (chatUnbindBtn) chatUnbindBtn.hidden = false;
+  }
+  refreshAiKeyBadge();
+  if (aiChatModal) {
+    aiChatModal.showModal();
+    setTimeout(() => chatInput?.focus(), 40);
+  }
+}
+
+if (openAiChatBtn) {
+  openAiChatBtn.addEventListener('click', () => openAiChatWithContext(null));
+}
+
+if (chatCloseBtn) {
+  chatCloseBtn.addEventListener('click', () => aiChatModal.close());
+}
+
+if (chatUnbindBtn) {
+  chatUnbindBtn.addEventListener('click', () => {
+    activeChatContext = null;
+    chatContextText.textContent = 'General Project & Code Debugging Assistant';
+    chatUnbindBtn.hidden = true;
+  });
+}
+
+if (chatClearBtn) {
+  chatClearBtn.addEventListener('click', () => {
+    chatHistory = [];
+    chatMessagesBox.innerHTML = `
+      <div class="chat-bubble is-ai">
+        <div class="bubble-role">TraceVault AI</div>
+        <div class="bubble-content">Chat history cleared. Ask any question about your code, SQL schema, or bug records.</div>
+      </div>
+    `;
+  });
+}
+
+function appendChatBubble(role, text) {
+  const div = document.createElement('div');
+  div.className = `chat-bubble ${role === 'user' ? 'is-user' : 'is-ai'}`;
+  const roleEl = document.createElement('div');
+  roleEl.className = 'bubble-role';
+  roleEl.textContent = role === 'user' ? 'You' : 'TraceVault AI';
+  const contentEl = document.createElement('div');
+  contentEl.className = 'bubble-content';
+  contentEl.textContent = text;
+  div.append(roleEl, contentEl);
+  chatMessagesBox.appendChild(div);
+  chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+  return contentEl;
+}
+
+async function handleChatSubmit(promptText) {
+  const question = String(promptText || '').trim();
+  if (!question) return;
+
+  appendChatBubble('user', question);
+  chatInput.value = '';
+  chatSendBtn.disabled = true;
+  const thinkingEl = appendChatBubble('ai', 'Analyzing...');
+
+  const contextBlock = activeChatContext
+    ? `Active Bug Record Context:\n- ID: #${activeChatContext.error_id}\n- Domain: ${activeChatContext.domain_name}\n- Tech Stack: ${activeChatContext.tech_stack}\n- Error Signature: ${activeChatContext.error_signature}\n- Root Cause: ${activeChatContext.root_cause}\n- Current Fix: ${activeChatContext.fix_requirements || activeChatContext.fixed_code || 'None'}`
+    : `Project Context: TraceVault Software Bug & Error Inventory System (Node.js, Express, MySQL 3306 with domains and error_logs tables, currently tracking ${errorsMap.size} bug records).`;
+
+  const systemPrompt = `You are TraceVault AI, a senior full-stack and MySQL database debugging assistant. Be concise, practical, and provide clean code examples.\n${contextBlock}`;
+
+  try {
+    const reply = await callUniversalAI(systemPrompt, question, false);
+    thinkingEl.textContent = reply.trim() || 'No response received.';
+  } catch (err) {
+    if (activeChatContext) {
+      thinkingEl.textContent =
+        `[Diagnostic Analysis for #${activeChatContext.error_id} — ${activeChatContext.tech_stack}]\n\n` +
+        `• Error Signature: ${activeChatContext.error_signature}\n` +
+        `• Root Cause: ${activeChatContext.root_cause}\n` +
+        `• Recommended Fix:\n${activeChatContext.fix_requirements || activeChatContext.fixed_code || 'None'}\n\n` +
+        `(Tip: Click "API Key" in the top navbar and paste a Groq/Gemini/OpenAI key for live custom LLM generation.)`;
+    } else {
+      thinkingEl.textContent =
+        `[TraceVault Diagnostic Assistant]\n` +
+        `To get live custom AI responses for "${question.slice(0, 60)}...", click "API Key" in the top bar and paste your API key (Groq gsk_, Gemini AIza, OpenRouter sk-or-, or OpenAI sk-). Or click "Ask AI" on any table row to inspect its root cause and verified fix.`;
+    }
+  } finally {
+    chatSendBtn.disabled = false;
+    chatMessagesBox.scrollTop = chatMessagesBox.scrollHeight;
+  }
+}
+
+if (chatForm) {
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleChatSubmit(chatInput.value);
+  });
+}
+
+if (chatInput) {
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleChatSubmit(chatInput.value);
+    }
+  });
+}
+
+document.querySelectorAll('.chat-prompt-chip').forEach((btn) => {
+  btn.addEventListener('click', () => handleChatSubmit(btn.dataset.prompt));
+});
+
+// Initialize AI Key status on boot
+refreshAiKeyBadge();
