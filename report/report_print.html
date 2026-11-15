@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TraceVault — DBMS Laboratory Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 14mm 14mm 14mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Crimson Pro', serif, 'Times New Roman';
+      font-size: 10pt;
+      line-height: 1.35;
+      color: #111827;
+      background: #ffffff;
+    }
+
+    .page {
+      width: 100%;
+      min-height: 269mm;
+      max-height: 269mm;
+      overflow: hidden;
+      page-break-after: always;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 4px;
+      font-size: 8pt;
+      color: #64748b;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+      font-size: 8pt;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Title Block */
+    .title-block {
+      text-align: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1.5px solid #0f172a;
+    }
+
+    .title-course {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0f2d59;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .title-main {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 3px 0;
+    }
+
+    .title-meta {
+      font-size: 9pt;
+      color: #475569;
+    }
+
+    h2 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f2d59;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 2px;
+      margin: 8px 0 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    h3 {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 5px 0 2px 0;
+    }
+
+    p {
+      margin-bottom: 5px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 18px;
+      margin-bottom: 6px;
+    }
+
+    li {
+      margin-bottom: 2px;
+    }
+
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    code {
+      font-size: 8.5pt;
+      background: #f1f5f9;
+      padding: 1px 3px;
+      border-radius: 3px;
+      color: #0f2d59;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 5px 0 8px 0;
+      font-size: 8pt;
+    }
+
+    th, td {
+      padding: 4px 6px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      border-top: 1.5px solid #0f172a;
+      border-bottom: 1px solid #0f172a;
+      font-weight: 700;
+      color: #0f172a;
+      background: #f8fafc;
+    }
+
+    td {
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    tr:last-child td {
+      border-bottom: 1.5px solid #0f172a;
+    }
+
+    /* Code Blocks */
+    .code-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 5px 8px;
+      margin: 4px 0 6px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.2pt;
+      line-height: 1.25;
+      color: #1e293b;
+      white-space: pre-wrap;
+    }
+
+    .kw { color: #0284c7; font-weight: 600; }
+    .fn { color: #d97706; font-weight: 600; }
+    .str { color: #16a34a; }
+    .com { color: #64748b; font-style: italic; }
+
+    /* Figures */
+    .fig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 6px 0;
+    }
+
+    .fig-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .fig-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .fig-caption {
+      font-size: 7.5pt;
+      color: #334155;
+      padding: 3px 6px;
+      background: #f8fafc;
+      line-height: 1.2;
+    }
+
+    .full-fig img {
+      width: 100%;
+      max-height: 185px;
+      object-fit: cover;
+      object-position: top;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .badge-pk { color: #0284c7; font-weight: 700; }
+    .badge-fk { color: #d97706; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 1: OBJECTIVES, TOOLS, DATABASE DESIGN & ER DIAGRAM             -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Database Management System (DBMS) Laboratory</span>
+      <span>TraceVault Error Inventory System</span>
+      <span>Fall 2026</span>
+    </div>
+
+    <div class="title-block">
+      <div class="title-course">Database Management System (DBMS) Laboratory</div>
+      <div class="title-main">TraceVault: Software Bug &amp; Error Inventory Management System</div>
+      <div class="title-meta">
+        <strong>Topic:</strong> Inventory / Product Management &nbsp;|&nbsp;
+        <strong>Architecture:</strong> Single-Page Application (SPA) &nbsp;|&nbsp;
+        <strong>Database:</strong> MySQL 8.0 InnoDB
+      </div>
+    </div>
+
+    <h2>1. Project Objective &amp; Topic Scope</h2>
+    <p>
+      The goal of this laboratory project is to design, implement, and evaluate a single-page application (SPA) backed by a relational database to perform full <strong>CRUD operations</strong> (Create, Read, Update, Delete) and <strong>real-time SQL aggregation</strong>. Within the approved domain of <strong>Inventory Management</strong>, <em>TraceVault</em> models an engineering repository of software exceptions, runtime defects, occurrence frequencies, and verified resolutions. The project demonstrates:
+    </p>
+    <ul>
+      <li>Strict relational table normalization adhering to <strong>Third Normal Form (3NF)</strong> with foreign key constraints.</li>
+      <li>End-to-end execution of core SQL queries: <code>CREATE</code>, <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, and <code>DELETE</code>.</li>
+      <li>Real-time telemetry using five SQL aggregate functions: <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MAX()</code>, and <code>MIN()</code>.</li>
+      <li>Intuitive single-page user interface without page reloads, featuring search, modal dialogs, and instant deduplication.</li>
+    </ul>
+
+    <h2>2. Tools and Technologies Used</h2>
+    <ul>
+      <li><strong>Database Management System (RDBMS):</strong> MySQL 8.0 / MariaDB utilizing the <code>InnoDB</code> ACID-compliant storage engine with Foreign Key cascades and <code>ON DELETE RESTRICT</code> integrity rules.</li>
+      <li><strong>Backend Runtime &amp; API:</strong> Node.js (v22 LTS) with Express.js 4.19, utilizing <code>mysql2/promise</code> for connection pooling (10 connections) and <code>express-rate-limit</code> for endpoint security.</li>
+      <li><strong>Frontend User Interface:</strong> Single-Page Application built with semantic HTML5, CSS3 Matte Carbon Design System, and modern ES6+ JavaScript utilizing the Fetch API and DOM dialogs.</li>
+      <li><strong>Cryptographic Deduplication:</strong> Node.js <code>crypto</code> and Web Crypto API generating deterministic SHA-256 fingerprint hashes.</li>
+    </ul>
+
+    <h2>3. Database Table Design (3NF Normalization)</h2>
+    <p>
+      The schema decomposes data into two normalized tables in Third Normal Form (3NF): the parent classification entity <code>domains</code> and the child inventory entity <code>error_logs</code>.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Table</th>
+          <th>Field / Column</th>
+          <th>Data Type</th>
+          <th>Key / Constraints</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>domains</strong></td>
+          <td><code>domain_id</code></td>
+          <td>INT</td>
+          <td><span class="badge-pk">PRIMARY KEY</span>, AUTO_INCREMENT</td>
+          <td>Unique domain category identifier</td>
+        </tr>
+        <tr>
+          <td><em>(Parent)</em></td>
+          <td><code>domain_name</code></td>
+          <td>VARCHAR(50)</td>
+          <td>NOT NULL, UNIQUE</td>
+          <td>Classification label (Frontend, Backend, etc.)</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>description</code></td>
+          <td>VARCHAR(255)</td>
+          <td>NOT NULL</td>
+          <td>Architectural domain scope</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>created_at</code></td>
+          <td>TIMESTAMP</td>
+          <td>DEFAULT CURRENT_TIMESTAMP</td>
+          <td>Registration timestamp</td>
+        </tr>
+        <tr>
+          <td><strong>error_logs</strong></td>
+          <td><code>error_id</code></td>
+          <td>INT</td>
+          <td><span class="badge-pk">PRIMARY KEY</span>, AUTO_INCREMENT</td>
+          <td>Unique incident record identifier</td>
+        </tr>
+        <tr>
+          <td><em>(Child)</em></td>
+          <td><code>domain_id</code></td>
+          <td>INT</td>
+          <td><span class="badge-fk">FOREIGN KEY</span> &rarr; domains</td>
+          <td>FK constraint (ON UPDATE CASCADE ON DELETE RESTRICT)</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>tech_stack</code></td>
+          <td>VARCHAR(100)</td>
+          <td>NOT NULL</td>
+          <td>Technology ecosystem (e.g. React 18, MySQL, Node.js)</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>error_signature</code></td>
+          <td>VARCHAR(255)</td>
+          <td>NOT NULL</td>
+          <td>Canonical runtime error exception string</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>signature_hash</code></td>
+          <td>CHAR(64)</td>
+          <td>NOT NULL, UNIQUE</td>
+          <td>Deterministic SHA-256 fingerprint for deduplication</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>root_cause</code></td>
+          <td>TEXT</td>
+          <td>NOT NULL</td>
+          <td>Mechanistic explanation of the defect</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>fix_requirements</code></td>
+          <td>TEXT</td>
+          <td>NOT NULL</td>
+          <td>Verified remediation code and instructions</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>times_hit</code></td>
+          <td>INT</td>
+          <td>NOT NULL, DEFAULT 1, CHECK &ge; 1</td>
+          <td>Occurrence frequency counter</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>is_verified</code></td>
+          <td>TINYINT(1)</td>
+          <td>NOT NULL, DEFAULT 1</td>
+          <td>Verification state (1 = Verified, 0 = Pending)</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><code>created_at</code></td>
+          <td>TIMESTAMP</td>
+          <td>DEFAULT CURRENT_TIMESTAMP</td>
+          <td>Record registration timestamp</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Entity-Relationship (ER) Diagram</h2>
+    <div style="text-align: center; margin: 4px 0 0 0;">
+      <img src="screenshots/00_er_diagram.png" alt="TraceVault 3NF ER Diagram" style="width: 86%; max-height: 155px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;">
+    </div>
+    <p style="font-size: 8pt; color: #475569; text-align: center; margin-top: 2px;">
+      <em>Figure 1: Relational Entity-Relationship Diagram depicting 1:N cardinality between DOMAINS and ERROR_LOGS with foreign key integrity.</em>
+    </p>
+
+    <div class="page-footer">
+      <span>TraceVault Lab Report</span>
+      <span>Page 1 of 3</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 2: KEY SQL QUERIES & SAMPLE DATA POPULATION                    -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Database Management System (DBMS) Laboratory</span>
+      <span>TraceVault Error Inventory System</span>
+      <span>Fall 2026</span>
+    </div>
+
+    <h2>5. Key SQL Queries for Database Operations</h2>
+    <p>
+      The following SQL statements demonstrate the practical database operations executing within TraceVault:
+    </p>
+
+    <h3>A. DDL: Table Definition &amp; Foreign Key Constraints</h3>
+    <div class="code-box"><span class="com">-- 1. Create Parent Table (Domains)</span>
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> domains (
+  domain_id <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+  domain_name <span class="kw">VARCHAR</span>(50) <span class="kw">NOT NULL UNIQUE</span>,
+  description <span class="kw">VARCHAR</span>(255) <span class="kw">NOT NULL</span>,
+  created_at <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+) <span class="kw">ENGINE</span>=InnoDB;
+
+<span class="com">-- 2. Create Child Table (Error Logs) with Foreign Key RESTRICT</span>
+<span class="kw">CREATE TABLE IF NOT EXISTS</span> error_logs (
+  error_id <span class="kw">INT AUTO_INCREMENT PRIMARY KEY</span>,
+  domain_id <span class="kw">INT NOT NULL</span>,
+  tech_stack <span class="kw">VARCHAR</span>(100) <span class="kw">NOT NULL</span>,
+  error_signature <span class="kw">VARCHAR</span>(255) <span class="kw">NOT NULL</span>,
+  signature_hash <span class="kw">CHAR</span>(64) <span class="kw">NOT NULL UNIQUE</span>,
+  root_cause <span class="kw">TEXT NOT NULL</span>,
+  fix_requirements <span class="kw">TEXT NOT NULL</span>,
+  times_hit <span class="kw">INT NOT NULL DEFAULT</span> 1 <span class="kw">CHECK</span> (times_hit &gt;= 1),
+  is_verified <span class="kw">TINYINT</span>(1) <span class="kw">NOT NULL DEFAULT</span> 1,
+  created_at <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+  <span class="kw">CONSTRAINT</span> fk_error_domain <span class="kw">FOREIGN KEY</span> (domain_id) <span class="kw">REFERENCES</span> domains (domain_id)
+    <span class="kw">ON UPDATE CASCADE ON DELETE RESTRICT</span>
+) <span class="kw">ENGINE</span>=InnoDB;</div>
+
+    <h3>B. DML: Record Insertion &amp; Deduplication (INSERT with ON DUPLICATE KEY UPDATE)</h3>
+    <div class="code-box"><span class="kw">INSERT INTO</span> error_logs 
+  (domain_id, tech_stack, error_signature, signature_hash, root_cause, fix_requirements, times_hit, is_verified)
+<span class="kw">VALUES</span> (?, ?, ?, ?, ?, ?, ?, ?)
+<span class="kw">ON DUPLICATE KEY UPDATE</span>
+  times_hit = times_hit + <span class="fn">VALUES</span>(times_hit),
+  domain_id = <span class="fn">VALUES</span>(domain_id),
+  tech_stack = <span class="fn">VALUES</span>(tech_stack),
+  root_cause = <span class="fn">VALUES</span>(root_cause),
+  fix_requirements = <span class="fn">VALUES</span>(fix_requirements),
+  is_verified = <span class="fn">VALUES</span>(is_verified);</div>
+
+    <h3>C. DML: Relational Join with Multi-Field Filtering (SELECT + INNER JOIN + WHERE)</h3>
+    <div class="code-box"><span class="kw">SELECT</span> e.error_id, e.domain_id, d.domain_name, e.tech_stack, e.error_signature,
+       e.signature_hash, e.root_cause, e.fix_requirements, e.times_hit, e.is_verified, e.created_at
+<span class="kw">FROM</span> error_logs e
+<span class="kw">INNER JOIN</span> domains d <span class="kw">ON</span> e.domain_id = d.domain_id
+<span class="kw">WHERE</span> (e.domain_id = ? <span class="kw">OR</span> ? = <span class="str">'all'</span>)
+  <span class="kw">AND</span> (e.error_id = ? <span class="kw">OR</span> e.error_signature <span class="kw">LIKE</span> ? <span class="kw">OR</span> e.tech_stack <span class="kw">LIKE</span> ? <span class="kw">OR</span> e.root_cause <span class="kw">LIKE</span> ?)
+<span class="kw">ORDER BY</span> e.error_id <span class="kw">ASC</span>;</div>
+
+    <h3>D. DML: Real-Time Telemetry via SQL Aggregate Functions</h3>
+    <div class="code-box"><span class="kw">SELECT</span> 
+  <span class="fn">COUNT</span>(e.error_id) <span class="kw">AS</span> total_bugs,
+  <span class="fn">COALESCE</span>(<span class="fn">SUM</span>(e.times_hit), 0) <span class="kw">AS</span> total_hits,
+  <span class="fn">COALESCE</span>(<span class="fn">ROUND</span>(<span class="fn">AVG</span>(e.times_hit), 1), 0.0) <span class="kw">AS</span> avg_hits,
+  <span class="fn">COALESCE</span>(<span class="fn">MAX</span>(e.times_hit), 0) <span class="kw">AS</span> max_hits,
+  <span class="fn">COALESCE</span>(<span class="fn">MIN</span>(e.times_hit), 0) <span class="kw">AS</span> min_hits,
+  <span class="fn">COALESCE</span>(<span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> e.is_verified = 1 <span class="kw">THEN</span> 1 <span class="kw">ELSE</span> 0 <span class="kw">END</span>), 0) <span class="kw">AS</span> verified_count
+<span class="kw">FROM</span> error_logs e
+<span class="kw">LEFT JOIN</span> domains d <span class="kw">ON</span> e.domain_id = d.domain_id
+<span class="kw">WHERE</span> (e.domain_id = ? <span class="kw">OR</span> ? = <span class="str">'all'</span>) <span class="kw">AND</span> (e.error_signature <span class="kw">LIKE</span> ? <span class="kw">OR</span> e.tech_stack <span class="kw">LIKE</span> ?);</div>
+
+    <h3>E. DML: Record Mutation &amp; Safe Deletion (UPDATE &amp; DELETE)</h3>
+    <div class="code-box"><span class="com">-- Update record by Primary Key error_id</span>
+<span class="kw">UPDATE</span> error_logs
+<span class="kw">SET</span> domain_id = ?, tech_stack = ?, error_signature = ?, signature_hash = ?,
+    root_cause = ?, fix_requirements = ?, times_hit = ?, is_verified = ?
+<span class="kw">WHERE</span> error_id = ?;
+
+<span class="com">-- Delete error record after user modal confirmation</span>
+<span class="kw">DELETE FROM</span> error_logs <span class="kw">WHERE</span> error_id = ?;</div>
+
+    <h2>6. Sample Data Demonstration (12 Seeded Records)</h2>
+    <p>
+      The database contains 12 seed records across 4 domains (exceeding the course requirement of 10 records):
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 30px;">ID</th>
+          <th style="width: 80px;">Domain (FK)</th>
+          <th style="width: 100px;">Tech Stack</th>
+          <th>Canonical Error Signature</th>
+          <th style="width: 50px; text-align: center;">Hits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>#1</td><td>Frontend (1)</td><td>Fetch API / CORS</td><td>Access to fetch at origin has been blocked by CORS policy</td><td style="text-align: center;"><strong>15</strong></td></tr>
+        <tr><td>#2</td><td>Frontend (1)</td><td>React 18 / Hooks</td><td>Too many re-renders. React limits the number of renders to prevent infinite loop</td><td style="text-align: center;"><strong>9</strong></td></tr>
+        <tr><td>#3</td><td>Frontend (1)</td><td>Next.js 14 / SSR</td><td>Hydration failed because the initial UI does not match what was rendered</td><td style="text-align: center;"><strong>7</strong></td></tr>
+        <tr><td>#4</td><td>Backend (2)</td><td>Node.js / Express</td><td>Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent</td><td style="text-align: center;"><strong>12</strong></td></tr>
+        <tr><td>#5</td><td>Backend (2)</td><td>Node.js / TCP</td><td>Error: listen EADDRINUSE: address already in use :::3000</td><td style="text-align: center;"><strong>6</strong></td></tr>
+        <tr><td>#6</td><td>Backend (2)</td><td>Express / JSON</td><td>SyntaxError: Unexpected token in JSON at position 0 in body-parser</td><td style="text-align: center;"><strong>5</strong></td></tr>
+        <tr><td>#7</td><td>Database (3)</td><td>MySQL 8.0 / InnoDB</td><td>ER_NO_REFERENCED_ROW_2: Cannot add or update child row: foreign key fails</td><td style="text-align: center;"><strong>11</strong></td></tr>
+        <tr><td>#8</td><td>Database (3)</td><td>MySQL 8.0 / SQL</td><td>ER_DUP_ENTRY: Duplicate entry for key error_logs.signature_hash</td><td style="text-align: center;"><strong>4</strong></td></tr>
+        <tr><td>#9</td><td>Database (3)</td><td>mysql2 / Pool</td><td>Error: connect ECONNREFUSED 127.0.0.1:3306</td><td style="text-align: center;"><strong>4</strong></td></tr>
+        <tr><td>#10</td><td>Fullstack (4)</td><td>JWT / Auth</td><td>JsonWebTokenError: invalid signature on protected API route</td><td style="text-align: center;"><strong>8</strong></td></tr>
+        <tr><td>#11</td><td>Fullstack (4)</td><td>Prisma / Env</td><td>Error: Environment variable not found: DATABASE_URL</td><td style="text-align: center;"><strong>2</strong></td></tr>
+        <tr><td>#12</td><td>Fullstack (4)</td><td>WebSockets / TLS</td><td>Mixed Content: Page at HTTPS requested an insecure ws:// endpoint</td><td style="text-align: center;"><strong>2</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="page-footer">
+      <span>TraceVault Lab Report</span>
+      <span>Page 2 of 3</span>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PAGE 3: APPLICATION SCREENSHOTS & LAB EVALUATION COMPLIANCE         -->
+  <!-- =================================================================== -->
+  <div class="page">
+    <div class="page-header">
+      <span>Database Management System (DBMS) Laboratory</span>
+      <span>TraceVault Error Inventory System</span>
+      <span>Fall 2026</span>
+    </div>
+
+    <h2>7. Screenshots of the Working Application</h2>
+    <p>
+      TraceVault functions strictly as a single-page application. All record creation, table viewing, searching, modal updates, and deletions occur within one responsive interface without full-page reloads.
+    </p>
+
+    <!-- Full Width Screenshot 1 -->
+    <div style="margin-bottom: 8px;">
+      <div class="full-fig">
+        <img src="screenshots/01_inventory_overview.png" alt="TraceVault Overview">
+      </div>
+      <p style="font-size: 7.5pt; color: #475569; margin-top: 2px;">
+        <strong>Figure 2: TraceVault Single-Page Inventory Overview</strong> — Showing real-time SQL aggregate KPI cards (<code>COUNT(*)</code>, <code>SUM(times_hit)</code>, <code>AVG(times_hit)</code>, <code>MAX &amp; MIN</code>), left-hand <code>INSERT INTO</code> submission form, parent domain list, and normalized 8-column records table.
+      </p>
+    </div>
+
+    <!-- 2 Column Grid for Screenshots 2 & 3 -->
+    <div class="fig-grid">
+      <div class="fig-card">
+        <img src="screenshots/02_search_filter.png" alt="Search and Filter">
+        <div class="fig-caption">
+          <strong>Figure 3: Live SQL Search &amp; Filtering:</strong> Dynamically querying across error signature, tech stack, and root cause while aggregate metrics recalculate in real time.
+        </div>
+      </div>
+      <div class="fig-card">
+        <img src="screenshots/03_edit_modal.png" alt="Edit Modal">
+        <div class="fig-caption">
+          <strong>Figure 4: Modal Update Dialog:</strong> In-place editing via <code>UPDATE ... WHERE error_id = ?</code> with client and server-side integrity validation before saving.
+        </div>
+      </div>
+    </div>
+
+    <!-- Screenshot 4 -->
+    <div style="margin-top: 6px; margin-bottom: 8px;">
+      <div class="full-fig">
+        <img src="screenshots/04_ai_diagnostic_workbench.png" alt="Diagnostic Workbench" style="max-height: 120px;">
+      </div>
+      <p style="font-size: 7.5pt; color: #475569; margin-top: 2px;">
+        <strong>Figure 5: Live Code Bug Fixer Workbench (Alt + L)</strong> — Interactive diagnostic workspace featuring language auto-detection, local heuristic analysis, and 1-click database commit.
+      </p>
+    </div>
+
+    <h2>8. Lab Evaluation Compliance &amp; Conclusion</h2>
+    <p>
+      The TraceVault project fully satisfies all requirements stipulated in the DBMS Laboratory evaluation guidelines:
+    </p>
+    <ol>
+      <li><strong>Single-Page Architecture:</strong> All functional requirements (insert, view, filter, edit, delete, telemetry) operate on one page without navigation reloads.</li>
+      <li><strong>Database Requirements:</strong> Strict 3NF schema featuring explicit Primary Keys, Foreign Key with <code>ON UPDATE CASCADE ON DELETE RESTRICT</code>, unique SHA-256 indexes, and <code>CHECK (times_hit &gt;= 1)</code> constraints.</li>
+      <li><strong>SQL Command Coverage:</strong> Production-grade implementation of <code>CREATE</code>, <code>INSERT</code>, <code>SELECT</code> (with <code>INNER JOIN</code> and <code>WHERE</code>), <code>UPDATE</code>, and <code>DELETE</code>.</li>
+      <li><strong>SQL Aggregate Functions:</strong> Full implementation of five aggregate functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MAX</code>, <code>MIN</code>) displayed on live metric cards.</li>
+      <li><strong>Demonstration Data:</strong> 12 verified engineering records across 4 parent domains, fully seeded and ready for live lab evaluation.</li>
+    </ol>
+
+    <div class="page-footer">
+      <span>TraceVault Lab Report</span>
+      <span>Page 3 of 3</span>
+    </div>
+  </div>
+
+</body>
+</html>
