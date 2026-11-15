@@ -3,196 +3,277 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TraceVault — Software Bug & Error Inventory Management System</title>
+  <title>TraceVault — Bug &amp; Error Inventory System</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=clean_dbms_v1">
+  <link rel="stylesheet" href="./style.css?v=human_v3">
 </head>
 <body>
-  <div class="app-shell">
-    <!-- Top Header -->
-    <header class="topbar">
-      <div class="brand-group">
-        <div class="brand-logo" aria-hidden="true">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-            <polygon points="16,2 29,9.5 29,22.5 16,30 3,22.5 3,9.5" fill="#0d1520" stroke="#10b981" stroke-width="2"/>
-            <polygon points="16,2 29,9.5 16,17 3,9.5" fill="rgba(16,185,129,0.22)"/>
-            <polyline points="3,9.5 16,17 29,9.5" stroke="#34d399" stroke-width="1.5" fill="none"/>
-            <line x1="16" y1="17" x2="16" y2="30" stroke="#34d399" stroke-width="1.5"/>
+  <div class="layout-container">
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+      <div class="navbar-left">
+        <div class="logo-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+            <polygon points="16,2 29,9.5 29,22.5 16,30 3,22.5 3,9.5" fill="#14171f" stroke="#2ea043" stroke-width="2.2"/>
+            <polyline points="3,9.5 16,17 29,9.5" stroke="#3fb950" stroke-width="1.6" fill="none"/>
+            <line x1="16" y1="17" x2="16" y2="30" stroke="#3fb950" stroke-width="1.6"/>
           </svg>
         </div>
-        <div>
-          <div class="brand-title-row">
-            <h1>TraceVault</h1>
-            <span class="topic-pill">Bug &amp; Error Inventory System</span>
-          </div>
-          <p class="brand-subtitle">Relational MySQL Error Knowledge Base &amp; Issue Tracker</p>
+        <span class="brand-name">TraceVault</span>
+        <span class="nav-divider">/</span>
+        <span class="workspace-title">error-inventory</span>
+      </div>
+
+      <!-- Mode Switcher: Default Lab View vs Alt+L Live Code Fixer -->
+      <div class="navbar-center">
+        <div class="mode-tabs" role="tablist">
+          <button type="button" id="tab-lab-view" class="mode-tab is-active" role="tab" aria-selected="true">
+            Database Inventory (Default)
+          </button>
+          <button type="button" id="tab-live-fixer" class="mode-tab" role="tab" aria-selected="false" title="Shortcut: Alt + L">
+            Live Code Bug Fixer <kbd>Alt+L</kbd>
+          </button>
         </div>
       </div>
 
-      <div class="topbar-right">
-        <span id="db-status-badge" class="status-badge is-online">
-          <span class="status-dot"></span>
-          <span id="db-status-text">MySQL 3306 Connected</span>
+      <div class="navbar-right">
+        <span id="db-status-badge" class="conn-indicator">
+          <span class="conn-dot"></span>
+          <span id="db-status-text">MySQL 3306</span>
         </span>
       </div>
     </header>
 
-    <!-- Notification Toast Banner -->
-    <div id="status-banner" class="status-banner" hidden></div>
+    <!-- Status Toast -->
+    <div id="status-banner" class="toast-banner" hidden></div>
 
-    <!-- Section 1: SQL Aggregate Summary Cards -->
-    <section class="summary-grid" aria-label="Database Summary Statistics">
-      <article class="summary-card">
-        <div class="summary-top">
-          <span class="summary-label">Total Bug Records</span>
-          <span class="sql-tag">COUNT(*)</span>
+    <!-- Single Connected Horizontal Metric Bar (Replaces AI-style 4 Giant Boxes) -->
+    <section class="metric-strip" aria-label="SQL Aggregate Summary">
+      <div class="metric-cell">
+        <div class="metric-meta">
+          <span class="metric-label">Total Bug Records</span>
+          <code class="metric-fn">COUNT(*)</code>
         </div>
-        <p id="stat-count" class="summary-value">0</p>
-        <span class="summary-sub">Unique error signatures in vault</span>
-      </article>
+        <div class="metric-val-row">
+          <strong id="stat-count" class="metric-number">0</strong>
+          <span class="metric-unit">signatures</span>
+        </div>
+      </div>
 
-      <article class="summary-card">
-        <div class="summary-top">
-          <span class="summary-label">Total Occurrences</span>
-          <span class="sql-tag">SUM(times_hit)</span>
+      <div class="metric-cell">
+        <div class="metric-meta">
+          <span class="metric-label">Total Occurrences</span>
+          <code class="metric-fn">SUM(times_hit)</code>
         </div>
-        <p id="stat-sum" class="summary-value text-emerald">0</p>
-        <span class="summary-sub">Cumulative incidents tracked</span>
-      </article>
+        <div class="metric-val-row">
+          <strong id="stat-sum" class="metric-number text-green">0</strong>
+          <span class="metric-unit">total hits</span>
+        </div>
+      </div>
 
-      <article class="summary-card">
-        <div class="summary-top">
-          <span class="summary-label">Average Hits / Bug</span>
-          <span class="sql-tag">AVG(times_hit)</span>
+      <div class="metric-cell">
+        <div class="metric-meta">
+          <span class="metric-label">Average Frequency</span>
+          <code class="metric-fn">AVG(times_hit)</code>
         </div>
-        <p id="stat-avg" class="summary-value">0.0</p>
-        <span class="summary-sub">Mean recurrence frequency</span>
-      </article>
+        <div class="metric-val-row">
+          <strong id="stat-avg" class="metric-number">0.0</strong>
+          <span class="metric-unit">hits / bug</span>
+        </div>
+      </div>
 
-      <article class="summary-card">
-        <div class="summary-top">
-          <span class="summary-label">Frequency Spread</span>
-          <span class="sql-tag">MAX / MIN</span>
+      <div class="metric-cell">
+        <div class="metric-meta">
+          <span class="metric-label">Occurrence Spread</span>
+          <code class="metric-fn">MAX / MIN</code>
         </div>
-        <p class="summary-value"><span id="stat-max">0</span> <span class="muted-slash">/</span> <span id="stat-min">0</span></p>
-        <span class="summary-sub">Highest vs. lowest hit count</span>
-      </article>
+        <div class="metric-val-row">
+          <strong class="metric-number"><span id="stat-max">0</span> <span class="slash">/</span> <span id="stat-min">0</span></strong>
+          <span class="metric-unit">max vs min</span>
+        </div>
+      </div>
     </section>
 
-    <!-- Main Single-Page Workspace -->
-    <main class="workspace-grid">
-      <!-- Left Column: Add Bug Record Form & Domain Management -->
-      <aside class="sidebar-column">
-        <section class="panel">
-          <div class="panel-header">
-            <h2 class="panel-title">Add New Bug Record</h2>
-            <span class="sql-tag">INSERT INTO</span>
+    <!-- =================================================================== -->
+    <!-- VIEW 2 (HIDDEN BY DEFAULT, TOGGLED VIA Alt+L): LIVE CODE BUG FIXER  -->
+    <!-- =================================================================== -->
+    <section id="live-fixer-workspace" class="fixer-workbench" hidden>
+      <div class="workbench-header">
+        <div>
+          <h2 class="section-heading">Live Code &amp; Stack-Trace Diagnostic Workbench</h2>
+          <p class="section-desc">Paste broken source code or a terminal exception below to diagnose the root cause, generate a verified fix, and commit it directly to the MySQL inventory table.</p>
+        </div>
+        <div class="sample-bar">
+          <span class="sample-label">Load Broken Code Sample:</span>
+          <button type="button" class="chip-btn" data-preset="cors">1. Express CORS Block</button>
+          <button type="button" class="chip-btn" data-preset="react">2. React Infinite Render</button>
+          <button type="button" class="chip-btn" data-preset="mysql">3. MySQL Foreign Key Fail</button>
+          <button type="button" class="chip-btn" data-preset="async">4. Express Headers Sent</button>
+        </div>
+      </div>
+
+      <div class="fixer-split">
+        <!-- Left Pane: Broken Code & Exception Input -->
+        <div class="editor-card">
+          <div class="card-bar">
+            <span class="card-bar-title">1. Broken Code / Exception Stack Trace</span>
+            <div class="inline-selects">
+              <select id="fixer-domain" aria-label="Domain Category"></select>
+              <input type="text" id="fixer-stack" placeholder="Tech stack (e.g., Node.js / Express)">
+            </div>
+          </div>
+          <textarea id="fixer-code-input" class="code-textarea" rows="10" placeholder="// Paste broken code or error stack trace here..."></textarea>
+          <div class="card-footer">
+            <button type="button" id="run-diagnosis-btn" class="btn-primary">Diagnose Code &amp; Generate Fix</button>
+          </div>
+        </div>
+
+        <!-- Right Pane: Live Diagnosis & Direct MySQL Commit -->
+        <div class="editor-card">
+          <div class="card-bar">
+            <span class="card-bar-title">2. Diagnostic Output &amp; Database Commit</span>
+            <code class="metric-fn">INSERT INTO error_logs</code>
+          </div>
+          <div class="diagnosis-body">
+            <div class="field-block">
+              <label for="fixer-out-sig">Detected Error Signature *</label>
+              <input type="text" id="fixer-out-sig" placeholder="Error signature will appear here...">
+            </div>
+            <div class="field-block">
+              <label for="fixer-out-cause">Diagnosed Root Cause *</label>
+              <textarea id="fixer-out-cause" rows="2" placeholder="Root cause analysis..."></textarea>
+            </div>
+            <div class="field-block">
+              <label for="fixer-out-fix">Patched Code / Fix Requirements *</label>
+              <textarea id="fixer-out-fix" class="mono-textarea" rows="4" placeholder="Patched solution code..."></textarea>
+            </div>
+          </div>
+          <div class="card-footer split-footer">
+            <span class="footer-note">Saves directly to MySQL &amp; switches to Inventory Table</span>
+            <button type="button" id="commit-diagnosis-btn" class="btn-primary">Commit Fix to MySQL Inventory</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 1 (DEFAULT ON LOAD): DBMS LAB INVENTORY & CRUD WORKSPACE       -->
+    <!-- =================================================================== -->
+    <main id="lab-inventory-workspace" class="main-grid">
+      <!-- Left Sidebar: Add Record Form + Parent Domains -->
+      <aside class="left-rail">
+        <section class="box-panel">
+          <div class="box-header">
+            <h2 class="box-title">Log New Bug Record</h2>
+            <code class="metric-fn">INSERT</code>
           </div>
 
           <form id="add-error-form" novalidate>
-            <div class="form-group">
-              <label for="add-signature">Error Signature / Message *</label>
-              <input type="text" id="add-signature" name="error_signature" required maxlength="255" placeholder="e.g., ER_NO_REFERENCED_ROW_2: Foreign key constraint fails">
+            <div class="field-block">
+              <label for="add-signature">Error Signature *</label>
+              <input type="text" id="add-signature" name="error_signature" required maxlength="255" placeholder="e.g., ER_NO_REFERENCED_ROW_2: Foreign key fail">
             </div>
 
-            <div class="form-row-2">
-              <div class="form-group">
-                <label for="add-domain">Domain Category (FK) *</label>
+            <div class="field-row-2">
+              <div class="field-block">
+                <label for="add-domain">Domain (FK) *</label>
                 <select id="add-domain" name="domain_id" required></select>
               </div>
-              <div class="form-group">
+              <div class="field-block">
                 <label for="add-stack">Tech Stack *</label>
-                <input type="text" id="add-stack" name="tech_stack" required maxlength="100" placeholder="e.g., MySQL 8 / Node.js">
+                <input type="text" id="add-stack" name="tech_stack" required maxlength="100" placeholder="e.g., MySQL / Node.js">
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="field-block">
               <label for="add-cause">Root Cause *</label>
-              <textarea id="add-cause" name="root_cause" rows="2" required placeholder="Explain why this bug occurred..."></textarea>
+              <textarea id="add-cause" name="root_cause" rows="2" required placeholder="Why did this error happen?"></textarea>
             </div>
 
-            <div class="form-group">
+            <div class="field-block">
               <label for="add-fix">Fix Requirements / Solution *</label>
-              <textarea id="add-fix" name="fix_requirements" rows="2" required placeholder="Provide the verified fix or configuration..."></textarea>
+              <textarea id="add-fix" name="fix_requirements" rows="2" required placeholder="How to resolve and prevent it..."></textarea>
             </div>
 
-            <div class="form-row-2">
-              <div class="form-group">
+            <div class="field-row-2">
+              <div class="field-block">
                 <label for="add-hits">Times Hit *</label>
                 <input type="number" id="add-hits" name="times_hit" required min="1" step="1" value="1">
               </div>
-              <div class="form-group">
+              <div class="field-block">
                 <label for="add-verified">Status *</label>
                 <select id="add-verified" name="is_verified">
-                  <option value="1" selected>Verified Fix</option>
-                  <option value="0">Pending Review</option>
+                  <option value="1" selected>Verified</option>
+                  <option value="0">Pending</option>
                 </select>
               </div>
             </div>
 
-            <button type="submit" id="add-submit-btn" class="btn-primary">Save Bug Record</button>
+            <button type="submit" id="add-submit-btn" class="btn-primary w-full">Save Bug Record</button>
           </form>
         </section>
 
-        <!-- Manage Parent Domains (1:N Parent Table) -->
-        <section class="panel">
-          <div class="panel-header">
-            <h2 class="panel-title">Manage Domains (Parent Table)</h2>
-            <span id="domain-count-pill" class="sql-tag">4 total</span>
+        <!-- Parent Table: Domains -->
+        <section class="box-panel">
+          <div class="box-header">
+            <h2 class="box-title">Domains (Parent Table)</h2>
+            <code id="domain-count-pill" class="metric-fn">4 rows</code>
           </div>
 
-          <form id="add-domain-form" class="domain-inline-form" novalidate>
-            <input type="text" id="new-domain-name" name="domain_name" required maxlength="50" placeholder="New domain (e.g., DevOps)">
+          <form id="add-domain-form" class="inline-add-form" novalidate>
+            <input type="text" id="new-domain-name" name="domain_name" required maxlength="50" placeholder="Add category (e.g., Security)">
             <button type="submit" class="btn-secondary">Add</button>
           </form>
 
-          <ul id="domain-list" class="domain-list"></ul>
+          <ul id="domain-list" class="compact-domain-list"></ul>
         </section>
       </aside>
 
-      <!-- Right Column: Search, Filter & Saved Bug Records Table -->
-      <section class="panel table-panel">
-        <form id="filter-form" class="filter-bar">
-          <div class="form-group search-group">
-            <label for="search-input">Search Error Inventory (SQL WHERE &amp; LIKE)</label>
+      <!-- Right Main Area: Search, Filter & Relational Table -->
+      <section class="box-panel table-container-panel">
+        <!-- Toolbar -->
+        <form id="filter-form" class="table-toolbar">
+          <div class="search-box-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input type="search" id="search-input" name="search" placeholder="Search by ID, error signature, tech stack, or root cause... (Ctrl+K)" autocomplete="off">
           </div>
 
-          <div class="form-group">
-            <label for="domain-filter">Filter Domain (FK)</label>
-            <select id="domain-filter" name="domain_id">
-              <option value="all">All Domains</option>
+          <div class="toolbar-controls">
+            <select id="domain-filter" name="domain_id" aria-label="Filter by Domain">
+              <option value="all">All Domains (FK)</option>
             </select>
+            <button type="reset" id="clear-filter-btn" class="btn-secondary">Reset</button>
           </div>
-
-          <button type="reset" id="clear-filter-btn" class="btn-secondary">Clear</button>
         </form>
 
-        <div class="table-header-bar">
-          <span id="records-caption" class="table-caption-text">Saved Error Records (0 items)</span>
-          <span class="sql-tag">SELECT ... INNER JOIN domains</span>
+        <div class="table-subbar">
+          <span id="records-caption" class="records-count-label">Saved Error Records (12 items)</span>
+          <code class="metric-fn">SELECT ... FROM error_logs INNER JOIN domains WHERE ...</code>
         </div>
 
-        <div class="table-scroll">
-          <table>
+        <div class="table-responsive">
+          <table class="inventory-table">
             <thead>
               <tr>
-                <th class="col-id">ID</th>
+                <th class="w-id">ID</th>
                 <th>Error Signature &amp; Root Cause</th>
                 <th>Domain</th>
                 <th>Tech Stack</th>
                 <th>Fix Requirements</th>
-                <th class="col-center">Hits</th>
-                <th class="col-center">Status</th>
-                <th class="col-center">Actions</th>
+                <th class="t-center">Hits</th>
+                <th class="t-center">State</th>
+                <th class="t-right">Actions</th>
               </tr>
             </thead>
             <tbody id="errors-tbody">
               <tr>
-                <td colspan="8" class="empty-cell">Loading bug inventory records...</td>
+                <td colspan="8" class="empty-row">Loading records...</td>
               </tr>
             </tbody>
           </table>
@@ -201,75 +282,75 @@
     </main>
   </div>
 
-  <!-- Update Error Record Modal Dialog -->
-  <dialog id="edit-dialog" class="modal-dialog">
-    <div class="modal-header">
+  <!-- Update Record Modal -->
+  <dialog id="edit-dialog" class="clean-modal">
+    <div class="modal-top">
       <h2 id="edit-dialog-title">Update Error Record</h2>
-      <span class="sql-tag">UPDATE ... WHERE</span>
+      <code class="metric-fn">UPDATE ... WHERE error_id = ?</code>
     </div>
     <form id="edit-error-form" novalidate>
       <input type="hidden" id="edit-id" name="error_id">
 
-      <div class="form-group">
-        <label for="edit-signature">Error Signature / Message *</label>
+      <div class="field-block">
+        <label for="edit-signature">Error Signature *</label>
         <input type="text" id="edit-signature" name="error_signature" required maxlength="255">
       </div>
 
-      <div class="form-row-2">
-        <div class="form-group">
+      <div class="field-row-2">
+        <div class="field-block">
           <label for="edit-domain">Domain Category (FK) *</label>
           <select id="edit-domain" name="domain_id" required></select>
         </div>
-        <div class="form-group">
+        <div class="field-block">
           <label for="edit-stack">Tech Stack *</label>
           <input type="text" id="edit-stack" name="tech_stack" required maxlength="100">
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="field-block">
         <label for="edit-cause">Root Cause *</label>
         <textarea id="edit-cause" name="root_cause" rows="2" required></textarea>
       </div>
 
-      <div class="form-group">
-        <label for="edit-fix">Fix Requirements / Solution *</label>
+      <div class="field-block">
+        <label for="edit-fix">Fix Requirements *</label>
         <textarea id="edit-fix" name="fix_requirements" rows="2" required></textarea>
       </div>
 
-      <div class="form-row-2">
-        <div class="form-group">
+      <div class="field-row-2">
+        <div class="field-block">
           <label for="edit-times-hit">Times Hit *</label>
           <input type="number" id="edit-times-hit" name="times_hit" required min="1" step="1">
         </div>
-        <div class="form-group">
+        <div class="field-block">
           <label for="edit-is-verified">Verification Status *</label>
           <select id="edit-is-verified" name="is_verified">
-            <option value="1">Verified Fix</option>
-            <option value="0">Pending Review</option>
+            <option value="1">Verified</option>
+            <option value="0">Pending</option>
           </select>
         </div>
       </div>
 
-      <div class="modal-actions">
+      <div class="modal-foot">
         <button type="button" id="edit-cancel-btn" class="btn-secondary">Cancel</button>
-        <button type="submit" id="edit-submit-btn" class="btn-primary">Update Changes</button>
+        <button type="submit" id="edit-submit-btn" class="btn-primary">Save Changes</button>
       </div>
     </form>
   </dialog>
 
-  <!-- Delete Confirmation Modal Dialog -->
-  <dialog id="delete-dialog" class="modal-dialog modal-sm">
-    <div class="modal-header">
-      <h2 id="delete-dialog-title">Confirm Record Deletion</h2>
-      <span class="sql-tag tag-danger">DELETE WHERE</span>
+  <!-- Delete Confirmation Modal -->
+  <dialog id="delete-dialog" class="clean-modal modal-narrow">
+    <div class="modal-top">
+      <h2 id="delete-dialog-title">Confirm Deletion</h2>
+      <code class="metric-fn text-red">DELETE WHERE</code>
     </div>
-    <p id="delete-dialog-message" class="delete-msg">Are you sure you want to permanently delete this bug record from the database?</p>
-    <div class="modal-actions">
+    <p id="delete-dialog-message" class="modal-body-text">Are you sure you want to permanently delete this record?</p>
+    <div class="modal-foot">
       <button type="button" id="delete-cancel-btn" class="btn-secondary">Cancel</button>
-      <button type="button" id="delete-confirm-btn" class="btn-danger">Delete Permanently</button>
+      <button type="button" id="delete-confirm-btn" class="btn-danger">Delete Record</button>
     </div>
   </dialog>
 
-  <script src="./app.js?v=clean_dbms_v1" defer></script>
+  <script src="./app.js?v=human_v3" defer></script>
 </body>
 </html>
