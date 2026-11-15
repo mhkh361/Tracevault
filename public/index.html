@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=fullpage_v11">
+  <link rel="stylesheet" href="./style.css?v=universal_v12">
 </head>
 <body>
   <div class="layout-container">
@@ -126,7 +126,7 @@
         <div class="fixer-top-right">
           <button type="button" id="modal-api-key-btn" class="api-key-btn">
             <span id="modal-key-dot" class="key-dot"></span>
-            <span id="modal-key-label">🔑 API Key</span>
+            <span id="modal-key-label">🔑 Connect API Key</span>
           </button>
           <button type="button" id="close-fixer-modal-btn" class="btn-secondary">
             ← Back to Inventory Table
@@ -208,7 +208,7 @@
             <span class="chat-subtitle">Ask how to fix the code, request line-by-line explanations, or discuss SQL/project architecture</span>
           </div>
           <div class="chat-header-right">
-            <code id="chat-provider-pill" class="metric-fn">AI Ready</code>
+            <code id="chat-provider-pill" class="metric-fn">API Disconnected</code>
             <button type="button" id="clear-chat-history-btn" class="btn-secondary btn-xs">Clear Chat</button>
           </div>
         </div>
@@ -358,45 +358,33 @@
   </div>
 
   <!-- =================================================================== -->
-  <!-- UNIVERSAL API KEY CONFIGURATION POPUP MODAL                         -->
+  <!-- PURE UNIVERSAL API KEY CONNECTOR MODAL (DARK THEME, NO MODEL NAMES) -->
   <!-- =================================================================== -->
-    <dialog id="api-key-modal" class="clean-modal modal-wide">
+  <dialog id="api-key-modal" class="clean-modal">
     <div class="modal-top">
-      <h2>🔑 Connect AI API Key (Gemini / Groq / OpenRouter / OpenAI)</h2>
-      <code id="detected-provider-pill" class="metric-fn">Auto-Detect</code>
+      <h2>🔑 Universal API Connector</h2>
+      <code id="detected-provider-pill" class="metric-fn">Disconnected</code>
     </div>
 
     <p class="modal-body-text">
-      Select your provider (or leave on Auto-Detect) and paste your API key below. Your key is stored only in your browser's <code>localStorage</code>.
+      Enter your personal API key below to enable live intelligence across the diagnostic workbench and chat assistant. This framework routes requests directly from your browser using your key without storing credentials on any external server.
     </p>
 
     <form id="api-key-form" novalidate>
-      <div class="field-row-2">
-        <div class="field-block">
-          <label for="api-provider-select">AI Provider *</label>
-          <select id="api-provider-select">
-            <option value="auto" selected>✨ Auto-Detect from Key</option>
-            <option value="gemini">Google Gemini (AIza...)</option>
-            <option value="groq">Groq Cloud (gsk_...)</option>
-            <option value="openrouter">OpenRouter (sk-or-...)</option>
-            <option value="openai">OpenAI (sk-...)</option>
-          </select>
-        </div>
-        <div class="field-block">
-          <label for="api-key-input">API Key *</label>
-          <input type="text" id="api-key-input" spellcheck="false" autocomplete="off" placeholder="Paste your API key here...">
-        </div>
+      <div class="field-block">
+        <label for="api-key-input">Universal API Key *</label>
+        <input type="password" id="api-key-input" spellcheck="false" autocomplete="off" placeholder="Paste your API key here...">
       </div>
 
       <div id="api-key-feedback" class="key-status-box">
-        Status: Ready.
+        Status: Disconnected — Connect an API key above to activate live responses.
       </div>
 
       <div class="modal-foot split-foot">
-        <button type="button" id="remove-api-key-btn" class="btn-danger">Remove Key</button>
+        <button type="button" id="remove-api-key-btn" class="btn-danger">Disconnect Key</button>
         <div class="row-actions">
-          <button type="button" id="close-api-key-btn" class="btn-secondary">Close</button>
-          <button type="submit" class="btn-primary">Save &amp; Connect Key</button>
+          <button type="button" id="close-api-key-btn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Connect API</button>
         </div>
       </div>
     </form>
@@ -471,6 +459,6 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=fullpage_v11" defer></script>
+  <script src="./app.js?v=universal_v12" defer></script>
 </body>
 </html>

@@ -55,10 +55,14 @@ const CODE_PRESETS = {
   }
 };
 
-const AI_KEY_STORAGE = 'tv_universal_api_key_v1';
-const AI_PROVIDER_STORAGE = 'tv_ai_provider_choice_v1';
+// Clean up any old cached key slots that caused false "OpenAI Connected" badges
+try {
+  localStorage.removeItem('tv_universal_api_key_v1');
+  localStorage.removeItem('tv_ai_provider_choice_v1');
+} catch (_e) {}
+
+const AI_KEY_STORAGE = 'tv_universal_api_key_v2';
 const labWorkspace = document.getElementById('lab-inventory-workspace');
-const apiProviderSelect = document.getElementById('api-provider-select');
 const clearChatHistoryBtn = document.getElementById('clear-chat-history-btn');
 let useLocalFallback = false;
 let apiBase = '';
@@ -148,69 +152,87 @@ function showBanner(msg, tone = 'success') {
 }
 
 // ===================================================================
-// UNIVERSAL API KEY AUTO-ROUTER
+// PURE UNIVERSAL API FRAMEWORK CONNECTOR (BRAND-FREE)
 // ===================================================================
-function detectProviderFromKey(rawKey, forcedChoice = 'auto') {
+function resolveUniversalEndpoint(rawKey) {
   const key = String(rawKey || '').replace(/["'\s]/g, '');
-  if (!key) return null;
-  const choice = (forcedChoice && forcedChoice !== 'auto') ? forcedChoice : (localStorage.getItem(AI_PROVIDER_STORAGE) || 'auto');
+  if (!key || key.length < 16) return null;
 
-  if (choice === 'gemini' || /^AIza/i.test(key) || (!key.startsWith('sk-') && !key.startsWith('gsk_') && key.length >= 35 && key.length <= 45)) {
-    return { id: 'gemini', name: 'Google Gemini', models: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'], key };
+  if (/^AIza/i.test(key) || (!key.startsWith('sk-') && !key.startsWith('gsk_') && key.length >= 35 && key.length <= 45)) {
+    return {
+      type: 'google-rest',
+      models: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
+      key
+    };
   }
-  if (choice === 'groq' || /^gsk_/i.test(key)) {
-    return { id: 'groq', name: 'Groq Llama-3.3', endpoint: 'https://api.groq.com/openai/v1/chat/completions', model: 'llama-3.3-70b-versatile', key };
+  if (/^gsk_/i.test(key)) {
+    return {
+      type: 'chat-completions',
+      endpoint: 'https://api.groq.com/openai/v1/chat/completions',
+      model: 'llama-3.3-70b-versatile',
+      key
+    };
   }
-  if (choice === 'openrouter' || /^sk-or-/i.test(key)) {
-    return { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1/chat/completions', model: 'openai/gpt-4o-mini', key };
+  if (/^sk-or-/i.test(key)) {
+    return {
+      type: 'chat-completions',
+      endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+      model: 'openai/gpt-4o-mini',
+      key
+    };
   }
-  return { id: 'openai', name: 'OpenAI', endpoint: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini', key };
+  return {
+    type: 'chat-completions',
+    endpoint: 'https://api.openai.com/v1/chat/completions',
+    model: 'gpt-4o-mini',
+    key
+  };
 }
 
-function getSavedProvider() {
+function getSavedUniversalConnection() {
   const raw = localStorage.getItem(AI_KEY_STORAGE) || '';
-  const choice = localStorage.getItem(AI_PROVIDER_STORAGE) || 'auto';
-  return detectProviderFromKey(raw, choice);
+  return resolveUniversalEndpoint(raw);
 }
 
 function refreshAiKeyUI() {
-  const p = getSavedProvider();
-  if (p) {
+  const conn = getSavedUniversalConnection();
+  if (conn) {
     navKeyDot.classList.add('is-active');
-    modalKeyDot.classList.add('is-active');
-    navKeyLabel.textContent = `🔑 AI: ${p.name}`;
-    modalKeyLabel.textContent = `🔑 ${p.name} Active`;
-    chatProviderPill.textContent = `${p.name} Connected`;
-    detectedProviderPill.textContent = p.name;
-    const modelDesc = p.models ? p.models[0] : p.model;
-    apiKeyFeedback.textContent = `Active: ${p.name} (${modelDesc}) connected and ready.`;
+    if (modalKeyDot) modalKeyDot.classList.add('is-active');
+    navKeyLabel.textContent = '🔑 API Connected';
+    if (modalKeyLabel) modalKeyLabel.textContent = '🔑 API Connected';
+    if (chatProviderPill) chatProviderPill.textContent = '● Universal API Active';
+    if (detectedProviderPill) detectedProviderPill.textContent = 'Connected';
+    if (apiKeyFeedback) apiKeyFeedback.textContent = 'Status: Connected — Universal API endpoint is active in this browser.';
   } else {
     navKeyDot.classList.remove('is-active');
-    modalKeyDot.classList.remove('is-active');
+    if (modalKeyDot) modalKeyDot.classList.remove('is-active');
     navKeyLabel.textContent = '🔑 Connect API Key';
-    modalKeyLabel.textContent = '🔑 Set API Key';
-    chatProviderPill.textContent = 'Built-in AI Ready';
-    detectedProviderPill.textContent = 'Auto-Detect';
-    apiKeyFeedback.textContent = 'Current Mode: Built-in Diagnostic Engine (Paste an API key above for live LLM calls).';
+    if (modalKeyLabel) modalKeyLabel.textContent = '🔑 Connect API Key';
+    if (chatProviderPill) chatProviderPill.textContent = 'API Disconnected';
+    if (detectedProviderPill) detectedProviderPill.textContent = 'Disconnected';
+    if (apiKeyFeedback) apiKeyFeedback.textContent = 'Status: Disconnected — Paste your API key above to enable live intelligence.';
   }
 }
 
 async function callUniversalAI(systemPrompt, userPrompt) {
-  const p = getSavedProvider();
-  if (!p) throw new Error('NO_API_KEY');
+  const conn = getSavedUniversalConnection();
+  if (!conn) {
+    throw new Error('API key is not connected. Click "🔑 Connect API Key" to add your key.');
+  }
 
-  if (p.id === 'gemini') {
-    let lastErr = null;
-    for (const modelName of p.models) {
+  if (conn.type === 'google-rest') {
+    let lastError = null;
+    for (const model of conn.models) {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(p.key)}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(conn.key)}`;
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{
               role: 'user',
-              parts: [{ text: `${systemPrompt}\n\nUser Input:\n${userPrompt}` }]
+              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
             }],
             generationConfig: { temperature: 0.25 }
           })
@@ -219,22 +241,22 @@ async function callUniversalAI(systemPrompt, userPrompt) {
         if (res.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
           return data.candidates[0].content.parts[0].text;
         }
-        lastErr = new Error(data.error?.message || `Gemini ${modelName} error`);
-      } catch (e) {
-        lastErr = e;
+        lastError = new Error(data.error?.message || 'API request failed.');
+      } catch (err) {
+        lastError = err;
       }
     }
-    throw lastErr || new Error('Gemini API call failed.');
+    throw lastError || new Error('Universal API request failed.');
   }
 
-  const res = await fetch(p.endpoint, {
+  const res = await fetch(conn.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${p.key}`
+      'Authorization': `Bearer ${conn.key}`
     },
     body: JSON.stringify({
-      model: p.model,
+      model: conn.model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -243,56 +265,54 @@ async function callUniversalAI(systemPrompt, userPrompt) {
     })
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error?.message || `${p.name} API error.`);
+  if (!res.ok) {
+    throw new Error(data.error?.message || 'Universal API request failed.');
+  }
   return data.choices?.[0]?.message?.content || '';
 }
 
 function openKeyDialog() {
   apiKeyInput.value = localStorage.getItem(AI_KEY_STORAGE) || '';
-  if (apiProviderSelect) {
-    apiProviderSelect.value = localStorage.getItem(AI_PROVIDER_STORAGE) || 'auto';
-  }
   refreshAiKeyUI();
   apiKeyModal.showModal();
 }
 
 openApiKeyBtn.addEventListener('click', openKeyDialog);
-modalApiKeyBtn.addEventListener('click', openKeyDialog);
+if (modalApiKeyBtn) modalApiKeyBtn.addEventListener('click', openKeyDialog);
 closeApiKeyBtn.addEventListener('click', () => apiKeyModal.close());
 
-function updateKeyModalFeedback() {
-  const chosen = apiProviderSelect ? apiProviderSelect.value : 'auto';
-  const p = detectProviderFromKey(apiKeyInput.value, chosen);
-  detectedProviderPill.textContent = p ? p.name : 'Auto-Detect';
-}
-
-apiKeyInput.addEventListener('input', updateKeyModalFeedback);
-if (apiProviderSelect) {
-  apiProviderSelect.addEventListener('change', updateKeyModalFeedback);
-}
+apiKeyInput.addEventListener('input', () => {
+  const conn = resolveUniversalEndpoint(apiKeyInput.value);
+  if (detectedProviderPill) {
+    detectedProviderPill.textContent = conn ? 'Valid Key Format' : 'Disconnected';
+  }
+});
 
 removeApiKeyBtn.addEventListener('click', () => {
   localStorage.removeItem(AI_KEY_STORAGE);
-  localStorage.removeItem(AI_PROVIDER_STORAGE);
   apiKeyInput.value = '';
-  if (apiProviderSelect) apiProviderSelect.value = 'auto';
   refreshAiKeyUI();
   apiKeyModal.close();
-  appendChat('ai', 'API key removed. Switched to built-in diagnostic engine.');
+  appendChat('ai', 'API key disconnected. Switched to built-in diagnostic engine.');
+  showBanner('API key disconnected.');
 });
 
 apiKeyForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const raw = apiKeyInput.value.trim().replace(/["'\s]/g, '');
   if (!raw) return;
-  const choice = apiProviderSelect ? apiProviderSelect.value : 'auto';
-  const p = detectProviderFromKey(raw, choice);
+  const conn = resolveUniversalEndpoint(raw);
+  if (!conn) {
+    if (apiKeyFeedback) {
+      apiKeyFeedback.textContent = 'Status: Invalid key format. Please enter a valid API key.';
+    }
+    return;
+  }
   localStorage.setItem(AI_KEY_STORAGE, raw);
-  localStorage.setItem(AI_PROVIDER_STORAGE, choice);
   refreshAiKeyUI();
   apiKeyModal.close();
-  appendChat('ai', `Connected ${p.name}! You can now analyze code or chat with me live.`);
-  showBanner(`Connected ${p.name} API key.`);
+  appendChat('ai', 'Universal API key connected! You can now analyze code or chat with live intelligence.');
+  showBanner('Universal API key connected.');
 });
 
 // ===================================================================
@@ -468,8 +488,8 @@ runDiagnosisBtn.addEventListener('click', async () => {
   fixerOutCause.value = heur.cause;
   fixerOutFix.value = heur.fix;
 
-  const provider = getSavedProvider();
-  if (provider) {
+  const conn = getSavedUniversalConnection();
+  if (conn) {
     try {
       const sys = `You are TraceVault AI Bug Fixer. Analyze the user's broken code or stack trace and respond in valid JSON with exact keys: {"error_signature": "...", "tech_stack": "...", "domain_id": 1|2|3|4, "root_cause": "...", "fixed_code": "...", "chat_summary": "..."} where domain_id is 1 (Frontend), 2 (Backend), 3 (Database), or 4 (Fullstack).`;
       const reply = await callUniversalAI(sys, raw);
@@ -480,7 +500,7 @@ runDiagnosisBtn.addEventListener('click', async () => {
       if (parsed.domain_id) fixerDomainSelect.value = String(parsed.domain_id);
       if (parsed.root_cause) fixerOutCause.value = parsed.root_cause;
       if (parsed.fixed_code) fixerOutFix.value = parsed.fixed_code;
-      appendChat('ai', parsed.chat_summary || `Analyzed with ${provider.name}! Root cause: ${fixerOutCause.value}`);
+      appendChat('ai', parsed.chat_summary || `Analyzed live! Root cause: ${fixerOutCause.value}`);
     } catch (_err) {
       appendChat('ai', `Diagnosed "${heur.sig}" (${heur.stack}). Root Cause: ${heur.cause}`);
     }
@@ -569,8 +589,8 @@ async function handleChatQuestion(questionText) {
   const currentSig = fixerOutSig.value.trim();
   const currentFix = fixerOutFix.value.trim();
 
-  const provider = getSavedProvider();
-  if (provider) {
+  const conn = getSavedUniversalConnection();
+  if (conn) {
     try {
       const sys = `You are TraceVault AI Diagnostic Assistant. Provide clear, in-depth technical explanations with code snippets.\nCurrent Code:\n${currentCode || 'None'}\nCurrent Detected Error:\n${currentSig || 'None'}\nCurrent Fix:\n${currentFix || 'None'}`;
       const ans = await callUniversalAI(sys, q);
