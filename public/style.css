@@ -254,8 +254,8 @@ body {
 /* Main Grid */
 .main-grid {
   display: grid;
-  grid-template-columns: 335px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 300px minmax(0, 1fr) !important;
+  gap: 12px !important;
   align-items: start;
 }
 
@@ -419,22 +419,26 @@ button {
 .table-responsive { overflow-x: auto; }
 .inventory-table { width: 100%; border-collapse: collapse; text-align: left; }
 
+.inventory-table thead th, .inventory-table tbody td {
+  padding: 7px 8px !important;
+  font-size: 12px !important;
+}
+
 .inventory-table thead th {
   background: var(--bg-subtle);
   color: var(--text-secondary);
-  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  padding: 8px 12px;
   border-bottom: 1px solid var(--border);
 }
 
 .inventory-table tbody td {
-  padding: 9px 12px;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
-  font-size: 12.5px;
 }
+
+.inventory-table td:nth-child(2) { max-width: 240px; }
+.inventory-table td:nth-child(5) { max-width: 210px; }
 
 .w-id { width: 48px; }
 .t-center { text-align: center; }
