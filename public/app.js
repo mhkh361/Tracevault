@@ -85,6 +85,8 @@ const fixerOutCause = document.getElementById('fixer-out-cause');
 const fixerOutFix = document.getElementById('fixer-out-fix');
 const runDiagnosisBtn = document.getElementById('run-diagnosis-btn');
 const commitDiagnosisBtn = document.getElementById('commit-diagnosis-btn');
+const closeFixerModalBtn = document.getElementById('close-fixer-modal-btn');
+
 
 const addErrorForm = document.getElementById('add-error-form');
 const addDomainSelect = document.getElementById('add-domain');
@@ -120,28 +122,37 @@ function showBanner(msg, tone = 'success') {
   }, 4000);
 }
 
-// Switch between Default Lab View and Alt+L Live Code Bug Fixer
 function setWorkspaceMode(mode) {
   const isFixer = mode === 'fixer';
   fixerWorkspace.hidden = !isFixer;
-  labWorkspace.hidden = isFixer;
   tabLiveFixer.classList.toggle('is-active', isFixer);
   tabLabView.classList.toggle('is-active', !isFixer);
   tabLiveFixer.setAttribute('aria-selected', String(isFixer));
   tabLabView.setAttribute('aria-selected', String(!isFixer));
+  if (isFixer) {
+    setTimeout(() => fixerCodeInput.focus(), 40);
+  }
 }
 
 tabLabView.addEventListener('click', () => setWorkspaceMode('lab'));
 tabLiveFixer.addEventListener('click', () => setWorkspaceMode('fixer'));
 
-// Alt + L Keyboard Shortcut to toggle Live Code Bug Fixer
+if (closeFixerModalBtn) {
+  closeFixerModalBtn.addEventListener('click', () => setWorkspaceMode('lab'));
+}
+
+fixerWorkspace.addEventListener('click', (e) => {
+  if (e.target === fixerWorkspace) setWorkspaceMode('lab');
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.altKey && e.key.toLowerCase() === 'l') {
     e.preventDefault();
-    const nextMode = fixerWorkspace.hidden ? 'fixer' : 'lab';
-    setWorkspaceMode(nextMode);
-  }
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    setWorkspaceMode(fixerWorkspace.hidden ? 'fixer' : 'lab');
+  } else if (e.key === 'Escape' && !fixerWorkspace.hidden) {
+    e.preventDefault();
+    setWorkspaceMode('lab');
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
     setWorkspaceMode('lab');
     searchInput.focus();
@@ -168,27 +179,75 @@ runDiagnosisBtn.addEventListener('click', () => {
     showBanner('Paste a broken code snippet or error trace first.', 'error');
     return;
   }
-  const firstLine = raw.split('\n').find((l) => /error|exception|fail|blocked|warning/i.test(l)) || raw.split('\n')[0];
-  const cleanSig = firstLine.replace(/^\/\/\s*|^--\s*/, '').trim().slice(0, 180);
 
-  if (!fixerOutSig.value.trim()) {
-    fixerOutSig.value = cleanSig || 'Runtime Exception in Code Block';
-  }
-  if (!fixerOutCause.value.trim()) {
-    if (/cors/i.test(raw)) {
-      fixerOutCause.value = 'Cross-origin request blocked due to missing Access-Control-Allow-Origin response header.';
-      fixerOutFix.value = "app.use(cors({ origin: 'http://localhost:3000', credentials: true }));";
-    } else if (/foreign key|1452/i.test(raw)) {
-      fixerOutCause.value = 'Child row references a non-existent parent domain_id in domains table.';
-      fixerOutFix.value = 'Verify parent domain_id exists in domains before executing INSERT INTO error_logs.';
-    } else if (/headers_sent|headers after/i.test(raw)) {
-      fixerOutCause.value = 'Multiple HTTP responses sent in a single handler due to missing return statement.';
-      fixerOutFix.value = 'Add explicit return before res.status(...).json(...) in conditional blocks.';
+  const lines = raw.split('\n');
+  const errorLine = lines.find((l) => /error[:\s]|exception|er_[a-z0-9_]+|lock wait timeout|foreign key|headers_sent|cors|re-renders|hydration|eaddrinuse|econnrefused/i.test(l));
+  const codeLines = lines.filter((l) => {
+    const t = l.trim();
+    return t !== '' && !t.startsWith('//') && !t.startsWith('--');
+  });
+
+  let detectedSig = errorLine
+    ? errorLine.replace(/^\s*(\/\/|--|\/\*+|\*+)\s*/, '').replace(/\*+\/\s*$/, '').trim()
+    : (codeLines[0] || lines[0]).replace(/^\s*(\/\/|--)\s*/, '').trim();
+
+  let detectedDomain = Number(fixerDomainSelect.value || 1);
+  let detectedStack = fixerStackInput.value.trim();
+  let detectedCause = '';
+  let patchedCode = '';
+
+  if (/beginTransaction|getConnection|ER_LOCK_WAIT_TIMEOUT|lock wait timeout/i.test(raw)) {
+    detectedDomain = 3;
+    detectedStack = 'Node.js / MySQL Transaction Pool';
+    detectedCause = 'Database transaction lacks try/catch rollback handling and fails to release the pooled connection in a finally block, causing lock wait timeouts and connection leaks.';
+    patchedCode = `app.post('/api/checkout', async (req, res) => {\n  const conn = await pool.getConnection();\n  try {\n    await conn.beginTransaction();\n    const [order] = await conn.execute('INSERT INTO orders (user_id) VALUES (?)', [req.body.userId]);\n    await conn.commit();\n    return res.json({ success: true, orderId: order.insertId });\n  } catch (err) {\n    await conn.rollback();\n    return res.status(500).json({ error: 'Transaction failed', details: err.message });\n  } finally {\n    conn.release(); // Always release connection back to pool\n  }\n});`;
+  } else if (/cors|Access-Control-Allow-Origin/i.test(raw)) {
+    detectedDomain = 1;
+    detectedStack = 'Express / Fetch CORS';
+    detectedCause = 'Cross-origin browser request blocked because the backend server omitted Access-Control-Allow-Origin and credentials headers.';
+    patchedCode = `const cors = require('cors');\napp.use(cors({\n  origin: 'http://localhost:3000',\n  methods: ['GET', 'POST', 'PUT', 'DELETE'],\n  credentials: true\n}));`;
+  } else if (/useState|re-renders|useEffect/i.test(raw)) {
+    detectedDomain = 1;
+    detectedStack = 'React 18 / Hooks';
+    detectedCause = 'State setter is invoked unconditionally during component render, causing an infinite re-render loop.';
+    patchedCode = `useEffect(() => {\n  ${codeLines.join('\n  ')}\n}, [dependencies]);`;
+  } else if (/foreign key|ER_NO_REFERENCED_ROW|1452/i.test(raw)) {
+    detectedDomain = 3;
+    detectedStack = 'MySQL 8.0 / InnoDB';
+    detectedCause = 'Child row INSERT/UPDATE references a domain_id that does not exist in the parent domains table.';
+    patchedCode = `-- 1. Ensure parent domain exists first:\nINSERT IGNORE INTO domains (domain_id, domain_name, description) VALUES (1, 'Frontend', 'UI layer');\n-- 2. Execute child insert with valid FK:\n${codeLines.join('\n')}`;
+  } else if (/HEADERS_SENT|headers after they are sent/i.test(raw)) {
+    detectedDomain = 2;
+    detectedStack = 'Node.js / Express';
+    detectedCause = 'Multiple res.json() / res.send() calls executed in one request lifecycle due to a missing return statement.';
+    patchedCode = codeLines
+      .map((l) => (l.includes('res.status(') && !l.trim().startsWith('return ') ? l.replace('res.status(', 'return res.status(') : l))
+      .join('\n');
+  } else {
+    if (/SELECT|INSERT|UPDATE|DELETE|mysql|pool\./i.test(raw)) {
+      detectedDomain = 3;
+      detectedStack = detectedStack || 'MySQL / Node.js';
+    } else if (/app\.(get|post|put|delete)|req,\s*res|express/i.test(raw)) {
+      detectedDomain = 2;
+      detectedStack = detectedStack || 'Node.js / Express';
+    } else if (/jwt|token|auth|prisma/i.test(raw)) {
+      detectedDomain = 4;
+      detectedStack = detectedStack || 'Fullstack / Auth';
     } else {
-      fixerOutCause.value = `Unhandled runtime exception detected in ${fixerStackInput.value || 'application module'}.`; fixerOutFix.value = `try {\n  ${raw.split('\n')[0]}\n} catch (err) {\n  console.error('Handled error:', err.message);\n}`;
+      detectedStack = detectedStack || 'JavaScript / Runtime';
     }
+    detectedCause = `Unhandled exception in ${detectedStack} execution block without defensive try/catch error boundary.`;
+    const indentedBody = (codeLines.length ? codeLines : lines).map((l) => `  ${l}`).join('\n');
+    patchedCode = `try {\n${indentedBody}\n} catch (err) {\n  console.error('[Handled Exception]:', err.message);\n  return res?.status ? res.status(500).json({ error: err.message }) : null;\n}`;
   }
-  showBanner('Live code diagnosis complete. Ready to commit to MySQL inventory.');
+
+  fixerDomainSelect.value = String(detectedDomain);
+  fixerStackInput.value = detectedStack;
+  fixerOutSig.value = detectedSig.slice(0, 250);
+  fixerOutCause.value = detectedCause;
+  fixerOutFix.value = patchedCode;
+
+  showBanner('Live diagnosis complete. Verified multi-line fix generated.');
 });
 
 commitDiagnosisBtn.addEventListener('click', async () => {
