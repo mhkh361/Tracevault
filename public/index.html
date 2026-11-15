@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css?v=human_v5">
+  <link rel="stylesheet" href="./style.css?v=human_v6">
 </head>
 <body>
   <div class="layout-container">
@@ -40,6 +40,16 @@
       </div>
 
       <div class="navbar-right">
+        <button type="button" id="open-ai-chat-btn" class="nav-action-btn" title="Open AI Diagnostic Chat Popup">
+          <span class="status-dot-sm is-cyan"></span>
+          <span>AI Chat</span>
+        </button>
+
+        <button type="button" id="open-api-key-btn" class="nav-action-btn" title="Configure Universal AI API Key">
+          <span id="ai-key-dot" class="status-dot-sm"></span>
+          <span id="ai-key-status-text">API Key</span>
+        </button>
+
         <span id="db-status-badge" class="conn-indicator">
           <span class="conn-dot"></span>
           <span id="db-status-text">MySQL 3306</span>
@@ -367,6 +377,81 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=human_v5" defer></script>
+    <!-- =================================================================== -->
+  <!-- TOP POPUP 1: INTERACTIVE AI DIAGNOSTIC CHAT MODAL                   -->
+  <!-- =================================================================== -->
+  <dialog id="ai-chat-modal" class="clean-modal chat-popup-modal">
+    <div class="modal-top">
+      <div class="chat-modal-title-wrap">
+        <span class="live-pulse-dot"></span>
+        <h2>TraceVault AI Diagnostic Chat</h2>
+        <code id="chat-provider-badge" class="metric-fn">Auto-Router</code>
+      </div>
+      <div class="chat-top-actions">
+        <button type="button" id="chat-clear-btn" class="btn-secondary btn-xs">Clear Chat</button>
+        <button type="button" id="chat-close-btn" class="btn-close-popup btn-xs">✕ Close</button>
+      </div>
+    </div>
+
+    <div class="chat-context-bar">
+      <span class="context-label">Active Context:</span>
+      <span id="chat-context-text" class="context-val">General Project &amp; Code Debugging Assistant (Select any row's "Ask AI" to bind specific bug)</span>
+      <button type="button" id="chat-unbind-btn" class="btn-secondary btn-xs" hidden>Unbind</button>
+    </div>
+
+    <div class="chat-quick-prompts">
+      <button type="button" class="chip-btn chat-prompt-chip" data-prompt="Explain the root cause of this error in simple terms and how it affects the database/application.">Explain Root Cause</button>
+      <button type="button" class="chip-btn chat-prompt-chip" data-prompt="Write the complete, production-ready fixed code for this issue with comments.">Generate Complete Fix</button>
+      <button type="button" class="chip-btn chat-prompt-chip" data-prompt="How can we prevent this bug from happening again in future deployments?">Prevention Checklist</button>
+      <button type="button" class="chip-btn chat-prompt-chip" data-prompt="Write a quick test case to verify that this bug is completely resolved.">Verification Test</button>
+    </div>
+
+    <div id="chat-messages" class="chat-messages-box">
+      <div class="chat-bubble is-ai">
+        <div class="bubble-role">TraceVault AI</div>
+        <div class="bubble-content">Connected and ready. Ask any question about your code, stack traces, SQL queries, or click <strong>Ask AI</strong> on any table record to debug it interactively.</div>
+      </div>
+    </div>
+
+    <form id="chat-form" class="chat-input-row" novalidate>
+      <textarea id="chat-input" rows="2" spellcheck="false" placeholder="Ask AI anything about a bug, paste broken code, or request a fix... (Enter to send, Shift+Enter for newline)"></textarea>
+      <button type="submit" id="chat-send-btn" class="btn-primary">Send</button>
+    </form>
+  </dialog>
+
+  <!-- =================================================================== -->
+  <!-- TOP POPUP 2: UNIVERSAL API KEY AUTO-ROUTER MODAL                    -->
+  <!-- =================================================================== -->
+  <dialog id="api-key-modal" class="clean-modal">
+    <div class="modal-top">
+      <h2>Universal AI API Key Configuration</h2>
+      <code id="detected-provider-pill" class="metric-fn">Auto-Detect</code>
+    </div>
+
+    <p class="modal-body-text">
+      Paste any API key below. TraceVault automatically detects the provider from the key prefix (<strong>Groq</strong> <code>gsk_...</code>, <strong>Google Gemini</strong> <code>AIza...</code>, <strong>OpenRouter</strong> <code>sk-or-...</code>, or <strong>OpenAI</strong> <code>sk-...</code>) and stores it exclusively in your browser's <code>localStorage</code>.
+    </p>
+
+    <form id="api-key-form" novalidate>
+      <div class="field-block">
+        <label for="api-key-input">Universal API Key *</label>
+        <input type="password" id="api-key-input" spellcheck="false" autocomplete="off" placeholder="Paste gsk_..., AIza..., sk-or-..., or sk-... key here">
+      </div>
+
+      <div id="api-key-feedback" class="key-feedback-box">
+        Status: Using built-in local diagnostic engine (Add an API key for live LLM intelligence).
+      </div>
+
+      <div class="modal-foot split-footer">
+        <button type="button" id="remove-api-key-btn" class="btn-danger">Remove Key</button>
+        <div class="row-actions">
+          <button type="button" id="close-api-key-btn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Save &amp; Connect Key</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js?v=human_v6" defer></script>
 </body>
 </html>
