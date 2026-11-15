@@ -9,8 +9,15 @@ node_modules/
 # Personal Local Vault Data
 data/real-vault.json
 
-# Internal Documentation & IDE Config
-LAB_REPORT.md
+# Internal Academic Documentation & Builds
+LAB_REPORT.*
+screenshots/*.png
+report-template.html
+compile-pdf.js
+capture-screenshots.js
+test.png
+
+# IDE Config
 .vscode/
 
 # Logs & OS files

@@ -1,314 +1,54 @@
--- =====================================================================
--- TraceVault - Self-Learning AI Debug Bot & Error Knowledge Base
--- DBMS Lab Final Project Database Specification & Seed Script
--- Target Engine: MySQL 8.0+ / MariaDB 10.5+
--- Architecture: 3NF Relational Schema with Dual Workspace Separation
--- =====================================================================
-
--- 1. Database Creation (Idempotent)
-CREATE DATABASE IF NOT EXISTS tracevault 
-  CHARACTER SET utf8mb4 
+CREATE DATABASE IF NOT EXISTS tracevault
+  CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
 USE tracevault;
 
--- Clean slate: drop objects in dependency order
-DROP TRIGGER IF EXISTS trg_error_logs_before_update;
-DROP PROCEDURE IF EXISTS sp_increment_error_hit;
-DROP VIEW IF EXISTS v_domain_summary;
+SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS error_logs;
 DROP TABLE IF EXISTS domains;
+SET FOREIGN_KEY_CHECKS = 1;
 
--- =====================================================================
--- 2. Schema Definition (Third Normal Form - 3NF)
--- =====================================================================
-
--- Parent Table: domains
--- Enforces 1NF (atomic attributes), 2NF (single-attribute primary key), 
--- and 3NF (no transitive dependencies).
-CREATE TABLE domains (
+CREATE TABLE IF NOT EXISTS domains (
   domain_id INT AUTO_INCREMENT PRIMARY KEY,
-  domain_name VARCHAR(30) NOT NULL UNIQUE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  domain_name VARCHAR(50) NOT NULL UNIQUE,
+  description VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
--- Child Table: error_logs
--- Stores deduplicated error signatures with foreign key to domains.
--- Includes is_demo flag to strictly isolate Real Workspace (0) from Lab Demo Sandbox (1).
-CREATE TABLE error_logs (
+CREATE TABLE IF NOT EXISTS error_logs (
   error_id INT AUTO_INCREMENT PRIMARY KEY,
   domain_id INT NOT NULL,
-  tech_stack VARCHAR(50) NOT NULL,
+  tech_stack VARCHAR(100) NOT NULL,
   error_signature VARCHAR(255) NOT NULL,
   signature_hash CHAR(64) NOT NULL UNIQUE,
-  root_cause VARCHAR(255) DEFAULT NULL,
+  root_cause TEXT NOT NULL,
   fix_requirements TEXT NOT NULL,
-  source ENUM('ai', 'manual', 'edited') NOT NULL DEFAULT 'manual',
-  is_verified TINYINT(1) NOT NULL DEFAULT 0,
   times_hit INT NOT NULL DEFAULT 1 CHECK (times_hit >= 1),
-  is_demo TINYINT(1) NOT NULL DEFAULT 0,
+  is_verified TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_error_domain FOREIGN KEY (domain_id) 
-    REFERENCES domains(domain_id) 
-    ON UPDATE CASCADE 
+  CONSTRAINT fk_error_domain
+    FOREIGN KEY (domain_id) REFERENCES domains (domain_id)
+    ON UPDATE CASCADE
     ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB;
 
--- Performance & Query Optimization Indexes
-CREATE INDEX idx_domain_id ON error_logs (domain_id);
-CREATE INDEX idx_tech_stack ON error_logs (tech_stack);
-CREATE INDEX idx_error_signature ON error_logs (error_signature);
-CREATE INDEX idx_times_hit ON error_logs (times_hit);
-CREATE INDEX idx_is_demo ON error_logs (is_demo);
-CREATE INDEX idx_updated_at ON error_logs (updated_at);
+INSERT INTO domains (domain_id, domain_name, description) VALUES
+(1, 'Frontend', 'Client-side rendering, DOM state, React hooks, and browser CORS policies'),
+(2, 'Backend', 'Node.js runtime, Express middleware, async lifecycle, and API routing'),
+(3, 'Database', 'MySQL relational schema, foreign key constraints, indexing, and deadlocks'),
+(4, 'Fullstack', 'End-to-end authentication, JWT session tokens, and deployment pipelines');
 
--- =====================================================================
--- 3. Advanced Relational Objects
--- =====================================================================
-
--- 3.1 Trigger: Automatically update updated_at timestamp on record updates
-DELIMITER //
-CREATE TRIGGER trg_error_logs_before_update
-BEFORE UPDATE ON error_logs
-FOR EACH ROW
-BEGIN
-  SET NEW.updated_at = CURRENT_TIMESTAMP;
-END //
-DELIMITER ;
-
--- 3.2 Stored Procedure: Atomic hit counter increment
-DELIMITER //
-CREATE PROCEDURE sp_increment_error_hit (
-  IN p_error_id INT
-)
-BEGIN
-  UPDATE error_logs 
-  SET times_hit = times_hit + 1 
-  WHERE error_id = p_error_id;
-END //
-DELIMITER ;
-
--- 3.3 Analytical View: Domain Summary Aggregation
-CREATE VIEW v_domain_summary AS
-SELECT
-  d.domain_id,
-  d.domain_name,
-  COUNT(e.error_id) AS total_errors,
-  COALESCE(SUM(e.times_hit), 0) AS total_hits,
-  ROUND(COALESCE(AVG(e.times_hit), 0), 1) AS avg_hits,
-  COALESCE(MAX(e.times_hit), 0) AS max_hits,
-  COALESCE(MIN(e.times_hit), 0) AS min_hits
-FROM domains d
-LEFT JOIN error_logs e ON d.domain_id = e.domain_id
-GROUP BY d.domain_id, d.domain_name;
-
--- =====================================================================
--- 4. Seed Data (16 Total Relational Records)
--- =====================================================================
-
--- 4.1 Seed Domains (4 Rows)
-INSERT INTO domains (domain_id, domain_name) VALUES
-(1, 'Frontend'),
-(2, 'Backend'),
-(3, 'Database'),
-(4, 'Fullstack');
-
--- 4.2 Seed Error Logs (12 Rows across 4 domains)
--- NOTE: All seed records are flagged with is_demo = 1 for the University Lab Sandbox.
--- The Real Developer Workspace (is_demo = 0) starts strictly clean at 0 records.
-INSERT INTO error_logs (
-  domain_id, tech_stack, error_signature, signature_hash, 
-  root_cause, fix_requirements, source, is_verified, times_hit, is_demo
-) VALUES
--- --- Frontend Domain ---
-(
-  1, 
-  'React', 
-  'Cannot read properties of undefined (reading \'map\')',
-  '54bd8abe41415e13fb4a68ad28bc1345bec1e3ec62c00c7f27623df9b040b2cd',
-  'State array initialized as undefined prior to async fetch completion.',
-  '1. Initialize state with empty array: const [items, setItems] = useState([]);\n2. Use optional chaining and fallback: (items || []).map(...)\n3. Add conditional loading spinner before rendering list.',
-  'ai', 
-  1, 
-  9,
-  1
-),
-(
-  1, 
-  'JavaScript', 
-  'Uncaught TypeError: Assignment to constant variable.',
-  'f12bd80a8b3ed1876012fe73b42438c17f9946f45ff31098db86fd71aa2a8cf8',
-  'Attempting to reassign a variable declared with the const keyword.',
-  '1. Declare the identifier with let instead of const if value must change.\n2. If operating on an object/array, mutate properties rather than reassigning the identifier binding.',
-  'manual', 
-  1, 
-  4,
-  1
-),
-(
-  1, 
-  'CSS / Webpack', 
-  'ChunkLoadError: Loading chunk failed',
-  '47382b5fb6c9d4aca7fdc0d4dc4cd55422cdaaac2f44036b4bc3c33fe2f019d0',
-  'Dynamic bundle chunk missing or network cache mismatch following recent build deployment.',
-  '1. Catch dynamic import error and invoke window.location.reload(true) once.\n2. Configure output.publicPath and disable aggressive browser caching on index.html.',
-  'manual', 
-  0, 
-  3,
-  1
-),
-
--- --- Backend Domain ---
-(
-  2, 
-  'Node.js', 
-  'Error: listen EADDRINUSE: address already in use :::3000',
-  '866d0cb159d48348e57bea3402d4f1ccf8382242b55ffcc6a9684e96a0e9177e',
-  'Another background instance or node process is actively bound to port 3000.',
-  '1. Identify and terminate the occupying PID: npx kill-port 3000\n2. Configure dynamic fallback: const PORT = process.env.PORT || 3001;\n3. Gracefully close server on SIGINT / SIGTERM signals.',
-  'manual', 
-  1, 
-  12,
-  1
-),
-(
-  2, 
-  'Express', 
-  'Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client',
-  'ea8f8511ed638ac5d9b727a6b5455a7116ae70f2c32e15bde8e69532ebcdc159',
-  'Attempting multiple res.json() or res.send() calls in a single execution branch without returning.',
-  '1. Always return immediately on sending response: return res.status(400).json(...);\n2. Verify async middleware next() is not called after sending headers.',
-  'ai', 
-  1, 
-  7,
-  1
-),
-(
-  2, 
-  'Python / Flask', 
-  'ModuleNotFoundError: No module named \'jwt\'',
-  'd5a3f7aebe65bf884a0c8ec65e6b9fbd519bafe403308b0f9d9bc2caa642a1e1',
-  'PyJWT or dependencies not installed in the currently active virtual environment.',
-  '1. Activate corresponding venv (.venv/Scripts/activate).\n2. Install required library: pip install PyJWT cryptography\n3. Freeze dependencies to requirements.txt.',
-  'manual', 
-  0, 
-  2,
-  1
-),
-
--- --- Database Domain ---
-(
-  3, 
-  'MySQL', 
-  'Error 1452: Cannot add or update a child row: a foreign key constraint fails',
-  '22009c398b1e1a69918ffea4d521f507967ac86dbce287384b2b8fc869c4c13c',
-  'Attempting to insert a foreign key reference that does not exist in the referenced parent table.',
-  '1. Ensure parent record exists in referenced table before inserting child row.\n2. Check datatype and sign consistency between FK and PK columns (e.g. INT vs INT UNSIGNED).',
-  'manual', 
-  1, 
-  8,
-  1
-),
-(
-  3, 
-  'MySQL Pool', 
-  'Error: Connection lost: The server closed the connection (PROTOCOL_CONNECTION_LOST)',
-  '92e73db0db3b5a98a9a05578c438e47efe358e0780d46b79a5d9e25d537186bd',
-  'Idle timeout exceeded on TCP socket or MySQL wait_timeout dropped connection.',
-  '1. Use mysql2 pool with enableKeepAlive: true and keepAliveInitialDelay: 10000.\n2. Handle connection error events and implement exponential backoff reconnection.',
-  'ai', 
-  1, 
-  5,
-  1
-),
-(
-  3, 
-  'MongoDB', 
-  'MongooseServerSelectionError: Server selection timed out after 30000 ms',
-  '8b301c80854f6ee462c3a7398b93188e6aa44167cde17e079890495872c4b2f0',
-  'Cluster IP access list blocks client IP, or cluster primary is unreachable.',
-  '1. Whitelist current public IP (or 0.0.0.0/0 for testing) in MongoDB Atlas Network Access.\n2. Verify cluster URI connection string and credentials in .env.',
-  'manual', 
-  0, 
-  3,
-  1
-),
-
--- --- Fullstack Domain ---
-(
-  4, 
-  'Web API / CORS', 
-  'Access to fetch at origin has been blocked by CORS policy: No \'Access-Control-Allow-Origin\' header',
-  '5a58e7bd0031b6b11266738cbb39c02b844053014ec9b0d999576487e6e570f9',
-  'Backend server lacks appropriate Cross-Origin Resource Sharing response headers.',
-  '1. Install cors package: npm install cors\n2. Add middleware before routes: app.use(cors({ origin: \'http://localhost:3000\', credentials: true }));\n3. Handle preflight OPTIONS requests.',
-  'manual', 
-  1, 
-  15,
-  1
-),
-(
-  4, 
-  'Auth / JWT', 
-  'JsonWebTokenError: invalid signature',
-  '7a8ea0f68c7e53043c0a74f4e5182e9d5fca19f852091e2fff4203c202e9f6da',
-  'JWT signed with a different secret key than the verification algorithm expects, or secret is undefined.',
-  '1. Verify JWT_SECRET is loaded from process.env before jwt.verify() is executed.\n2. Ensure symmetric algorithm (HS256) is consistently specified on sign and verify.',
-  'ai', 
-  1, 
-  6,
-  1
-),
-(
-  4, 
-  'Next.js', 
-  'Error: Text content does not match server-rendered HTML (Hydration failed)',
-  '85f20b52798fd4409df87a88816ac12cee783c108d4fc04bea84394121f9dcae',
-  'Component rendered different HTML output on server vs client (e.g. typeof window or Date.now()).',
-  '1. Defer client-only rendering using useEffect or dynamic import with ssr: false.\n2. Avoid browser-only APIs (localStorage, navigator) during initial component render.',
-  'ai', 
-  1, 
-  11,
-  1
-);
-
--- =====================================================================
--- 5. Verification & Demonstration Queries (Lab Evaluation)
--- =====================================================================
-
--- Query 1: Display Lab Demo sandbox records (is_demo = 1)
-SELECT 
-  e.error_id,
-  d.domain_name,
-  e.tech_stack,
-  e.error_signature,
-  e.times_hit,
-  e.source,
-  e.is_verified,
-  e.is_demo,
-  e.updated_at
-FROM error_logs e
-INNER JOIN domains d ON e.domain_id = d.domain_id
-WHERE e.is_demo = 1
-ORDER BY e.times_hit DESC;
-
--- Query 2: Aggregate statistics for Lab Demo records
-SELECT 
-  COUNT(*) AS total_errors,
-  SUM(times_hit) AS total_hits,
-  ROUND(AVG(times_hit), 1) AS avg_hits,
-  MAX(times_hit) AS max_hits,
-  MIN(times_hit) AS min_hits
-FROM error_logs
-WHERE is_demo = 1;
-
--- Query 3: Query analytical domain summary view
-SELECT * FROM v_domain_summary ORDER BY domain_id;
-
--- Query 4: Test Stored Procedure hit counter increment on error_id = 1
-CALL sp_increment_error_hit(1);
-
--- Verify hit counter incremented
-SELECT error_id, error_signature, times_hit, updated_at 
-FROM error_logs 
-WHERE error_id = 1;
+INSERT INTO error_logs (error_id, domain_id, tech_stack, error_signature, signature_hash, root_cause, fix_requirements, times_hit, is_verified) VALUES
+(1, 1, 'Fetch API / CORS', 'Access to fetch at origin has been blocked by CORS policy', SHA2(LOWER('Access to fetch at origin has been blocked by CORS policy'), 256), 'Express backend response is missing Access-Control-Allow-Origin headers for cross-origin browser requests.', 'Configure cors() middleware in server.js with explicit origin and credentials support.', 15, 1),
+(2, 1, 'React 18 / Hooks', 'Too many re-renders. React limits the number of renders to prevent an infinite loop', SHA2(LOWER('Too many re-renders. React limits the number of renders to prevent an infinite loop'), 256), 'State setter function is invoked directly inside the component render body instead of an event handler or useEffect.', 'Wrap the state update call inside an arrow function onClick={() => setCount(c + 1)} or useEffect hook with a dependency array.', 9, 1),
+(3, 1, 'Next.js 14 / SSR', 'Hydration failed because the initial UI does not match what was rendered on the server', SHA2(LOWER('Hydration failed because the initial UI does not match what was rendered on the server'), 256), 'Non-deterministic values like Date.now(), Math.random(), or browser-only window objects were used during initial SSR render.', 'Defer browser-specific rendering to a client-side useEffect hook after component mount.', 7, 1),
+(4, 2, 'Node.js / Express', 'Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client', SHA2(LOWER('Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client'), 256), 'Multiple res.json() or res.send() calls executed in the same route handler because a return statement was omitted.', 'Add an explicit return statement before every res.status().json() call inside conditional branches.', 12, 1),
+(5, 2, 'Node.js / TCP', 'Error: listen EADDRINUSE: address already in use :::3000', SHA2(LOWER('Error: listen EADDRINUSE: address already in use :::3000'), 256), 'Another Node.js process is already bound to TCP port 3000 from a previous unclosed terminal session.', 'Terminate the orphaned process using taskkill /F /IM node.exe or configure a fallback port in environment variables.', 6, 1),
+(6, 2, 'Express / JSON', 'SyntaxError: Unexpected token in JSON at position 0 in body-parser', SHA2(LOWER('SyntaxError: Unexpected token in JSON at position 0 in body-parser'), 256), 'Client sent a malformed JSON payload or unquoted string with Content-Type: application/json header.', 'Validate JSON payload structure on the client before fetch() and add an Express JSON syntax error middleware.', 5, 1),
+(7, 3, 'MySQL 8.0 / InnoDB', 'ER_NO_REFERENCED_ROW_2: Cannot add or update a child row: a foreign key constraint fails', SHA2(LOWER('ER_NO_REFERENCED_ROW_2: Cannot add or update a child row: a foreign key constraint fails'), 256), 'Attempted to insert an error_logs record with a domain_id that does not exist in the parent domains table.', 'Verify that domain_id exists in the domains table before executing INSERT INTO error_logs.', 11, 1),
+(8, 3, 'MySQL 8.0 / SQL', 'ER_DUP_ENTRY: Duplicate entry for key error_logs.signature_hash', SHA2(LOWER('ER_DUP_ENTRY: Duplicate entry for key error_logs.signature_hash'), 256), 'Submitted an error_signature whose SHA-256 hash already exists in the error_logs table.', 'Use INSERT INTO ... ON DUPLICATE KEY UPDATE times_hit = times_hit + 1 to increment existing occurrence counts.', 4, 1),
+(9, 3, 'mysql2 / Pool', 'Error: connect ECONNREFUSED 127.0.0.1:3306', SHA2(LOWER('Error: connect ECONNREFUSED 127.0.0.1:3306'), 256), 'Local MySQL / MariaDB service on port 3306 is stopped or blocked by firewall rules.', 'Start the MySQL daemon on port 3306 and verify connection credentials in dbConfig.', 4, 1),
+(10, 4, 'JWT / Auth', 'JsonWebTokenError: invalid signature on protected API route', SHA2(LOWER('JsonWebTokenError: invalid signature on protected API route'), 256), 'JWT token was signed with a different secret key than the JWT_SECRET used by the verification middleware.', 'Synchronize JWT_SECRET across token generation and verification modules.', 8, 1),
+(11, 4, 'Prisma / Env', 'Error: Environment variable not found: DATABASE_URL', SHA2(LOWER('Error: Environment variable not found: DATABASE_URL'), 256), 'Application started without loading .env configuration or missing DATABASE_URL in deployment environment.', 'Configure dotenv.config() at the top of server.js and provide sensible localhost fallback defaults.', 2, 1),
+(12, 4, 'WebSockets / TLS', 'Mixed Content: The page at HTTPS was loaded over HTTPS, but requested an insecure ws:// endpoint', SHA2(LOWER('Mixed Content: The page at HTTPS was loaded over HTTPS, but requested an insecure ws:// endpoint'), 256), 'Hardcoded insecure ws:// or http:// protocol used inside an HTTPS production origin.', 'Use protocol-relative URLs or upgrade connections to wss:// and https:// when window.location.protocol is https:.', 2, 1);

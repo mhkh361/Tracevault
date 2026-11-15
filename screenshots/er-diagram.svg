@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" width="880" height="340">
+  <rect width="880" height="340" fill="#ffffff" rx="8"/>
+
+  <!-- Left Entity: DOMAINS -->
+  <rect x="30" y="65" width="290" height="175" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <path d="M30 73 a8 8 0 0 1 8 -8 h274 a8 8 0 0 1 8 8 v32 h-290 z" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+  <text x="175" y="88" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">DOMAINS</text>
+
+  <text x="48" y="132" font-family="Consolas, monospace" font-size="13" fill="#0f172a"><tspan font-weight="700" fill="#0f766e">PK</tspan>  domain_id INT</text>
+  <text x="48" y="160" font-family="Consolas, monospace" font-size="13" fill="#0f172a"><tspan font-weight="700" fill="#0284c7">UK</tspan>  domain_name VARCHAR(50)</text>
+  <text x="48" y="188" font-family="Consolas, monospace" font-size="13" fill="#334155">    description VARCHAR(255)</text>
+  <text x="48" y="216" font-family="Consolas, monospace" font-size="13" fill="#64748b">    created_at TIMESTAMP</text>
+
+  <!-- Relationship Line: 1 : N (categorizes) -->
+  <line x1="320" y1="152" x2="530" y2="152" stroke="#1e293b" stroke-width="2.5"/>
+  <!-- 1 tick mark -->
+  <line x1="342" y1="138" x2="342" y2="166" stroke="#1e293b" stroke-width="2.5"/>
+  <!-- N crow's foot -->
+  <line x1="506" y1="152" x2="530" y2="136" stroke="#1e293b" stroke-width="2.5"/>
+  <line x1="506" y1="152" x2="530" y2="168" stroke="#1e293b" stroke-width="2.5"/>
+  <text x="425" y="140" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">1 : N (categorizes)</text>
+
+  <!-- Right Entity: ERROR_LOGS -->
+  <rect x="530" y="20" width="320" height="300" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <path d="M530 28 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v32 h-320 z" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+  <text x="690" y="43" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#0f172a" text-anchor="middle">ERROR_LOGS</text>
+
+  <text x="548" y="84" font-family="Consolas, monospace" font-size="13" fill="#0f172a"><tspan font-weight="700" fill="#0f766e">PK</tspan>  error_id INT</text>
+  <text x="548" y="109" font-family="Consolas, monospace" font-size="13" fill="#0f172a"><tspan font-weight="700" fill="#e11d48">FK</tspan>  domain_id INT</text>
+  <text x="548" y="134" font-family="Consolas, monospace" font-size="13" fill="#334155">    tech_stack VARCHAR(100)</text>
+  <text x="548" y="159" font-family="Consolas, monospace" font-size="13" fill="#334155">    error_signature VARCHAR(255)</text>
+  <text x="548" y="184" font-family="Consolas, monospace" font-size="13" fill="#0284c7"><tspan font-weight="700">UK</tspan>  signature_hash CHAR(64)</text>
+  <text x="548" y="209" font-family="Consolas, monospace" font-size="13" fill="#334155">    root_cause TEXT</text>
+  <text x="548" y="234" font-family="Consolas, monospace" font-size="13" fill="#334155">    fix_requirements TEXT</text>
+  <text x="548" y="259" font-family="Consolas, monospace" font-size="13" fill="#334155">    times_hit INT</text>
+  <text x="548" y="284" font-family="Consolas, monospace" font-size="13" fill="#334155">    is_verified TINYINT(1)</text>
+  <text x="548" y="306" font-family="Consolas, monospace" font-size="13" fill="#64748b">    created_at TIMESTAMP</text>
+</svg>
