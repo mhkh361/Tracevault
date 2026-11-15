@@ -705,3 +705,50 @@ button {
 }
 
 .split-foot { justify-content: space-between; }
+
+/* Force Dark Matte Carbon Theme on All Native <dialog> Modals (Fix White Popup Bug) */
+dialog,
+dialog.clean-modal,
+#api-key-modal,
+#edit-dialog,
+#delete-dialog {
+  color-scheme: dark !important;
+  background: #111317 !important;
+  background-color: #111317 !important;
+  color: #e6edf3 !important;
+  border: 1px solid #30363d !important;
+  border-radius: 10px !important;
+  padding: 20px 22px !important;
+  width: min(520px, 94vw) !important;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.9) !important;
+}
+
+dialog::backdrop {
+  background: rgba(4, 6, 10, 0.82) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+dialog input,
+dialog select,
+dialog textarea {
+  background: #0b0d12 !important;
+  color: #e6edf3 !important;
+  border: 1px solid #262b35 !important;
+}
+
+dialog input:focus,
+dialog select:focus,
+dialog textarea:focus {
+  border-color: #388bfd !important;
+}
+
+.key-status-box {
+  background: #0b0d12 !important;
+  color: #8b949e !important;
+  border: 1px solid #23262e !important;
+  padding: 9px 12px !important;
+  border-radius: 6px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11.5px !important;
+  margin-top: 10px !important;
+}
